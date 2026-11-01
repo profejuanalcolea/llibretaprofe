@@ -233,6 +233,10 @@ body.mob main{padding:10px 10px 30px}body.mob #banOff{top:auto}
 .mbnav{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.mbnav select{font:inherit;padding:6px;margin-left:auto}
 body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{grid-template-columns:1fr 1fr}
 #btnMob{display:none}@media(max-width:700px){#btnMob{display:inline-block}}body.mob #btnMob{display:none!important}
+#credAmmo{display:flex;justify-content:center;height:80px}#credAmmo svg{transform-origin:50% 55%}
+#credAmmo.anim svg{animation:aGira .8s ease-in-out}#credAmmo.anim .eye{animation:aUll .5s .95s}#credAmmo.anim .lid{animation:aPar .5s .95s}
+@keyframes aGira{from{transform:rotate(0)}to{transform:rotate(360deg)}}@keyframes aUll{0%,100%{opacity:1}15%,85%{opacity:0}}@keyframes aPar{0%,100%{opacity:0}15%,85%{opacity:1}}
+@media(prefers-reduced-motion:reduce){#credAmmo.anim svg,#credAmmo.anim .eye,#credAmmo.anim .lid{animation:none}}
 .tilew{position:relative}.tilew .acc{position:absolute;top:4px;right:4px;display:none;gap:2px}.tilew:hover .acc{display:flex}
 .tilew .acc button{border:0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;padding:1px 5px}.tilew .acc button:disabled{opacity:.3}
 .posit .vtxt{color:#b00020;font-weight:800;font-size:12px}
@@ -352,6 +356,9 @@ details.bcfg{border-top:1px solid var(--linia);padding:4px 0}
 #login .btn{background:#fff;color:#111;font-size:17px;padding:12px 22px}
 #login .btn:hover{background:var(--tar)}
 #login a{color:#bbb;font-size:14px;cursor:pointer}
+#lgAmmo{width:96px;height:96px;border-radius:50%;background:#FFE8D8;display:flex;align-items:center;justify-content:center;margin-bottom:-4px}#lgAmmo svg{margin-left:6px}body.mob #lgLocal{display:none}#lgAmmo.anim .eye{animation:aUll .5s .7s}#lgAmmo.anim .lid{animation:aPar .5s .7s}
+@media(prefers-reduced-motion:reduce){#lgAmmo.anim .eye,#lgAmmo.anim .lid{animation:none}}
+body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340px;font-size:18px;padding:15px}
 </style>
 </head>
 <body>
@@ -405,6 +412,23 @@ details.bcfg{border-top:1px solid var(--linia);padding:4px 0}
 </div>
 
 <div id="login">
+  <div id="lgAmmo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="70" height="67" aria-hidden="true"><g class="jump"><g class="bob">
+ <g class="body">
+  <path class="tent" d="M60 72 q8 -2 14 -8" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="tent" d="M61 78 q9 0 16 -2" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="tent" d="M60 84 q8 3 14 6" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <ellipse cx="54" cy="78" rx="10" ry="11" fill="#141414"/>
+  <g class="eye"><circle cx="56" cy="74" r="4.4" fill="#fff"/><circle cx="57.2" cy="74" r="2.2" fill="#141414"/></g>
+  <path class="lid" d="M52 74.5 q4 -4.5 8 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity="0"/>
+  <path class="spark" d="M66 62 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" fill="#FF6A13" stroke="#141414" stroke-width="1" opacity="0"/>
+ </g>
+ <g class="shellg">
+  <path d="M48 68.2 L49.4 68.3 L50.9 68.3 L52.3 68.2 L53.7 68 L55.2 67.7 L56.6 67.3 L58 66.8 L59.4 66.2 L60.7 65.5 L62 64.7 L63.3 63.8 L64.4 62.8 L65.6 61.7 L66.6 60.6 L67.6 59.3 L68.5 58 L69.3 56.6 L70 55.2 L70.7 53.7 L71.2 52.1 L71.6 50.5 L71.9 48.8 L72.1 47.2 L72.1 45.5 L72.1 43.8 L71.9 42 L71.6 40.3 L71.2 38.6 L70.7 36.9 L70 35.3 L69.2 33.7 L68.3 32.1 L67.3 30.6 L66.2 29.1 L65 27.8 L63.7 26.5 L62.2 25.2 L60.7 24.1 L59.1 23.1 L57.4 22.2 L55.6 21.4 L53.8 20.7 L51.9 20.2 L50 19.7 L48 19.5 L46 19.3 L44 19.3 L41.9 19.4 L39.9 19.7 L37.9 20.1 L35.8 20.7 L33.9 21.4 L31.9 22.3 L30 23.3 L28.2 24.4 L26.4 25.7 L24.7 27.1 L23.1 28.6 L21.6 30.2 L20.3 32 L19 33.8 L17.8 35.8 L16.8 37.9 L15.9 40 L15.2 42.2 L14.6 44.5 L14.2 46.8 L13.9 49.2 L13.9 51.6 L13.9 54 L14.2 56.4 L14.6 58.9 L15.2 61.3 L15.9 63.6 L16.9 66 L18 68.3 L19.2 70.5 L20.7 72.6 L22.2 74.7 L24 76.6 L25.9 78.5 L27.9 80.2 L30 81.8 L32.3 83.2 L34.7 84.5 L37.2 85.6 L39.8 86.6 L42.5 87.4 L45.2 88 L48 88.4Z" fill="#FF6A13"/>
+  <path d="M49.6 53 L51.2 57.9 M50.8 52.6 L53.6 57.1 M51.9 51.9 L55.9 55.7 M52.9 50.9 L57.7 53.8 M53.6 49.7 L59.1 51.4 M54 48.3 L59.9 48.7 M54 46.9 L60 45.8 M53.7 45.4 L59.5 42.8 M53.1 44 L58.2 40 M52.1 42.8 L56.2 37.6 M50.8 41.8 L53.6 35.6 M49.3 41.1 L50.6 34.3 M47.6 40.8 L47.2 33.7 M45.9 40.9 L43.7 33.9 M44.2 41.5 L40.3 35 M42.6 42.4 L37.2 36.9 M41.2 43.8 L34.5 39.5 M40.2 45.4 L32.4 42.9 M39.6 47.3 L31.2 46.7 M39.5 49.4 L30.9 50.8 M39.8 51.5 L31.7 54.9 M40.7 53.5 L33.4 58.9 M42.1 55.2 L36.1 62.4 M43.8 56.7 L39.7 65.3 M46 57.6 L43.9 67.3 M48.3 58.1 L48.6 68.2 M50.8 58 L53.6 68 M53.2 57.3 L58.4 66.6 M55.5 56 L63 64 M57.4 54.2 L66.8 60.3 M58.9 51.9 L69.8 55.7 M59.8 49.2 L71.6 50.4 M60.1 46.3 L72.1 44.6 M59.6 43.4 L71.2 38.7 M58.5 40.5 L68.9 33.1 M56.6 38 L65.2 28 M54.1 35.9 L60.3 23.8 M51.2 34.5 L54.4 20.9 M47.9 33.7 L47.7 19.4 M44.4 33.8 L40.8 19.6 M40.9 34.7 L33.8 21.4 M37.7 36.5 L27.4 24.9 M34.9 39 L21.8 30 M32.7 42.2 L17.5 36.5 M31.4 46 L14.8 43.9 M30.9 50 L13.9 52.1 M31.5 54.2 L14.9 60.4 M33 58.2 L18 68.4 M35.6 61.8 L23.1 75.7 M39 64.8 L29.9 81.7 M43.1 67 L38.2 86" stroke="#141414" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
+  <path d="M43.8 48 L43.7 48.4 L43.7 48.8 L43.8 49.2 L43.9 49.6 L44 50 L44.2 50.4 L44.4 50.8 L44.6 51.1 L44.9 51.4 L45.2 51.8 L45.5 52 L45.9 52.3 L46.3 52.5 L46.7 52.7 L47.1 52.9 L47.6 53 L48 53 L48.5 53.1 L49 53.1 L49.5 53 L49.9 52.9 L50.4 52.7 L50.9 52.5 L51.3 52.3 L51.7 52 L52.1 51.7 L52.5 51.3 L52.8 50.9 L53.1 50.5 L53.4 50 L53.6 49.5 L53.8 49 L53.9 48.5 L54 47.9 L54 47.4 L54 46.8 L53.9 46.2 L53.8 45.6 L53.6 45.1 L53.4 44.5 L53.1 44 L52.7 43.5 L52.4 43.1 L51.9 42.6 L51.4 42.2 L50.9 41.9 L50.4 41.6 L49.8 41.3 L49.1 41.1 L48.5 40.9 L47.8 40.8 L47.2 40.8 L46.5 40.9 L45.8 41 L45.1 41.1 L44.5 41.3 L43.8 41.6 L43.2 42 L42.6 42.4 L42.1 42.9 L41.6 43.4 L41.1 44 L40.7 44.6 L40.3 45.3 L40 46 L39.8 46.7 L39.6 47.5 L39.5 48.2 L39.5 49 L39.5 49.8 L39.6 50.7 L39.8 51.5 L40.1 52.2 L40.5 53 L40.9 53.7 L41.4 54.4 L41.9 55.1 L42.6 55.7 L43.3 56.3 L44 56.8 L44.8 57.2 L45.6 57.5 L46.5 57.8 L47.4 58 L48.4 58.1 L49.3 58.2 L50.3 58.1 L51.2 57.9 L52.2 57.7 L53.1 57.4 L54 56.9 L54.9 56.4 L55.7 55.8 L56.5 55.2 L57.2 54.4 L57.9 53.6 L58.5 52.7 L59 51.7 L59.4 50.7 L59.7 49.7 L59.9 48.6 L60 47.5 L60.1 46.4 L60 45.2 L59.8 44.1 L59.5 42.9 L59.1 41.8 L58.6 40.8 L58 39.7 L57.3 38.7 L56.4 37.8 L55.5 37 L54.6 36.2 L53.5 35.5 L52.3 34.9 L51.2 34.4 L49.9 34.1 L48.6 33.8 L47.3 33.7 L45.9 33.7 L44.6 33.8 L43.2 34 L41.9 34.4 L40.6 34.8 L39.3 35.5 L38.1 36.2 L36.9 37.1 L35.8 38 L34.8 39.1 L33.9 40.3 L33.1 41.6 L32.4 42.9 L31.8 44.4 L31.4 45.9 L31.1 47.4 L31 49 L30.9 50.6 L31.1 52.2 L31.4 53.8 L31.8 55.4 L32.4 57 L33.2 58.5 L34 59.9 L35.1 61.3 L36.2 62.6 L37.5 63.8 L39 64.8 L40.5 65.8 L42.1 66.6 L43.8 67.3 L45.6 67.8 L47.4 68.1 L49.3 68.3 L51.2 68.3 L53.1 68.1 L55 67.7 L56.9 67.2 L58.8 66.5 L60.6 65.6 L62.3 64.5 L63.9 63.3 L65.5 61.9 L66.9 60.3 L68.1 58.6 L69.2 56.8 L70.2 54.9 L71 52.8 L71.5 50.7 L71.9 48.5 L72.1 46.3 L72.1 44 L71.9 41.7 L71.4 39.4 L70.8 37.2 L69.9 35 L68.8 32.9 L67.5 30.8 L66 28.9 L64.3 27.1 L62.5 25.5 L60.5 24 L58.3 22.7 L56 21.5 L53.5 20.6 L51 20 L48.4 19.5 L45.7 19.3 L43 19.3 L40.3 19.6 L37.6 20.2 L35 21 L32.4 22.1 L29.8 23.4 L27.4 24.9 L25.1 26.7 L23 28.7 L21 30.9 L19.3 33.4 L17.7 36 L16.4 38.7 L15.4 41.6 L14.6 44.7 L14.1 47.8 L13.9 50.9 L13.9 54.1 L14.3 57.4 L15 60.6 L16 63.7 L17.3 66.8 L18.8 69.8 L20.7 72.7 L22.9 75.4 L25.3 77.9 L27.9 80.2 L30.8 82.3 L33.9 84.1 L37.2 85.6 L40.7 86.9 L44.3 87.8 L48 88.4" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M48 68.2 L49.4 68.3 L50.9 68.3 L52.3 68.2 L53.7 68 L55.2 67.7 L56.6 67.3 L58 66.8 L59.4 66.2 L60.7 65.5 L62 64.7 L63.3 63.8 L64.4 62.8 L65.6 61.7 L66.6 60.6 L67.6 59.3 L68.5 58 L69.3 56.6 L70 55.2 L70.7 53.7 L71.2 52.1 L71.6 50.5 L71.9 48.8 L72.1 47.2 L72.1 45.5 L72.1 43.8 L71.9 42 L71.6 40.3 L71.2 38.6 L70.7 36.9 L70 35.3 L69.2 33.7 L68.3 32.1 L67.3 30.6 L66.2 29.1 L65 27.8 L63.7 26.5 L62.2 25.2 L60.7 24.1 L59.1 23.1 L57.4 22.2 L55.6 21.4 L53.8 20.7 L51.9 20.2 L50 19.7 L48 19.5 L46 19.3 L44 19.3 L41.9 19.4 L39.9 19.7 L37.9 20.1 L35.8 20.7 L33.9 21.4 L31.9 22.3 L30 23.3 L28.2 24.4 L26.4 25.7 L24.7 27.1 L23.1 28.6 L21.6 30.2 L20.3 32 L19 33.8 L17.8 35.8 L16.8 37.9 L15.9 40 L15.2 42.2 L14.6 44.5 L14.2 46.8 L13.9 49.2 L13.9 51.6 L13.9 54 L14.2 56.4 L14.6 58.9 L15.2 61.3 L15.9 63.6 L16.9 66 L18 68.3 L19.2 70.5 L20.7 72.6 L22.2 74.7 L24 76.6 L25.9 78.5 L27.9 80.2 L30 81.8 L32.3 83.2 L34.7 84.5 L37.2 85.6 L39.8 86.6 L42.5 87.4 L45.2 88 L48 88.4Z" fill="none" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"/>
+ </g>
+</g></g></svg></div>
   <h1>Llibreta <b>del Profe</b></h1>
   <p style="color:#bbb;max-width:460px">Entra amb el compte del centre. Les dades es desen al teu Google Drive.</p>
   <button class="btn" id="lgEntra">Entra amb Google</button>
@@ -532,7 +556,23 @@ details.bcfg{border-top:1px solid var(--linia);padding:4px 0}
 
 <!-- Crèdits -->
 <dialog id="dlgCred" style="text-align:center;min-width:340px">
-  <div style="font-size:54px;line-height:1">📒</div>
+  <div id="credAmmo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="84" height="80" aria-label="Ammo, la mascota ammonit"><g class="jump"><g class="bob">
+ <g class="body">
+  <path class="tent" d="M60 72 q8 -2 14 -8" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="tent" d="M61 78 q9 0 16 -2" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <path class="tent" d="M60 84 q8 3 14 6" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
+  <ellipse cx="54" cy="78" rx="10" ry="11" fill="#141414"/>
+  <g class="eye"><circle cx="56" cy="74" r="4.4" fill="#fff"/><circle cx="57.2" cy="74" r="2.2" fill="#141414"/></g>
+  <path class="lid" d="M52 74.5 q4 -4.5 8 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity="0"/>
+  <path class="spark" d="M66 62 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" fill="#FF6A13" stroke="#141414" stroke-width="1" opacity="0"/>
+ </g>
+ <g class="shellg">
+  <path d="M48 68.2 L49.4 68.3 L50.9 68.3 L52.3 68.2 L53.7 68 L55.2 67.7 L56.6 67.3 L58 66.8 L59.4 66.2 L60.7 65.5 L62 64.7 L63.3 63.8 L64.4 62.8 L65.6 61.7 L66.6 60.6 L67.6 59.3 L68.5 58 L69.3 56.6 L70 55.2 L70.7 53.7 L71.2 52.1 L71.6 50.5 L71.9 48.8 L72.1 47.2 L72.1 45.5 L72.1 43.8 L71.9 42 L71.6 40.3 L71.2 38.6 L70.7 36.9 L70 35.3 L69.2 33.7 L68.3 32.1 L67.3 30.6 L66.2 29.1 L65 27.8 L63.7 26.5 L62.2 25.2 L60.7 24.1 L59.1 23.1 L57.4 22.2 L55.6 21.4 L53.8 20.7 L51.9 20.2 L50 19.7 L48 19.5 L46 19.3 L44 19.3 L41.9 19.4 L39.9 19.7 L37.9 20.1 L35.8 20.7 L33.9 21.4 L31.9 22.3 L30 23.3 L28.2 24.4 L26.4 25.7 L24.7 27.1 L23.1 28.6 L21.6 30.2 L20.3 32 L19 33.8 L17.8 35.8 L16.8 37.9 L15.9 40 L15.2 42.2 L14.6 44.5 L14.2 46.8 L13.9 49.2 L13.9 51.6 L13.9 54 L14.2 56.4 L14.6 58.9 L15.2 61.3 L15.9 63.6 L16.9 66 L18 68.3 L19.2 70.5 L20.7 72.6 L22.2 74.7 L24 76.6 L25.9 78.5 L27.9 80.2 L30 81.8 L32.3 83.2 L34.7 84.5 L37.2 85.6 L39.8 86.6 L42.5 87.4 L45.2 88 L48 88.4Z" fill="#FF6A13"/>
+  <path d="M49.6 53 L51.2 57.9 M50.8 52.6 L53.6 57.1 M51.9 51.9 L55.9 55.7 M52.9 50.9 L57.7 53.8 M53.6 49.7 L59.1 51.4 M54 48.3 L59.9 48.7 M54 46.9 L60 45.8 M53.7 45.4 L59.5 42.8 M53.1 44 L58.2 40 M52.1 42.8 L56.2 37.6 M50.8 41.8 L53.6 35.6 M49.3 41.1 L50.6 34.3 M47.6 40.8 L47.2 33.7 M45.9 40.9 L43.7 33.9 M44.2 41.5 L40.3 35 M42.6 42.4 L37.2 36.9 M41.2 43.8 L34.5 39.5 M40.2 45.4 L32.4 42.9 M39.6 47.3 L31.2 46.7 M39.5 49.4 L30.9 50.8 M39.8 51.5 L31.7 54.9 M40.7 53.5 L33.4 58.9 M42.1 55.2 L36.1 62.4 M43.8 56.7 L39.7 65.3 M46 57.6 L43.9 67.3 M48.3 58.1 L48.6 68.2 M50.8 58 L53.6 68 M53.2 57.3 L58.4 66.6 M55.5 56 L63 64 M57.4 54.2 L66.8 60.3 M58.9 51.9 L69.8 55.7 M59.8 49.2 L71.6 50.4 M60.1 46.3 L72.1 44.6 M59.6 43.4 L71.2 38.7 M58.5 40.5 L68.9 33.1 M56.6 38 L65.2 28 M54.1 35.9 L60.3 23.8 M51.2 34.5 L54.4 20.9 M47.9 33.7 L47.7 19.4 M44.4 33.8 L40.8 19.6 M40.9 34.7 L33.8 21.4 M37.7 36.5 L27.4 24.9 M34.9 39 L21.8 30 M32.7 42.2 L17.5 36.5 M31.4 46 L14.8 43.9 M30.9 50 L13.9 52.1 M31.5 54.2 L14.9 60.4 M33 58.2 L18 68.4 M35.6 61.8 L23.1 75.7 M39 64.8 L29.9 81.7 M43.1 67 L38.2 86" stroke="#141414" stroke-width="1.3" stroke-linecap="round" opacity=".55"/>
+  <path d="M43.8 48 L43.7 48.4 L43.7 48.8 L43.8 49.2 L43.9 49.6 L44 50 L44.2 50.4 L44.4 50.8 L44.6 51.1 L44.9 51.4 L45.2 51.8 L45.5 52 L45.9 52.3 L46.3 52.5 L46.7 52.7 L47.1 52.9 L47.6 53 L48 53 L48.5 53.1 L49 53.1 L49.5 53 L49.9 52.9 L50.4 52.7 L50.9 52.5 L51.3 52.3 L51.7 52 L52.1 51.7 L52.5 51.3 L52.8 50.9 L53.1 50.5 L53.4 50 L53.6 49.5 L53.8 49 L53.9 48.5 L54 47.9 L54 47.4 L54 46.8 L53.9 46.2 L53.8 45.6 L53.6 45.1 L53.4 44.5 L53.1 44 L52.7 43.5 L52.4 43.1 L51.9 42.6 L51.4 42.2 L50.9 41.9 L50.4 41.6 L49.8 41.3 L49.1 41.1 L48.5 40.9 L47.8 40.8 L47.2 40.8 L46.5 40.9 L45.8 41 L45.1 41.1 L44.5 41.3 L43.8 41.6 L43.2 42 L42.6 42.4 L42.1 42.9 L41.6 43.4 L41.1 44 L40.7 44.6 L40.3 45.3 L40 46 L39.8 46.7 L39.6 47.5 L39.5 48.2 L39.5 49 L39.5 49.8 L39.6 50.7 L39.8 51.5 L40.1 52.2 L40.5 53 L40.9 53.7 L41.4 54.4 L41.9 55.1 L42.6 55.7 L43.3 56.3 L44 56.8 L44.8 57.2 L45.6 57.5 L46.5 57.8 L47.4 58 L48.4 58.1 L49.3 58.2 L50.3 58.1 L51.2 57.9 L52.2 57.7 L53.1 57.4 L54 56.9 L54.9 56.4 L55.7 55.8 L56.5 55.2 L57.2 54.4 L57.9 53.6 L58.5 52.7 L59 51.7 L59.4 50.7 L59.7 49.7 L59.9 48.6 L60 47.5 L60.1 46.4 L60 45.2 L59.8 44.1 L59.5 42.9 L59.1 41.8 L58.6 40.8 L58 39.7 L57.3 38.7 L56.4 37.8 L55.5 37 L54.6 36.2 L53.5 35.5 L52.3 34.9 L51.2 34.4 L49.9 34.1 L48.6 33.8 L47.3 33.7 L45.9 33.7 L44.6 33.8 L43.2 34 L41.9 34.4 L40.6 34.8 L39.3 35.5 L38.1 36.2 L36.9 37.1 L35.8 38 L34.8 39.1 L33.9 40.3 L33.1 41.6 L32.4 42.9 L31.8 44.4 L31.4 45.9 L31.1 47.4 L31 49 L30.9 50.6 L31.1 52.2 L31.4 53.8 L31.8 55.4 L32.4 57 L33.2 58.5 L34 59.9 L35.1 61.3 L36.2 62.6 L37.5 63.8 L39 64.8 L40.5 65.8 L42.1 66.6 L43.8 67.3 L45.6 67.8 L47.4 68.1 L49.3 68.3 L51.2 68.3 L53.1 68.1 L55 67.7 L56.9 67.2 L58.8 66.5 L60.6 65.6 L62.3 64.5 L63.9 63.3 L65.5 61.9 L66.9 60.3 L68.1 58.6 L69.2 56.8 L70.2 54.9 L71 52.8 L71.5 50.7 L71.9 48.5 L72.1 46.3 L72.1 44 L71.9 41.7 L71.4 39.4 L70.8 37.2 L69.9 35 L68.8 32.9 L67.5 30.8 L66 28.9 L64.3 27.1 L62.5 25.5 L60.5 24 L58.3 22.7 L56 21.5 L53.5 20.6 L51 20 L48.4 19.5 L45.7 19.3 L43 19.3 L40.3 19.6 L37.6 20.2 L35 21 L32.4 22.1 L29.8 23.4 L27.4 24.9 L25.1 26.7 L23 28.7 L21 30.9 L19.3 33.4 L17.7 36 L16.4 38.7 L15.4 41.6 L14.6 44.7 L14.1 47.8 L13.9 50.9 L13.9 54.1 L14.3 57.4 L15 60.6 L16 63.7 L17.3 66.8 L18.8 69.8 L20.7 72.7 L22.9 75.4 L25.3 77.9 L27.9 80.2 L30.8 82.3 L33.9 84.1 L37.2 85.6 L40.7 86.9 L44.3 87.8 L48 88.4" fill="none" stroke="#141414" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M48 68.2 L49.4 68.3 L50.9 68.3 L52.3 68.2 L53.7 68 L55.2 67.7 L56.6 67.3 L58 66.8 L59.4 66.2 L60.7 65.5 L62 64.7 L63.3 63.8 L64.4 62.8 L65.6 61.7 L66.6 60.6 L67.6 59.3 L68.5 58 L69.3 56.6 L70 55.2 L70.7 53.7 L71.2 52.1 L71.6 50.5 L71.9 48.8 L72.1 47.2 L72.1 45.5 L72.1 43.8 L71.9 42 L71.6 40.3 L71.2 38.6 L70.7 36.9 L70 35.3 L69.2 33.7 L68.3 32.1 L67.3 30.6 L66.2 29.1 L65 27.8 L63.7 26.5 L62.2 25.2 L60.7 24.1 L59.1 23.1 L57.4 22.2 L55.6 21.4 L53.8 20.7 L51.9 20.2 L50 19.7 L48 19.5 L46 19.3 L44 19.3 L41.9 19.4 L39.9 19.7 L37.9 20.1 L35.8 20.7 L33.9 21.4 L31.9 22.3 L30 23.3 L28.2 24.4 L26.4 25.7 L24.7 27.1 L23.1 28.6 L21.6 30.2 L20.3 32 L19 33.8 L17.8 35.8 L16.8 37.9 L15.9 40 L15.2 42.2 L14.6 44.5 L14.2 46.8 L13.9 49.2 L13.9 51.6 L13.9 54 L14.2 56.4 L14.6 58.9 L15.2 61.3 L15.9 63.6 L16.9 66 L18 68.3 L19.2 70.5 L20.7 72.6 L22.2 74.7 L24 76.6 L25.9 78.5 L27.9 80.2 L30 81.8 L32.3 83.2 L34.7 84.5 L37.2 85.6 L39.8 86.6 L42.5 87.4 L45.2 88 L48 88.4Z" fill="none" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"/>
+ </g>
+</g></g></svg></div>
   <h3 style="margin:8px 0 2px;font-size:24px">Llibreta <span style="color:var(--tar)">del Profe</span></h3>
   <div style="color:var(--suau);font-size:14px;margin-bottom:14px">Versió <span id="credVer"></span></div>
   <p style="margin:4px 0">Ideat per <b>J Alcolea</b></p>
@@ -546,7 +586,7 @@ details.bcfg{border-top:1px solid var(--linia);padding:4px 0}
 <div id="toast"></div>
 
 <script>
-const VERSIO='1.0 · octubre 2026';
+const VERSIO='2 · ammonite · novembre 2026';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -978,7 +1018,7 @@ function surt(){try{if(G.token)google.accounts.oauth2.revoke(G.token,()=>{})}cat
   try{localStorage.removeItem(LSCACHE)}catch{}
   G.token=null;G.fileId=null;G.rev=null;G.brut=false;state=null;iniciaHist();$('#main').innerHTML='';mostraLogin();estat();renderSel()}
 $('#btnSurt').onclick=async()=>{if(G.brut){await driveDesa();if(G.brut&&!await confirma('Hi ha canvis que encara no s\'han pogut pujar al Drive. Si surts ara, es perdran.','Surt igualment','Canvis pendents'))return}surt()};
-function mostraLogin(){$('#login').style.display='flex';const c=llegeixCache();$('#lgOff').hidden=!c;
+function mostraLogin(){$('#login').style.display='flex';aplicaMob();const la=$('#lgAmmo');la.classList.remove('anim');void la.offsetWidth;la.classList.add('anim');const c=llegeixCache();$('#lgOff').hidden=!c;
   $('#lgOff').textContent=c?.pendent?'Continua sense connexió (hi ha canvis pendents de pujar)':'Continua sense connexió amb la còpia d\'aquest ordinador';
   $('#lgEntra').textContent=G.email?'Entra amb Google ('+G.email+')':'Entra amb Google'}
 $('#lgEntra').onclick=driveEntra;
@@ -1285,7 +1325,8 @@ document.addEventListener('keydown',e=>{if(!state||tab!=='resum'||!VA.on||docume
 /* ======================= Mode consulta (mòbil) ======================= */
 const MOBQ=matchMedia('(max-width:700px)');
 function esMobil(){try{if(localStorage.getItem('llibreta-mobil-off')==='1')return false}catch{}return MOBQ.matches}
-MOBQ.addEventListener?.('change',()=>{if(state)render()});
+function aplicaMob(){document.body.classList.toggle('mob',esMobil())}
+MOBQ.addEventListener?.('change',()=>{aplicaMob();if(state)render()});aplicaMob();
 const MB={vista:'al',st:null,col:'',cerca:'',mode:'resum'};
 function rMobil(){const sub=cur(),m=$('#main');if(!sub){m.innerHTML='<div class="buit">No hi ha cap llibreta activa.</div>';return}
   const sts=alumnesAval(sub);let h=`<div class="mbcap" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><div><b>${esc(sub.name)}</b><div class="capsub">${sts.length} alumnes · mode consulta (només lectura)</div></div></div>`;
@@ -1772,7 +1813,7 @@ $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b||!state)return;t
 $$('.tabic').forEach(b=>b.onclick=()=>{if(!state)return;tab=tab===b.dataset.t?tabPrincipal:b.dataset.t;render()});
 $('#btnCopia').onclick=()=>copia();
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='f'&&state&&tab==='llibreta'){e.preventDefault();plegaCap()}});
-$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO;$('#dlgCred').showModal()};$('#credX').onclick=()=>$('#dlgCred').close();
+$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO;const a=$('#credAmmo');a.classList.remove('anim');$('#dlgCred').showModal();void a.offsetWidth;a.classList.add('anim')};$('#credX').onclick=()=>$('#dlgCred').close();
 
 /* ======================= Eines ======================= */
 function nivPosit(p){if(!p.data||p.fet)return '';const d=Math.round((new Date(p.data+'T12:00')-new Date(avui()+'T12:00'))/864e5);
