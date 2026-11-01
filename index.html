@@ -24,6 +24,9 @@ nav button:hover{color:#fff}
 #tpill{display:none;background:var(--tar);color:#111;font-weight:800;font-variant-numeric:tabular-nums}
 .estat{font-size:12.5px;color:#ccc;white-space:nowrap;cursor:default;max-width:230px;overflow:hidden;text-overflow:ellipsis}
 .estat.av{color:#ffb35c;cursor:pointer;text-decoration:underline}
+.estat.off{color:#ff6b6b;cursor:pointer;font-weight:700}
+.estat s{text-decoration-thickness:2px}
+#banOff{position:sticky;top:54px;z-index:49;background:#b00020;color:#fff;padding:7px 14px;font-size:14px;text-align:center}
 main{padding:12px 16px 40px}
 .capw{border-radius:12px;padding:6px 12px;margin:0 0 8px;border:1px solid rgba(0,0,0,.06)}
 .cap{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap}
@@ -58,7 +61,7 @@ main{padding:12px 16px 40px}
 .chip{display:inline-flex;align-items:center;gap:6px;background:#fff;border-radius:20px;padding:3px 11px 3px 4px;border:1px solid var(--linia)}
 .sig{display:inline-block;min-width:26px;padding:1px 6px;border-radius:12px;font-size:12px;font-weight:800;text-align:center;letter-spacing:.3px}
 .avis{color:#a04800;font-weight:600}
-.tw{overflow:auto;max-height:calc(100vh - 185px);border:1px solid var(--linia);border-radius:8px}
+.tw{isolation:isolate;position:relative;overflow:auto;max-height:calc(100vh - 185px);border:1px solid var(--linia);border-radius:8px}
 table{border-collapse:separate;border-spacing:0;font-size:14px}
 th,td{border-right:1px solid var(--linia);border-bottom:1px solid var(--linia);padding:0;background:#fff}
 thead th{position:sticky;top:0;z-index:3;background:#fafafa;font-weight:600}
@@ -254,6 +257,7 @@ table.prev{font-size:13px;margin-top:8px}table.prev td,table.prev th{padding:4px
     <button class="icbtn" id="btnSurt" title="Tanca la sessió de Google" hidden>Surt</button>
   </div>
 </header>
+<div id="banOff" hidden>⚠ Sense connexió: les notes es guarden en aquest ordinador i es pujaran soles quan torni la connexió.</div>
 <main id="main"></main>
 
 <div id="pop">
@@ -275,6 +279,7 @@ table.prev{font-size:13px;margin-top:8px}table.prev td,table.prev th{padding:4px
   <p style="color:#bbb;max-width:460px">Entra amb el compte del centre. Les dades es desen al teu Google Drive.</p>
   <button class="btn" id="lgEntra">Entra amb Google</button>
   <div id="lgMsg" style="color:#ffb35c;max-width:500px"></div>
+  <button class="btn sec" id="lgOff" hidden style="background:transparent;color:#fff;border-color:#fff"></button>
   <a id="lgLocal">Fes servir la llibreta en aquest ordinador, sense Google</a>
 </div>
 
@@ -631,7 +636,7 @@ const idb={db:null,
   async set(k,v){try{const db=await this.open();await new Promise(res=>{const t=db.transaction('h','readwrite');t.objectStore('h').put(v,k);t.oncomplete=res;t.onerror=res})}catch{}}};
 
 function save(lbl,noHist){if(!state)return;if(!noHist)registra(lbl||'canvi');state.savedAt=Date.now();
-  if(mode==='drive'){clearTimeout(pend);pend=setTimeout(driveDesa,1200);estat();return}
+  if(mode==='drive'){G.brut=true;guardaCache();clearTimeout(pend);pend=setTimeout(driveDesa,1200);estat();return}
   try{localStorage.setItem(LS,JSON.stringify(state))}catch{}
   clearTimeout(pend);pend=setTimeout(escriuFitxer,700);estat()}
 async function escriuFitxer(){pend=null;if(!fileHandle||!filePerm)return estat();
@@ -639,9 +644,11 @@ async function escriuFitxer(){pend=null;if(!fileHandle||!filePerm)return estat()
   catch(e){filePerm=false;console.error(e);toast('No s\'ha pogut desar al fitxer. Torna a connectar-lo.')}estat()}
 function estat(){const e=$('#estat');e.onclick=null;e.className='estat';
   $('#btnSurt').hidden=mode!=='drive'||!G.token&&!G.fileId;
+  const ban=$('#banOff');if(ban)ban.hidden=!(mode==='drive'&&state&&G.offline);
   if(mode==='drive'){
-    if(G.need){e.className='estat av';e.textContent='🔒 Torna a entrar per desar';e.onclick=reentra;return}
-    e.textContent='☁ Drive'+(G.saving?' · desant…':pend?' · canvis pendents':estat.ultim?' · desat '+estat.ultim:'');return}
+    if(G.offline){e.className='estat off';e.innerHTML='☁✕ sense connexió';e.title='Sense connexió. Les notes es guarden en aquest ordinador i es pujaran soles quan torni la connexió.'+(G.brut?' Hi ha canvis pendents.':'');e.onclick=reentra;return}
+    if(G.need){e.className='estat av';e.innerHTML=(G.brut?'☁✕ ':'☁ ')+'clica per reconnectar';e.title='La sessió de Google ha caducat. Clica per renovar-la'+(G.brut?'; les notes pendents estan guardades en aquest ordinador.':'.');e.onclick=reentra;return}
+    e.textContent=G.saving||pend?'☁ …':estat.ultim?'☁ '+estat.ultim:'☁';e.title=G.saving||pend?'Desant al Drive…':estat.ultim?'Desat al teu Drive a les '+estat.ultim:'Connectat al teu Drive';return}
   if(!FS){e.textContent='Desat al navegador';return}
   if(!fileHandle){e.className='estat av';e.textContent='⚠ Sense fitxer: tria on desar';e.onclick=nouFitxer;return}
   if(!filePerm){e.className='estat av';e.textContent='🔒 Reconnecta '+fileHandle.name;e.onclick=reconnecta;return}
@@ -678,19 +685,36 @@ $('#inFitxer').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{con
 
 /* ----- Google Drive ----- */
 const CLIENT_ID_CENTRE='332235891042-mcielrsck4fvk8rep2v09k49r2eghlo9.apps.googleusercontent.com';
-const G={clientId:localStorage.getItem(LSCID)||CLIENT_ID_CENTRE,token:null,exp:0,fileId:null,rev:null,need:false,saving:false};
+const G={clientId:localStorage.getItem(LSCID)||CLIENT_ID_CENTRE,token:null,exp:0,fileId:null,rev:null,need:false,saving:false,
+  email:localStorage.getItem('llibreta-email')||'',offline:!navigator.onLine,renovant:false,brut:false,folderId:null};
 const DRIVE='https://www.googleapis.com/drive/v3/files',UPL='https://www.googleapis.com/upload/drive/v3/files',FNAME='llibreta-notes.json';
+const LSCACHE='llibreta-drive-cache',CARPETA='Llibreta del Profe · còpies',MAXCOPIES=8;
+/* Còpia local en mode Drive: si cau la connexió o caduca la sessió, les notes no es perden */
+function guardaCache(){try{localStorage.setItem(LSCACHE,JSON.stringify({state,rev:G.rev,fileId:G.fileId,pendent:G.brut,email:G.email}))}catch{}}
+function llegeixCache(){try{const c=JSON.parse(localStorage.getItem(LSCACHE));return c&&valida(c.state)?c:null}catch{return null}}
 function carregaGIS(){if(window.google?.accounts?.oauth2)return Promise.resolve();
   return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=res;s.onerror=()=>rej(new Error('No s\'ha pogut carregar l\'entrada de Google. Hi ha connexió?'));document.head.appendChild(s)})}
 function demanaToken(prompt=''){return new Promise((res,rej)=>{
-  const tc=google.accounts.oauth2.initTokenClient({client_id:G.clientId,scope:'https://www.googleapis.com/auth/drive.file',
+  const tc=google.accounts.oauth2.initTokenClient({client_id:G.clientId,scope:'https://www.googleapis.com/auth/drive.file',hint:G.email||undefined,
     callback:r=>{if(r.error)return rej(new Error(r.error_description||r.error));G.token=r.access_token;G.exp=Date.now()+((+r.expires_in||3600)-60)*1000;G.need=false;res()},
     error_callback:e=>rej(new Error(e?.message||e?.type||'Entrada cancel·lada'))});
   tc.requestAccessToken({prompt})})}
+const caducaAviat=()=>!G.token||Date.now()>G.exp-5*60*1000;
+/* Renovació: el navegador només deixa obrir la finestreta de Google després d'un clic o una tecla,
+   així que es renova en la primera acció que facis quan falten menys de 5 minuts. */
+function renovaSiCal(){if(mode!=='drive'||!G.fileId||G.renovant||G.offline||!caducaAviat()||!window.google?.accounts?.oauth2)return;
+  G.renovant=true;demanaToken('').then(()=>{G.renovant=false;estat();if(G.brut)driveDesa()}).catch(()=>{G.renovant=false;G.need=true;estat()})}
+document.addEventListener('pointerdown',renovaSiCal,true);document.addEventListener('keydown',renovaSiCal,true);
 async function gf(url,opt={}){if(!G.token||Date.now()>G.exp){G.need=true;estat();throw new Error('reauth')}
-  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+G.token}});
+  let r;try{r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+G.token}})}
+  catch(e){posaOffline(true);throw new Error('offline')}
+  if(G.offline)posaOffline(false);
   if(r.status===401){G.token=null;G.need=true;estat();throw new Error('reauth')}
   if(!r.ok)throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,200));return r}
+function posaOffline(v){if(G.offline===v)return;G.offline=v;estat();if(!v&&G.brut)driveDesa()}
+addEventListener('offline',()=>posaOffline(true));
+addEventListener('online',()=>{posaOffline(false);if(G.brut)driveDesa()});
+setInterval(()=>{if(mode==='drive'&&G.brut&&!G.saving&&!pend&&!G.offline&&!caducaAviat())driveDesa()},30000);
 /* Control de versions propi: cada desat posa una marca (rev) a les propietats del fitxer.
    Si la marca del Drive no és la que vam deixar nosaltres, és que s'ha desat des d'un altre lloc. */
 async function llegeixRev(){const m=await (await gf(`${DRIVE}/${G.fileId}?fields=appProperties`)).json();return m.appProperties?.rev||null}
@@ -698,47 +722,90 @@ async function driveEntra(){
   $('#lgMsg').textContent='';
   if(!G.clientId){$('#lgMsg').textContent='Falta l\'ID de client de Google. Configura\'l des del mode local (Configuració › Dades).';return}
   if(location.protocol==='file:'){$('#lgMsg').textContent='L\'entrada amb Google només funciona des de la pàgina publicada (GitHub), no obrint el fitxer des de l\'ordinador.';return}
-  try{await carregaGIS();await demanaToken('select_account');
-    const q=encodeURIComponent(`name='${FNAME}' and trashed=false`);
+  try{await carregaGIS();
+    try{await demanaToken(G.email?'':'select_account')}catch(e){if(!G.email)throw e;G.email='';await demanaToken('select_account')}
+    if(!G.email){try{const ab=await (await gf('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)')).json();G.email=ab.user?.emailAddress||'';if(G.email)localStorage.setItem('llibreta-email',G.email)}catch{}}
+    const q=encodeURIComponent(`name='${FNAME}' and trashed=false and not appProperties has { key='copia' and value='1' }`);
     const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id,appProperties)&orderBy=modifiedTime desc&spaces=drive`)).json();
-    if(r.files?.length){G.fileId=r.files[0].id;G.rev=r.files[0].appProperties?.rev||null;
+    const cache=llegeixCache();
+    if(r.files?.length){G.fileId=r.files[0].id;const remot=r.files[0].appProperties?.rev||null;G.rev=remot;
       const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();if(!valida(d))throw new Error('El fitxer del Drive no és una llibreta vàlida.');
-      mode='drive';localStorage.setItem(LSMODE,'drive');carrega(d)}
+      mode='drive';localStorage.setItem(LSMODE,'drive');
+      if(cache&&cache.pendent&&cache.fileId===G.fileId){
+        if(!remot||cache.rev===remot){carrega(cache.state);G.brut=true;guardaCache();$('#login').style.display='none';await driveDesa();toast('S\'han pujat els canvis que tenies pendents en aquest ordinador.')}
+        else{const tria=await pregunta('Hi ha canvis en dos llocs','En aquest ordinador hi ha canvis que no es van poder pujar, però mentrestant la llibreta s\'ha desat des d\'un altre lloc. Amb quina versió et quedes?',[{t:'La del Drive',v:'drive',cls:'sec'},{t:'La d\'aquest ordinador',v:'local'}]);
+          if(tria==='local'){carrega(cache.state);G.brut=true;$('#login').style.display='none';await driveDesa(true)}else{carrega(d);G.brut=false;guardaCache()}}}
+      else{carrega(d);G.brut=false;guardaCache()}}
     else{
       let local=null;try{local=JSON.parse(localStorage.getItem(LS))}catch{}
       let usa=state&&valida(state)?state:valida(local)?migra(local):null;
       if(usa){const r2=await pregunta('Primera vegada al Drive','Encara no hi ha cap llibreta al teu Drive. Vols pujar-hi les dades que tens en aquest ordinador?',[{t:'Comença de zero',v:'no',cls:'sec'},{t:'Puja-les',v:'si'}]);if(r2!=='si')usa=null}
-      state=usa||{...demo()};mode='drive';localStorage.setItem(LSMODE,'drive');iniciaHist();await driveCrea();render()}
-    $('#login').style.display='none';estat();toast('Connectat al Drive. Els canvis es desen sols.')}
-  catch(e){console.error(e);$('#lgMsg').textContent='No s\'ha pogut entrar: '+e.message+'. Si diu que l\'aplicació està bloquejada, ho ha d\'autoritzar l\'administrador del domini.'}}
-function cosMultipart(meta){const b='llibreta'+uid();
-  return{b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(state)}\r\n--${b}--`}}
+      state=usa||{...demo()};mode='drive';localStorage.setItem(LSMODE,'drive');iniciaHist();await driveCrea();G.brut=false;guardaCache();render()}
+    $('#login').style.display='none';estat();toast('Connectat al Drive. Els canvis es desen sols.');
+    comprovaCopia().catch(e=>console.error(e))}
+  catch(e){console.error(e);$('#lgMsg').textContent=e.message==='offline'?'No hi ha connexió a internet.':'No s\'ha pogut entrar: '+e.message+'. Si diu que l\'aplicació està bloquejada, ho ha d\'autoritzar l\'administrador del domini.'}}
+/* Treballar sense connexió amb la còpia guardada en aquest ordinador */
+function entraOffline(){const c=llegeixCache();if(!c)return;mode='drive';G.fileId=c.fileId;G.rev=c.rev;G.brut=!!c.pendent;G.offline=!navigator.onLine||G.offline;
+  carrega(c.state);$('#login').style.display='none';estat();toast('Treballes amb la còpia d\'aquest ordinador. Quan torni la connexió, clica el núvol per pujar els canvis.',6000)}
+function cosMultipart(meta,dades){const b='llibreta'+uid();
+  return{b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(dades??state)}\r\n--${b}--`}}
 async function driveCrea(){const rev=uid();const{b,body}=cosMultipart({name:FNAME,mimeType:'application/json',appProperties:{rev}});
   const r=await (await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
   G.fileId=r.id;G.rev=rev}
 async function driveDesa(forca=false){
   if(G.saving){clearTimeout(pend);pend=setTimeout(driveDesa,800);return}  /* mai dos desats alhora */
-  pend=null;if(mode!=='drive'||!G.fileId||!state)return;
-  G.saving=true;estat();
+  clearTimeout(pend);pend=null;if(mode!=='drive'||!G.fileId||!state)return;
+  if(G.offline||caducaAviat()&&!G.token||!G.token||Date.now()>G.exp){if(!G.token||Date.now()>G.exp)G.need=true;estat();return}
+  G.saving=true;estat();const enviat=state.savedAt;
   try{const remot=await llegeixRev();
     if(!forca&&remot&&G.rev&&remot!==G.rev){G.saving=false;
       const r=await pregunta('La llibreta ha canviat en un altre lloc','S\'ha desat la llibreta des d\'un altre ordinador o pestanya després que l\'obrissis aquí. Si desaràs ara, trepitjaràs aquells canvis.',[{t:'Carrega la del Drive (perdo els d\'aquí)',v:'load',cls:'sec'},{t:'Desa la meva igualment',v:'force'}]);
-      if(r==='load'){const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();G.rev=remot;carrega(d);estat();return}
+      if(r==='load'){const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();G.rev=remot;G.brut=false;carrega(d);guardaCache();estat();return}
       if(r==='force')return driveDesa(true);estat();return}
     const rev=uid();const{b,body}=cosMultipart({appProperties:{rev}});
     await gf(`${UPL}/${G.fileId}?uploadType=multipart&fields=id`,{method:'PATCH',headers:{'Content-Type':'multipart/related; boundary='+b},body});
-    G.rev=rev;estat.ultim=new Date().toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'})}
-  catch(e){if(e.message!=='reauth'){console.error(e);toast('No s\'ha pogut desar al Drive: '+e.message)}pend=pend||1}
-  G.saving=false;estat()}
-async function reentra(){try{await carregaGIS();await demanaToken('');driveDesa()}catch(e){toast('No s\'ha pogut tornar a entrar: '+e.message)}}
-async function driveRevisa(){if(mode!=='drive'||!G.fileId||!G.token||G.saving||pend)return;
+    G.rev=rev;if(state.savedAt===enviat)G.brut=false;guardaCache();
+    estat.ultim=new Date().toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'})}
+  catch(e){if(e.message!=='reauth'&&e.message!=='offline'){console.error(e);toast('No s\'ha pogut desar al Drive: '+e.message)}}
+  G.saving=false;estat();if(G.brut&&!G.offline&&G.token&&Date.now()<G.exp){clearTimeout(pend);pend=setTimeout(driveDesa,1500)}}
+async function reentra(){try{await carregaGIS();await demanaToken(G.email?'':'select_account');G.need=false;if(G.offline&&navigator.onLine)G.offline=false;estat();driveDesa()}catch(e){toast('No s\'ha pogut tornar a entrar: '+e.message)}}
+async function driveRevisa(){if(mode!=='drive'||!G.fileId||!G.token||Date.now()>G.exp||G.saving||pend||G.brut||G.offline)return;
   try{const remot=await llegeixRev();
-    if(remot&&G.rev&&remot!==G.rev){const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();G.rev=remot;carrega(d);toast('S\'ha carregat la versió més nova del Drive.')}}catch{}}
+    if(remot&&G.rev&&remot!==G.rev){const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();G.rev=remot;carrega(d);guardaCache();toast('S\'ha carregat la versió més nova del Drive.')}}catch{}}
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')driveRevisa()});
+
+/* ----- Còpia setmanal automàtica al Drive ----- */
+function dillunsDe(d){const x=new Date(d);const dia=(x.getDay()+6)%7;x.setDate(x.getDate()-dia);return `${x.getFullYear()}-${p2(x.getMonth()+1)}-${p2(x.getDate())}`}
+async function carpetaCopies(){if(G.folderId)return G.folderId;
+  const q=encodeURIComponent(`name='${CARPETA}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id)&spaces=drive`)).json();
+  if(r.files?.length)return G.folderId=r.files[0].id;
+  const c=await (await gf(`${DRIVE}?fields=id`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:CARPETA,mimeType:'application/vnd.google-apps.folder'})})).json();
+  return G.folderId=c.id}
+async function llistaCopies(){const f=await carpetaCopies();const q=encodeURIComponent(`'${f}' in parents and trashed=false`);
+  return (await (await gf(`${DRIVE}?q=${q}&fields=files(id,name,createdTime)&orderBy=createdTime desc&pageSize=100`)).json()).files||[]}
+async function comprovaCopia(forca=false){if(mode!=='drive'||!state||!G.token)return;
+  const ara=new Date(),ult=state.copiaSetmanal||'',dies=ult?(ara-new Date(ult+'T12:00'))/864e5:999,dia=ara.getDay();
+  const toca=forca||(ult<dillunsDe(ara)&&(dia>=5||dia===0))||dies>=7;if(!toca)return;
+  const f=await carpetaCopies();
+  const{b,body}=cosMultipart({name:`llibreta-notes_copia_${avui()}.json`,mimeType:'application/json',parents:[f],appProperties:{copia:'1'}});
+  await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body});
+  const totes=await llistaCopies();for(const x of totes.slice(MAXCOPIES)){try{await gf(`${DRIVE}/${x.id}`,{method:'DELETE'})}catch{}}
+  state.copiaSetmanal=avui();save(null,true);toast(forca?'Còpia desada a la carpeta «'+CARPETA+'» del teu Drive.':'📦 Còpia setmanal desada al teu Drive.')}
+async function recuperaCopia(id,nom){if(!await confirma(`Recuperar la còpia «${nom}»? Les dades actuals se substituiran per les de la còpia. Ho podràs desfer amb ↶ mentre no tanquis la pàgina.`,'Recupera','Recuperar una còpia'))return;
+  try{const d=await (await gf(`${DRIVE}/${id}?alt=media`)).json();if(!valida(d))return toast('Aquesta còpia no és vàlida.');
+    const c=state.cur;state=migra(d);if(state.subjects.some(x=>x.id===c))state.cur=c;else state.cur=cur().id;
+    save('recuperar una còpia');render();toast('Còpia recuperada.')}catch(e){toast('No s\'ha pogut recuperar: '+e.message)}}
+
 function surt(){try{if(G.token)google.accounts.oauth2.revoke(G.token,()=>{})}catch{}
-  G.token=null;G.fileId=null;G.rev=null;state=null;iniciaHist();$('#main').innerHTML='';$('#login').style.display='flex';estat();renderSel()}
-$('#btnSurt').onclick=async()=>{if(pend){await driveDesa()}surt()};
+  try{localStorage.removeItem(LSCACHE)}catch{}
+  G.token=null;G.fileId=null;G.rev=null;G.brut=false;state=null;iniciaHist();$('#main').innerHTML='';mostraLogin();estat();renderSel()}
+$('#btnSurt').onclick=async()=>{if(G.brut){await driveDesa();if(G.brut&&!await confirma('Hi ha canvis que encara no s\'han pogut pujar al Drive. Si surts ara, es perdran.','Surt igualment','Canvis pendents'))return}surt()};
+function mostraLogin(){$('#login').style.display='flex';const c=llegeixCache();$('#lgOff').hidden=!c;
+  $('#lgOff').textContent=c?.pendent?'Continua sense connexió (hi ha canvis pendents de pujar)':'Continua sense connexió amb la còpia d\'aquest ordinador';
+  $('#lgEntra').textContent=G.email?'Entra amb Google ('+G.email+')':'Entra amb Google'}
 $('#lgEntra').onclick=driveEntra;
+$('#lgOff').onclick=entraOffline;
 $('#lgLocal').onclick=()=>{mode='local';localStorage.setItem(LSMODE,'local');location.reload()};
 
 /* ======================= Exportació ======================= */
@@ -984,7 +1051,10 @@ function rDades(dins){const el=dins?$('#dades'):$('#main');
   const drive=mode==='drive';
   el.innerHTML=`<div class="card"><h2>Dades</h2>
     ${drive?`<p class="aj">☁ Les dades es desen al teu Google Drive, al fitxer <b>${FNAME}</b>. Si fas servir un ordinador compartit, clica <b>Surt</b> en acabar.</p>
-      <div class="fl"><button class="btn" id="dSurt">Surt</button><button class="btn sec" id="dCopia">Descarrega una còpia</button><button class="btn sec" id="dObre">Carrega una còpia…</button><button class="btn sec" id="dLocal">Passa a mode «aquest ordinador»</button></div>`
+      <div class="fl"><button class="btn" id="dSurt">Surt</button><button class="btn sec" id="dCopia">Descarrega una còpia</button><button class="btn sec" id="dObre">Carrega una còpia…</button><button class="btn sec" id="dLocal">Passa a mode «aquest ordinador»</button></div>
+      <h3 style="margin:16px 0 4px;font-size:15px">📦 Còpies setmanals</h3>
+      <p class="aj">Cada setmana, el primer cop que obres la llibreta a partir de divendres, es desa sola una còpia a la carpeta «${CARPETA}» del teu Drive. Es guarden les ${MAXCOPIES} últimes.${state?.copiaSetmanal?' Última còpia: <b>'+state.copiaSetmanal.split('-').reverse().join('/')+'</b>.':''}</p>
+      <div class="fl"><button class="btn sec" id="dCopNow">Fes una còpia ara</button><button class="btn sec" id="dCopList">Mostra les còpies</button></div><div id="dCopies"></div>`
     :`<p class="aj">${FS?'Les dades es desen automàticament al fitxer que triïs i, de reserva, al navegador. La còpia de seguretat desa un fitxer amb la data a la carpeta que triïs (Google Drive o OneDrive per a escriptori).':'Aquest navegador no permet desar directament en un fitxer: fes servir Chrome o Edge. Mentrestant, les dades es desen al navegador; fes còpies sovint.'}</p>
       <div class="fl">${FS?'<button class="btn" id="dNou">Desa en un fitxer nou…</button>':''}<button class="btn sec" id="dObre">Obre un fitxer o una còpia…</button>
       <button class="btn sec" id="dCopia">Fes còpia de seguretat</button>${'showDirectoryPicker' in window?'<button class="btn sec" id="dCarp">Canvia la carpeta de còpies</button>':''}</div>`}
@@ -996,7 +1066,12 @@ function rDades(dins){const el=dins?$('#dades'):$('#main');
     </details>`;
   const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#dNou','onclick',nouFitxer);on('#dObre','onclick',obreFitxer);on('#dCopia','onclick',()=>copia());on('#dCarp','onclick',()=>copia(true));
-  on('#dSurt','onclick',async()=>{if(pend)await driveDesa();surt()});
+  on('#dSurt','onclick',()=>$('#btnSurt').click());
+  on('#dCopNow','onclick',async()=>{try{await comprovaCopia(true);rDades(dins)}catch(e){toast(e.message==='offline'?'Sense connexió: no es pot fer la còpia ara.':'No s\'ha pogut fer la còpia: '+e.message)}});
+  on('#dCopList','onclick',async()=>{const w=$('#dCopies');w.innerHTML='<p class="aj">Carregant…</p>';
+    try{const ll=await llistaCopies();w.innerHTML=ll.length?'<div class="llista">'+ll.map(c=>`<div class="fl"><span style="min-width:300px">📄 ${esc(c.name)}</span><span class="aj" style="margin:0">${new Date(c.createdTime).toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'})}</span><button class="btn sec" style="padding:4px 10px" data-rec="${c.id}" data-nom="${esc(c.name)}">Recupera</button></div>`).join('')+'</div>':'<p class="aj">Encara no hi ha cap còpia.</p>';
+      $$('[data-rec]').forEach(b=>b.onclick=()=>recuperaCopia(b.dataset.rec,b.dataset.nom))}
+    catch(e){w.innerHTML='<p class="aj">No s\'han pogut carregar les còpies ('+esc(e.message)+').</p>'}});
   on('#dLocal','onclick',async()=>{if(!await confirma('Passar a desar en aquest ordinador? Les dades del Drive es copiaran al navegador d\'aquest ordinador.','Passa-hi'))return;
     if(pend)await driveDesa();mode='local';localStorage.setItem(LSMODE,'local');try{localStorage.setItem(LS,JSON.stringify(state))}catch{};location.reload()});
   on('#dCidOk','onclick',()=>{G.clientId=$('#dCid').value.trim();localStorage.setItem(LSCID,G.clientId);toast('ID de client desat en aquest navegador.')});
@@ -1360,11 +1435,11 @@ $('#btnCalc').onclick=()=>calcObre(false);$('#calcX').onclick=()=>calc.style.dis
   addEventListener('mousemove',e=>{if(!drag)return;calc.style.left=Math.max(0,Math.min(innerWidth-260,e.clientX-dx))+'px';calc.style.top=Math.max(0,Math.min(innerHeight-60,e.clientY-dy))+'px';calc.style.right='auto'});
   addEventListener('mouseup',()=>drag=false)})();
 
-addEventListener('beforeunload',e=>{if(pend){mode==='drive'?driveDesa():escriuFitxer();e.preventDefault();e.returnValue=''}});
+addEventListener('beforeunload',e=>{if(mode==='drive'){if(G.brut){guardaCache();driveDesa();e.preventDefault();e.returnValue=''}return}if(pend){escriuFitxer();e.preventDefault();e.returnValue=''}});
 
 /* ======================= Inici ======================= */
 (async()=>{
-  if(mode==='drive'){$('#login').style.display='flex';estat();return}
+  if(mode==='drive'){mostraLogin();estat();return}
   let d=null;try{d=JSON.parse(localStorage.getItem(LS))}catch{}
   state=valida(d)?migra(d):demo();if(!state.subjects.some(s=>s.id===state.cur))state.cur=cur().id;iniciaHist();render();
   if(FS){const h=await idb.get('file');if(h){fileHandle=h;try{filePerm=(await h.queryPermission({mode:'readwrite'}))==='granted'}catch{}
