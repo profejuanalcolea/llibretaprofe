@@ -626,7 +626,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 17:15';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -957,6 +957,9 @@ function llegeixCache(){try{const c=JSON.parse(localStorage.getItem(LSCACHE));re
 function carregaGIS(){if(window.google?.accounts?.oauth2)return Promise.resolve();
   return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=res;s.onerror=()=>rej(new Error('No s\'ha pogut carregar l\'entrada de Google. Hi ha connexió?'));document.head.appendChild(s)})}
 const CLS_SCOPES=['classroom.courses.readonly','classroom.rosters.readonly','classroom.coursework.students.readonly'].map(x=>'https://www.googleapis.com/auth/'+x);
+/* Google pot tornar el permís amb el seu nom antic o amb el permís d'escriptura equivalent */
+const ALIES={'classroom.courses.readonly':['classroom.courses'],'classroom.rosters.readonly':['classroom.rosters'],'classroom.coursework.students.readonly':['classroom.student-submissions.students.readonly','classroom.coursework.students']};
+const teScope=x=>{const sc=(G.scope||'').split(/\s+/).map(y=>y.split('/').pop()),k=x.split('/').pop();return sc.includes(k)||(ALIES[k]||[]).some(a=>sc.includes(a))};
 const ambCls=()=>{try{return localStorage.getItem('llibreta-cls')==='1'}catch{return false}};
 function demanaToken(prompt=''){return new Promise((res,rej)=>{
   const tc=google.accounts.oauth2.initTokenClient({client_id:G.clientId,scope:['https://www.googleapis.com/auth/drive.file',...(ambCls()?CLS_SCOPES:[])].join(' '),include_granted_scopes:true,hint:G.email||undefined,
@@ -1503,13 +1506,12 @@ const CLSAPI='https://classroom.googleapis.com/v1';
 function titolCls(sub){const k=sub.cls,alt=state.subjects.filter(x=>x!==sub&&x.cls?.id===k.id).map(x=>x.name);
   return `Classroom: ${k.nom}\nÚltima sincronització: ${k.sinc?new Date(k.sinc).toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'}):'encara no'}${alt.length?'\nTambé connectat a: '+alt.join(', '):''}\nClica per obrir el panell de Classroom`}
 async function assegCls(){if(mode!=='drive')throw new Error('Classroom només funciona entrant amb Google (mode Drive).');
-  if(G.token&&CLS_SCOPES.every(x=>(G.scope||'').includes(x)))return;
+  if(G.token&&(CLS_SCOPES.every(teScope)||G.clsDemanat))return;
   const primer=!ambCls()||G.clsDemanat;try{localStorage.setItem('llibreta-cls','1')}catch{}await carregaGIS();await demanaToken(primer?'consent':'');G.clsDemanat=true;
-  const falten=CLS_SCOPES.filter(x=>!(G.scope||'').includes(x));if(!falten.length)return;
-  const NOMS={'classroom.courses.readonly':'veure les classes','classroom.rosters.readonly':'veure les llistes d\'alumnes','classroom.coursework.students.readonly':'veure els treballs i les notes'};
-  throw new Error(`Falten permisos de Classroom: ${falten.map(x=>NOMS[x.split('/').pop()]).join(', ')}. Torna a clicar i, a la finestra de Google, marca totes les caselles (Google les mostra desmarcades) abans de clicar «Continua». Si no hi surten, revisa que aquests permisos estiguin afegits a Google Cloud › Accés a dades.`)}
+  /* No ho bloquegem aquí: Google de vegades torna els permisos amb altres noms. Si de veritat en falta algun, Classroom respondrà 403 i ho expliquem. */}
 async function cf(path){const tot=[];let tok='';do{let r;try{r=await gf(CLSAPI+path+(path.includes('?')?'&':'?')+'pageSize=100'+(tok?'&pageToken='+tok:''))}
-    catch(e){const m=String(e.message);if(/ 403/.test(m))throw new Error('Classroom no deixa accedir-hi. Cal activar l\'API de Classroom al projecte de Google Cloud o que l\'administrador del centre l\'autoritzi.');if(/ 404/.test(m))throw new Error('No s\'ha trobat el curs o la tasca a Classroom.');throw e}
+    catch(e){const m=String(e.message);if(/ 403/.test(m)){const d=(G.scope||'').split(/\s+/).filter(x=>x.includes('classroom')).map(x=>x.split('/').pop());
+      throw new Error(`Classroom no deixa accedir-hi (${/insufficient|scope/i.test(m)?'falta algun permís':'API no activada o bloquejada'}). Permisos que t'ha donat Google: ${d.join(', ')||'cap de Classroom'}. Revisa que l'API de Classroom estigui activada i que a la finestra de Google hagis marcat totes les caselles; si tot és correcte, ho ha d'autoritzar l'administrador del centre.`)}if(/ 404/.test(m))throw new Error('No s\'ha trobat el curs o la tasca a Classroom.');throw e}
     const j=await r.json();const k=Object.keys(j).find(x=>Array.isArray(j[x]));if(k)tot.push(...j[k]);tok=j.nextPageToken||''}while(tok);return tot}
 const nomCls=st=>{const n=st.profile?.name||{};return {nom:n.givenName||'',cognoms:n.familyName||'',full:n.fullName||((n.givenName||'')+' '+(n.familyName||'')).trim()}};
 /* Aparellament per noms: verd (clar), taronja (probable), vermell (no trobat o dubtós) */
@@ -2198,7 +2200,7 @@ $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b||!state)return;t
 $$('.tabic').forEach(b=>b.onclick=()=>{if(!state)return;tab=tab===b.dataset.t?tabPrincipal:b.dataset.t;render()});
 $('#btnCopia').onclick=()=>copia();
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='f'&&state&&tab==='llibreta'){e.preventDefault();plegaCap()}});
-$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO;const a=$('#credAmmo');a.classList.remove('anim');$('#dlgCred').showModal();void a.offsetWidth;a.classList.add('anim')};$('#credX').onclick=()=>$('#dlgCred').close();
+$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO+' · compilació '+COMPILACIO;const a=$('#credAmmo');a.classList.remove('anim');$('#dlgCred').showModal();void a.offsetWidth;a.classList.add('anim')};$('#credX').onclick=()=>$('#dlgCred').close();
 
 /* ======================= Eines ======================= */
 function nivPosit(p){if(!p.data||p.fet)return '';const d=Math.round((new Date(p.data+'T12:00')-new Date(avui()+'T12:00'))/864e5);
