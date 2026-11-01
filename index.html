@@ -257,6 +257,7 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 .dtab{border-collapse:collapse;font-size:14px}.dtab th,.dtab td{border:1px solid var(--linia);padding:5px 10px;text-align:center;white-space:nowrap}.dtab thead th{background:var(--gris)}
 .dtab tbody th{text-align:left;min-width:90px}.dtab td span{color:var(--suau);font-size:12.5px}.dtab .tot{font-weight:700;background:#fff3e0}.dtab .dsn th,.dtab .dsn td{color:var(--suau)}.dtab .dapr th,.dtab .dapr td{font-weight:700;border-top:2px solid #999}
 .clsx{border:1px solid rgba(0,0,0,.15);background:#fff;border-radius:12px;padding:0 8px;font:inherit;font-size:12px;cursor:pointer;max-width:260px;display:inline-flex;gap:4px;align-items:center;vertical-align:middle}
+.clsln{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.15);background:#fff;color:#1a73e8;text-decoration:none;font-size:12px;font-weight:700;margin-left:3px;vertical-align:middle}.clsln:hover{background:#1a73e8;color:#fff}
 .clsx span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.clsx:hover{border-color:var(--tar);background:var(--tar2)}.clsx.mini{padding:0 5px;font-size:13px;flex:0 0 auto}
 td.clsdraft input.g{font-style:italic;color:#6a6a6a}td.clsdraft::after{content:'';position:absolute;left:4px;right:4px;bottom:3px;border-bottom:1px dashed #999;pointer-events:none}
 td.clsman::before{content:'';position:absolute;top:3px;left:3px;width:6px;height:6px;border-radius:50%;background:#1565c0;pointer-events:none}
@@ -635,7 +636,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:40';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:55';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1119,8 +1120,8 @@ const capPlegada=()=>{try{return localStorage.getItem('llibreta-cap-plegada')===
 function plegaCap(){try{localStorage.setItem('llibreta-cap-plegada',capPlegada()?'0':'1')}catch{}render()}
 function capcalera(sub,barra='',llg=''){if(!sub)return '';const n=sub.students.length;
   const arx=sub.archived?`<div class="arxban">🔒 Llibreta arxivada: només lectura. <button class="btn sec" data-desarx="${sub.id}">Desarxiva</button></div>`:'';
-  if(capPlegada()&&barra)return `<div class="capw plg" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><b class="mnom" title="${esc(sub.name)} · ${n} alumne${n===1?'':'s'}">${esc(sub.name)}</b>${sub.cls?`<button class="clsx mini" data-clsx title="${esc(titolCls(sub))}">🎓</button>`:''}<span class="minibar">${barra}</span><button class="capfold" data-capfold title="Desplega la capçalera (Ctrl+Maj+F)">˅</button></div>`+arx;
-  return `<div class="capw" style="background:${sub.color||LPAL[0][0]}">${barra?'<button class="capfold" data-capfold title="Plega la capçalera (Ctrl+Maj+F)">˄</button>':''}<div class="cap ${barra?'ambbar':''}"><div class="captit"><span class="capic">${sub.icon||'📘'}</span><div><h1>${esc(sub.name)}</h1><div class="capsub">${sub.cls?`<button class="clsx" data-clsx title="${esc(titolCls(sub))}">🎓 <span>${esc(sub.cls.nom)}</span></button> `:''}${n} alumne${n===1?'':'s'}${sub.archived?' · arxivada a «'+esc(sub.archived.cat||'Sense categoria')+'»':''}</div></div></div>
+  if(capPlegada()&&barra)return `<div class="capw plg" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><b class="mnom" title="${esc(sub.name)} · ${n} alumne${n===1?'':'s'}">${esc(sub.name)}</b>${sub.cls?`<button class="clsx mini" data-clsx title="${esc(titolCls(sub))}">🎓</button>`:''}${sub.cls?`<a class="clsln" href="${esc(sub.cls.link||'https://classroom.google.com/')}" target="_blank" rel="noopener noreferrer" title="Obre aquest curs a Classroom">↗</a>`:''}<span class="minibar">${barra}</span><button class="capfold" data-capfold title="Desplega la capçalera (Ctrl+Maj+F)">˅</button></div>`+arx;
+  return `<div class="capw" style="background:${sub.color||LPAL[0][0]}">${barra?'<button class="capfold" data-capfold title="Plega la capçalera (Ctrl+Maj+F)">˄</button>':''}<div class="cap ${barra?'ambbar':''}"><div class="captit"><span class="capic">${sub.icon||'📘'}</span><div><h1>${esc(sub.name)}</h1><div class="capsub">${sub.cls?`<button class="clsx" data-clsx title="${esc(titolCls(sub))}">🎓 <span>${esc(sub.cls.nom)}</span></button><a class="clsln" href="${esc(sub.cls.link||'https://classroom.google.com/')}" target="_blank" rel="noopener noreferrer" title="Obre aquest curs a Classroom">↗</a> `:''}${n} alumne${n===1?'':'s'}${sub.archived?' · arxivada a «'+esc(sub.archived.cat||'Sense categoria')+'»':''}</div></div></div>
 ${barra?`<div class="capbar">${barra}</div>`:''}</div>${llg}</div>`+arx}
 function senseLlibretes(){$('#main').innerHTML=`<div class="buit">No tens cap llibreta activa. Crea'n una amb <b>＋</b> o desarxiva'n una des de la pestanya <b>Arxiu</b>.</div>`}
 
@@ -1291,7 +1292,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     h+=`<tfoot><tr>`+fix.map((f,i)=>`<td class="fx tot ${f.last?'fxlast':''}" style="${stf(f)}">${i===0?'Totals ('+sts.length+')':''}</td>`).join('')+
       gs.map(g=>g.folded?totalCat(sub,g.cat,sts):g.cols.map(c=>totalCella(sub,c,sts)).join('')).join('')+`</tr></tfoot>`}
   h+=`</table></div>`;
-  h+=`<div class="peu"><div class="peut">📝 Notes de la llibreta <span>· només les veus aquí: no surten a l'Avaluació, a la Vista alumne ni als PDF</span></div><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} placeholder="Horari, aula, dates d'examen, recordatoris, acords amb el grup…">${esc(sub.info||'')}</textarea></div>`;
+  h+=`<div class="peu"><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} placeholder="Horari, aula, dates d'examen, recordatoris, acords amb el grup…">${esc(sub.info||'')}</textarea></div>`;
   m.innerHTML=h;const tw=$('#tw');tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub);const ta=$('.peu textarea');if(ta){const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(70,ta.scrollHeight+2)+'px'};fit();ta.addEventListener('input',fit)}}
 function plegCella(sub,cat,st){const r=catResult(sub,cat,st);return `<td class="plegc ${r?'l'+r.lvl:''}" data-plegc="${cat.id}" data-s="${st.id}">${r?esc(r.label):'—'}</td>`}
 function amplada(sub,c){const a=c.amp||'normal';if(a==='plegada')return 20;if(a==='ampla')return c.type==='lliure'?240:170;if(a==='estreta')return 50;return sub.compacte?54:(c.type==='lliure'?190:110)}
@@ -1557,7 +1558,8 @@ const CL={vista:'',cursos:null,roster:null,tasques:null,props:null,err:''};
 function obreCls(){CL.vista=cur().cls?'menu':'cursos';CL.err='';pintaCls();$('#dlgCls').showModal();if(CL.vista==='cursos')carregaCursos()}
 async function ambCarrega(f){CL.err='';CL.carregant=true;pintaCls();try{await f()}catch(e){CL.err=e.message==='reauth'?'La sessió de Google ha caducat: clica el núvol per reconnectar.':e.message==='offline'?'No hi ha connexió.':e.message}CL.carregant=false;pintaCls()}
 function carregaCursos(){return ambCarrega(async()=>{await assegCls();CL.cursos=await cf('/courses?teacherId=me&courseStates=ACTIVE')})}
-function carregaRoster(){return ambCarrega(async()=>{await assegCls();const sub=cur();CL.roster=await cf(`/courses/${sub.cls.id}/students`);CL.props=proposaParelles(sub,CL.roster)})}
+async function enllacCls(sub){if(sub.cls.link)return;try{const c=await (await gf(`${CLSAPI}/courses/${sub.cls.id}`)).json();if(c.alternateLink){sub.cls.link=c.alternateLink;save(null,true);render()}}catch{}}
+function carregaRoster(){return ambCarrega(async()=>{await assegCls();const sub=cur();enllacCls(sub);CL.roster=await cf(`/courses/${sub.cls.id}/students`);CL.props=proposaParelles(sub,CL.roster)})}
 function carregaTasques(){return ambCarrega(async()=>{await assegCls();const sub=cur();CL.tasques=(await cf(`/courses/${sub.cls.id}/courseWork?courseWorkStates=PUBLISHED`)).sort((a,b)=>(b.creationTime||'').localeCompare(a.creationTime||''))})}
 async function sincCol(sub,c){const subs=await cf(`/courses/${sub.cls.id}/courseWork/${c.cls.cw}/studentSubmissions`);const per=new Map(subs.map(x=>[x.userId,x]));
   c.cls.vals??={};let posades=0,manuals=0,draft=0;
@@ -1571,12 +1573,12 @@ async function sincCol(sub,c){const subs=await cf(`/courses/${sub.cls.id}/course
     c.cls.vals[st.id]={v,p:g,draft:esD}}
   c.cls.sinc=Date.now();return {posades,manuals,draft}}
 async function sincTot(){const sub=cur(),cols=sub.columns.filter(c=>c.cls&&!c.cls.orfe);if(!cols.length)return toast('Aquesta llibreta encara no té cap tasca de Classroom.');
-  await ambCarrega(async()=>{await assegCls();let t={posades:0,manuals:0,draft:0};for(const c of cols){const r=await sincCol(sub,c);for(const k in t)t[k]+=r[k]}
+  await ambCarrega(async()=>{await assegCls();enllacCls(sub);let t={posades:0,manuals:0,draft:0};for(const c of cols){const r=await sincCol(sub,c);for(const k in t)t[k]+=r[k]}
     sub.cls.sinc=Date.now();save('sincronitzar Classroom');render();CL.msg=`${cols.length} tasca(es) sincronitzada(es): ${t.posades} notes${t.draft?` (${t.draft} esborranys)`:''}${t.manuals?` · ${t.manuals} canviades a mà s'han mantingut`:''}.`})}
 function pintaCls(){const sub=cur(),W=$('#clsW');if(!sub)return;const k=sub.cls,ld=CL.carregant?'<p class="aj">⏳ Carregant de Classroom…</p>':'',er=CL.err?`<p class="clserr">⚠ ${esc(CL.err)}</p>`:'';
   let h='';const msg=CL.msg?`<p class="clsok">✔ ${esc(CL.msg)}</p>`:'';CL.msg='';
   if(CL.vista==='cursos'){h=`<p class="aj">Tria el curs de Classroom d'aquesta llibreta. Només es llegeix: la llibreta no escriu mai res a Classroom.</p>${ld}${er}
-      ${CL.cursos?(CL.cursos.length?`<div class="afll">${CL.cursos.map(c=>{const alt=state.subjects.filter(x=>x.cls?.id===c.id&&x!==sub);return `<label class="afit"><input type="radio" name="clsC" value="${c.id}" data-nom="${esc(c.name+(c.section?' · '+c.section:''))}"> <b>${esc(c.name)}</b>${c.section?' · '+esc(c.section):''}${alt.length?` <span class="aj" style="margin:0">· ja connectat a ${esc(alt.map(x=>x.name).join(', '))}</span>`:''}</label>`}).join('')}</div>`:'<p class="aj">No tens cap curs actiu a Classroom.</p>'):''}`;
+      ${CL.cursos?(CL.cursos.length?`<div class="afll">${CL.cursos.map(c=>{const alt=state.subjects.filter(x=>x.cls?.id===c.id&&x!==sub);return `<label class="afit"><input type="radio" name="clsC" value="${c.id}" data-nom="${esc(c.name+(c.section?' · '+c.section:''))}" data-link="${esc(c.alternateLink||'')}"> <b>${esc(c.name)}</b>${c.section?' · '+esc(c.section):''}${alt.length?` <span class="aj" style="margin:0">· ja connectat a ${esc(alt.map(x=>x.name).join(', '))}</span>`:''}</label>`}).join('')}</div>`:'<p class="aj">No tens cap curs actiu a Classroom.</p>'):''}`;
     $('#clsBtns').innerHTML=`<button class="btn sec" data-clv="tanca">Cancel·la</button>${k?'<button class="btn sec" data-clv="menu">← Enrere</button>':''}${CL.err?'<button class="btn" data-clv="cursos">↻ Torna-ho a provar</button>':''}<button class="btn" data-clv="connecta" ${CL.cursos?.length?'':'disabled'}>Connecta</button>`}
   else if(CL.vista==='menu'){const alt=state.subjects.filter(x=>x!==sub&&x.cls?.id===k.id),nCid=sub.students.filter(s=>s.cid).length,cols=sub.columns.filter(c=>c.cls&&!c.cls.orfe);
     h=`${msg}${ld}${er}<div class="clsinfo"><div>🎓 <b>${esc(k.nom)}</b></div><div class="aj" style="margin:2px 0">Última sincronització: ${k.sinc?new Date(k.sinc).toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'}):'encara no'} · ${nCid}/${sub.students.length} alumnes aparellats · ${cols.length} tasca(es) importada(es)${(k.ignora||[]).length?` · ${k.ignora.length} ignorats (d'un altre grup)`:''}</div>
@@ -1608,7 +1610,7 @@ $('#dlgCls').addEventListener('click',async e=>{const b=e.target.closest('[data-
   if(v==='connecta'){const r=$('input[name=clsC]:checked');if(!r)return toast('Tria un curs.');const nou=r.value;
     if(sub.cls&&sub.cls.id!==nou&&!await confirma('Canviar de curs? Els aparellaments i les tasques importades del curs anterior deixaran de sincronitzar-se (les notes es queden).','Canvia'))return;
     if(sub.cls?.id!==nou){sub.students.forEach(st=>delete st.cid);sub.columns.forEach(c=>{if(c.cls)c.cls.orfe=1})}
-    sub.cls={id:nou,nom:r.dataset.nom,ignora:sub.cls?.id===nou?sub.cls.ignora:[],sinc:null};save('connectar Classroom');render();CL.vista='alumnes';pintaCls();carregaRoster();return}
+    sub.cls={id:nou,nom:r.dataset.nom,link:r.dataset.link||'',ignora:sub.cls?.id===nou?sub.cls.ignora:[],sinc:null};save('connectar Classroom');render();CL.vista='alumnes';pintaCls();carregaRoster();return}
   if(v==='alumnes'){CL.vista='alumnes';pintaCls();carregaRoster();return}
   if(v==='tasques'){CL.vista='tasques';pintaCls();carregaTasques();return}
   if(v==='sinc'){await sincTot();return}
