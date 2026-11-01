@@ -268,6 +268,11 @@ td.clsman::before{content:'';position:absolute;top:3px;left:3px;width:6px;height
 .tsons .btn.sec{background:transparent;color:#fff;border:1px solid #fff8}
 th.nomh{position:sticky}.nomres{position:absolute;top:0;right:0;bottom:0;width:7px;cursor:col-resize;z-index:5}.nomres:hover,body.redim .nomres{background:var(--tar)}
 body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
+.cap.ambbar{flex-wrap:nowrap;align-items:center}.cap.ambbar .captit{flex:0 0 auto;max-width:38%}.cap.ambbar .capbar{flex:1 1 auto;flex-direction:column;align-items:flex-end;gap:5px;padding-right:28px}
+.cbr1,.cbr2{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;justify-content:flex-end}.cbr2{font-size:12.5px;color:#555;gap:4px 14px}.cbr2 label{font-size:12.5px!important}
+.peu{margin-top:10px;border:1px solid var(--linia);border-radius:10px;background:#fffdf5;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
+.peu textarea{width:100%;border:0;background:transparent;font:inherit;font-size:14.5px;resize:vertical;min-height:70px;padding:2px}.peu textarea:focus{outline:2px solid var(--tar);border-radius:6px}
+@media(max-width:1000px){.cap.ambbar{flex-wrap:wrap}.cap.ambbar .captit{max-width:none}.cap.ambbar .capbar{align-items:flex-start}.cbr1,.cbr2{justify-content:flex-start}}
 .tilew{position:relative}.tilew .acc{position:absolute;top:4px;right:4px;display:none;gap:2px}.tilew:hover .acc{display:flex}
 .tilew .acc button{border:0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;padding:1px 5px}.tilew .acc button:disabled{opacity:.3}
 .posit .vtxt{color:#b00020;font-weight:800;font-size:12px}
@@ -630,7 +635,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:25';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:40';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1116,7 +1121,7 @@ function capcalera(sub,barra='',llg=''){if(!sub)return '';const n=sub.students.l
   const arx=sub.archived?`<div class="arxban">🔒 Llibreta arxivada: només lectura. <button class="btn sec" data-desarx="${sub.id}">Desarxiva</button></div>`:'';
   if(capPlegada()&&barra)return `<div class="capw plg" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><b class="mnom" title="${esc(sub.name)} · ${n} alumne${n===1?'':'s'}">${esc(sub.name)}</b>${sub.cls?`<button class="clsx mini" data-clsx title="${esc(titolCls(sub))}">🎓</button>`:''}<span class="minibar">${barra}</span><button class="capfold" data-capfold title="Desplega la capçalera (Ctrl+Maj+F)">˅</button></div>`+arx;
   return `<div class="capw" style="background:${sub.color||LPAL[0][0]}">${barra?'<button class="capfold" data-capfold title="Plega la capçalera (Ctrl+Maj+F)">˄</button>':''}<div class="cap ${barra?'ambbar':''}"><div class="captit"><span class="capic">${sub.icon||'📘'}</span><div><h1>${esc(sub.name)}</h1><div class="capsub">${sub.cls?`<button class="clsx" data-clsx title="${esc(titolCls(sub))}">🎓 <span>${esc(sub.cls.nom)}</span></button> `:''}${n} alumne${n===1?'':'s'}${sub.archived?' · arxivada a «'+esc(sub.archived.cat||'Sense categoria')+'»':''}</div></div></div>
-    <div class="info"><textarea data-info="${sub.id}" rows="2" ${sub.archived?'disabled':''} placeholder="Informació: horari, aula, examen, recordatoris…">${esc(sub.info||'')}</textarea></div>${barra?`<div class="capbar">${barra}</div>`:''}</div>${llg}</div>`+arx}
+${barra?`<div class="capbar">${barra}</div>`:''}</div>${llg}</div>`+arx}
 function senseLlibretes(){$('#main').innerHTML=`<div class="buit">No tens cap llibreta activa. Crea'n una amb <b>＋</b> o desarxiva'n una des de la pestanya <b>Arxiu</b>.</div>`}
 
 const sigHtml=c=>`<span class="sig" style="background:${c.color};color:${textSobre(c.color)}">${esc(c.sigla||'')}</span>`;
@@ -1233,16 +1238,15 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   const mosH=cls.length?`<label><span class="lt">Mostra </span><select id="bMos"><option value="tots" ${mostra==='tots'?'selected':''}>tots</option><option value="perclasse" ${mostra==='perclasse'?'selected':''}>tots per classes</option>${clas.map(k=>`<option value="c:${esc(k)}" ${mostra==='c:'+k?'selected':''}>${esc(k)}</option>`).join('')}</select></label>`:'';
   const ordH=`<label><span class="lt">Ordena per </span><select id="bOrd">${opcionsOrdre(sub)}</select></label>${ordrePerNota(sub)?`<button class="btn sec" id="bDir" title="Canvia el sentit">${sub.ordreDir==='asc'?'↑<span class="lt"> de baixa a alta</span>':'↓<span class="lt"> de alta a baixa</span>'}</button>`:''}`;
   const mini=capPlegada()?`${ro?'':'<button class="btn" id="bCol" title="Nova columna">＋<span class="lt"> Columna</span></button>'}${mosH}${ordH}${ocultesXip(sub)}`:'';
-  let barra=capPlegada()?mini:`
+  let barra=capPlegada()?mini:`<div class="cbr1">
     ${ro?'':`<button class="btn" id="bCol">＋ Columna</button><button class="btn sec" id="bImp">Importa notes</button>`}
     <button class="btn sec" id="bExp">Exporta</button>
     <span class="sep"></span>
     ${mosH}
-    ${ordH}
-    <span class="sep"></span>
+    ${ordH}</div><div class="cbr2">
     <label><input type="checkbox" id="bHCg" ${sub.ocult.cognoms?'checked':''}> Amaga cognoms</label>
     ${cls.length?`<label><input type="checkbox" id="bHCl" ${sub.ocult.classe?'checked':''}> Amaga classe</label>`:''}
-    <span class="sep"></span><label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label>
+    <label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label></div>
   `;let h=capcalera(sub,barra,capPlegada()?'':llegenda(sub));
   if(!sub.students.length){m.innerHTML=h+`<div class="buit">Encara no hi ha alumnes en aquesta llibreta.<div style="margin-top:12px"><button class="btn" id="bAfAl">👥 Afegeix alumnes</button></div></div>`;lligaBarra(sub);$('#bAfAl').onclick=()=>{tab='config';alObert=true;render();$('#detAl')?.scrollIntoView({block:'start'})};return}
   /* columnes fixes a l'esquerra */
@@ -1287,7 +1291,8 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     h+=`<tfoot><tr>`+fix.map((f,i)=>`<td class="fx tot ${f.last?'fxlast':''}" style="${stf(f)}">${i===0?'Totals ('+sts.length+')':''}</td>`).join('')+
       gs.map(g=>g.folded?totalCat(sub,g.cat,sts):g.cols.map(c=>totalCella(sub,c,sts)).join('')).join('')+`</tr></tfoot>`}
   h+=`</table></div>`;
-  m.innerHTML=h;const tw=$('#tw');tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub)}
+  h+=`<div class="peu"><div class="peut">📝 Notes de la llibreta <span>· només les veus aquí: no surten a l'Avaluació, a la Vista alumne ni als PDF</span></div><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} placeholder="Horari, aula, dates d'examen, recordatoris, acords amb el grup…">${esc(sub.info||'')}</textarea></div>`;
+  m.innerHTML=h;const tw=$('#tw');tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub);const ta=$('.peu textarea');if(ta){const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(70,ta.scrollHeight+2)+'px'};fit();ta.addEventListener('input',fit)}}
 function plegCella(sub,cat,st){const r=catResult(sub,cat,st);return `<td class="plegc ${r?'l'+r.lvl:''}" data-plegc="${cat.id}" data-s="${st.id}">${r?esc(r.label):'—'}</td>`}
 function amplada(sub,c){const a=c.amp||'normal';if(a==='plegada')return 20;if(a==='ampla')return c.type==='lliure'?240:170;if(a==='estreta')return 50;return sub.compacte?54:(c.type==='lliure'?190:110)}
 function lligaBarra(sub){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
@@ -1311,9 +1316,9 @@ function colFinal(sub){const f=sub.columns.filter(c=>c.type==='final');return f.
 function nivellAlumne(sub,st){const fc=colFinal(sub),v=fc?getG(sub,fc.id,st.id):undefined;if(v!==undefined&&v!=='')return lvlFinal(v,sub.settings);const f=finalDe(sub,st);return f?f.lvl:0}
 function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)return rVistaAlumne(sub);
   const ro=RO(),finals=sub.columns.filter(c=>c.type==='final'),fc=colFinal(sub),pleg=!!sub.aval.comPleg;
-  const barra=`<button class="btn" id="aVA">👤 Vista alumne</button>
+  const barra=`<div class="cbr1"><button class="btn" id="aVA">👤 Vista alumne</button>
     ${finals.length>1?`<label>Nota final <select id="aFin">${finals.map(c=>`<option value="${c.id}" ${c===fc?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
-    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button><button class="btn sec" id="bExp">Exporta</button>`;
+    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button><button class="btn sec" id="bExp">Exporta</button></div>`;
   let h=capcalera(sub,barra,llegenda(sub));
   if(!sub.students.length){$('#main').innerHTML=h+'<div class="buit">Sense alumnes.</div>';lligaAval(sub);return}
   const sts=alumnesAval(sub);if(DIST.on)h+=distHtml(sub);
