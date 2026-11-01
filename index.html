@@ -271,7 +271,7 @@ th.nomh{position:sticky}.nomres{position:absolute;top:0;right:0;bottom:0;width:7
 body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
 .cap.ambbar{flex-wrap:nowrap;align-items:center}.cap.ambbar .captit{flex:0 0 auto;max-width:38%}.cap.ambbar .capbar{flex:1 1 auto;flex-direction:column;align-items:flex-end;gap:5px;padding-right:28px}
 .cbr1,.cbr2{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;justify-content:flex-end}.cbr2{font-size:12.5px;color:#555;gap:4px 14px}.cbr2 label{font-size:12.5px!important}
-.peu{margin-top:16px;border:1px solid var(--linia);border-radius:10px;background:#fffdf5;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
+.peu{margin-top:16px;border:1px solid var(--linia);border-radius:10px;background:#fff;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
 .peu textarea{width:100%;border:0;background:transparent;font:inherit;font-size:14.5px;resize:vertical;min-height:70px;padding:2px}.peu textarea:focus{outline:2px solid var(--tar);border-radius:6px}
 @media(max-width:1000px){.cap.ambbar{flex-wrap:wrap}.cap.ambbar .captit{max-width:none}.cap.ambbar .capbar{align-items:flex-start}.cbr1,.cbr2{justify-content:flex-start}}
 .ordt{font-weight:700;font-size:13px;color:var(--suau);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}.ordll{display:flex;flex-direction:column;gap:2px;max-height:60vh;overflow:auto}
@@ -642,7 +642,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 20:45';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 21:20';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1276,14 +1276,14 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     const mvL=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="-1" ${bi===0?'disabled':''} title="Mou a l'esquerra">◀</button>`,mvR=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="1" ${bi===nB-1?'disabled':''} title="Mou a la dreta">▶</button>`;
     if(!g.cat){const col=g.solt.color||'#D9D9D9';return `<th class="grup solt" style="background:${col};color:${textSobre(col)}">${g.solt.amp==='plegada'?'':mvL+mvR}</th>`}
     const nC=g.folded?1:g.cols.length;
-    return `<th class="grup ${g.folded?'plg':''}" colspan="${nC}" style="background:${g.cat.color};color:${textSobre(g.cat.color)}">${mvL}<span class="gtog" data-pleg="${g.cat.id}" title="${g.folded?'Desplega':'Plega'} la categoria">${g.folded?'▸':'▾'} ${esc(g.cat.sigla)}${g.folded?'':` · ${esc(g.cat.name)}`} · ${g.cat.weight}%</span>${mvR}</th>`}).join('');
+    return `<th class="grup ${g.folded?'plg':''}" colspan="${nC}" style="background:${g.cat.color};color:${textSobre(g.cat.color)}">${mvL}<span class="gtog" data-pleg="${g.cat.id}" title="${g.folded?'Desplega':'Plega'} la categoria">${g.folded?'▸':'▾'} ${esc(g.cat.sigla)}${g.folded?'':` · ${esc(g.cat.name)}`}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}</span>${mvR}</th>`}).join('');
   h+=`</tr><tr>`;let zc=1000;
   h+=gs.map(g=>{
     if(g.folded){const m=g.cat.method==='mean'&&!mitjanaPermesa(sub,g.cat)?'mediana':METODE[g.cat.method];
       return `<th class="colh plegh" data-pleg="${g.cat.id}" style="border-top-color:${g.cat.color}" title="Clica per desplegar">${esc(g.cat.name)}<span class="t">Σ ${m} · ${g.cols.length} col.</span></th>`}
     return g.cols.map((c,i)=>{zc--;const top=`border-top-color:${g.cat?g.cat.color:(c.color||'#D9D9D9')}`;
       if(c.amp==='plegada')return `<th class="colh plc" data-col="${c.id}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} (plegada) · clica l'ull per desplegar-la"><button class="ull" data-desplc="${c.id}">👁</button></th>`;
-      const np=g.cat&&!compta(c),vert=cp&&(c.amp||'normal')!=='ampla';
+      const np=g.cat&&sub.tipus!=='llista'&&!compta(c),vert=cp&&(c.amp||'normal')!=='ampla';
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
       const tools=ro?'':`<span class="htools"><button data-mv="-1" ${g.solt?'':first?'disabled':''} title="Mou a l'esquerra">◀</button><button data-plc="${c.id}" title="Plega la columna">👁</button><button data-srt="${c.id}" title="Ordena els alumnes per aquesta columna" ${['num','ord','ass','final','ext'].includes(c.type)?'':'disabled'}>⇅</button><button data-mv="1" ${g.solt?'':last?'disabled':''} title="Mou a la dreta">▶</button></span>`;
@@ -1434,7 +1434,7 @@ function fitxaHtml(sub,st,mode,obs,priv){const f=finalDe(sub,st),fc=colFinal(sub
       ${fc?`<div class="vacat fin"><div class="vct">${esc(fc.name)}</div><div class="vcv ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</div></div>`:''}</div>`}
   else{h+=grups(sub,true).map(g=>{const cols=g.cols.filter(c=>c.type!=='classe'&&(obs||!['lliure','url'].includes(c.type)));if(!cols.length)return '';
       const col=g.cat?g.cat.color:(g.solt.color||'#D9D9D9');
-      return `<div class="vabloc" style="border-left:5px solid ${col}">${g.cat?`<div class="vbt">${sigHtml(g.cat)} ${esc(g.cat.name)} · ${g.cat.weight}%${(()=>{const r=catResult(sub,g.cat,st);return r?` <span class="vchip l${r.lvl}">${esc(r.label)}</span>`:''})()}</div>`:''}
+      return `<div class="vabloc" style="border-left:5px solid ${col}">${g.cat?`<div class="vbt">${sigHtml(g.cat)} ${esc(g.cat.name)}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}${(()=>{if(sub.tipus==='llista')return '';const r=catResult(sub,g.cat,st);return r?` <span class="vchip l${r.lvl}">${esc(r.label)}</span>`:''})()}</div>`:''}
         ${cols.map(c=>{const an=priv&&sub.anot?.[c.id+'|'+st.id];return `<div class="vrow ${an?.h?'anh':''}"><span class="vrn">${esc(c.name)}</span><span>${valorVista(sub,c,st)}</span></div>${an?.t?`<div class="vran">💬 ${esc(an.t)}</div>`:''}`}).join('')}</div>`}).join('')}
   if(obs&&sub.comentaris[st.id])h+=`<div class="vabloc" style="border-left:5px solid #999"><div class="vbt">💬 Comentari</div><div style="white-space:pre-wrap">${esc(sub.comentaris[st.id])}</div></div>`;
   return h+'</div>'}
@@ -1834,7 +1834,7 @@ function lligaColors(){$$('input[name=kJoc]').forEach(r=>r.onchange=()=>{const j
   $$('[data-pcolr]').forEach(i=>{i.oninput=()=>{state.colors.pers[i.dataset.pcolr]=i.value;aplicaColors()};i.onchange=()=>{save('colors');rConfig()}});
   const b=$('#kPersRes');if(b)b.onclick=()=>{state.colors.pers={...JOCS.pal.c};save('colors');aplicaColors();rConfig()}}
 function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=cfgOb();o.al=1;cfgDesa(o);alObert=false}const s=sub.settings,tot=sub.categories.reduce((a,c)=>a+(+c.weight||0),0),ro=RO();
-  const nS=sub.students.length;
+  const nS=sub.students.length,esLl=sub.tipus==='llista';
   $('#main').innerHTML=capcalera(sub)+`<div class="cfgtop"><button class="btn sec" id="cfgPl">▸ Plega-ho tot</button><button class="btn sec" id="cfgDp">▾ Desplega-ho tot</button></div>
   ${cfgDet('al','👥 Alumnes',nS+' alumne'+(nS===1?'':'s'),'<div id="alW"></div>','detAl')}<fieldset ${ro?'disabled':''}>
   ${cfgDet('llib','📘 Llibreta',`${sub.icon||''} ${esc(sub.name)}`,`<div class="fl"><label>Nom</label><input type="text" id="kNom" value="${esc(sub.name)}" style="min-width:360px"></div>
@@ -1844,16 +1844,16 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     <div class="fl" ${sub.tipus==='llista'?'hidden':''}><label>Aplica una plantilla de categories</label><select id="kTpl"><option value="batx">Batxillerat (Exàmens 70 · Tasques 25 · CPS 5)</option><option value="eso">ESO · mateix pes (Activitats 100)</option></select><button class="btn sec" id="kTplOk">Aplica</button></div>
     <div class="fl"><label>Classroom</label><button class="btn sec" id="kCls">🎓 ${sub.cls?esc(sub.cls.nom):'Connecta amb un curs de Classroom…'}</button>${mode!=='drive'?'<span class="aj" style="margin:0">(cal entrar amb Google)</span>':''}</div>
     <div class="fl" style="margin-top:10px"><button class="btn" id="kDup">Duplica la llibreta…</button><button class="btn sec" id="kArx">Arxiva la llibreta…</button><button class="btn perill" id="kDelSub">Elimina la llibreta</button></div>`)}
-  ${sub.tipus==='llista'?'':cfgDet('cats','⚖️ Categories i ponderació',sub.categories.map(c=>esc(c.sigla||c.name)+' '+c.weight+'%').join(' · ')+(tot!==100?' · <b class="avis">⚠ '+tot+'%</b>':''),`
+  ${cfgDet('cats',esLl?'Categories':'Categories i ponderació',esLl?(sub.categories.map(c=>esc(c.sigla||c.name)).join(' · ')||'cap'):sub.categories.map(c=>esc(c.sigla||c.name)+' '+c.weight+'%').join(' · ')+(tot!==100?' · <b class="avis">⚠ '+tot+'%</b>':''),`
     <div class="llista">${sub.categories.map((c,i)=>`<div class="fl">
       <span class="ord"><button data-cmv="-1" data-cat="${c.id}" ${i===0?'disabled':''}>▲</button><button data-cmv="1" data-cat="${c.id}" ${i===sub.categories.length-1?'disabled':''}>▼</button></span>
       <input type="text" class="sigin" maxlength="3" value="${esc(c.sigla||'')}" data-k="sigla" data-cat="${c.id}" title="Sigla (fins a 3 lletres)">
       <input type="text" value="${esc(c.name)}" data-k="name" data-cat="${c.id}">
-      <input type="number" class="mini" value="${c.weight}" min="0" max="100" data-k="weight" data-cat="${c.id}">%
-      <select data-k="method" data-cat="${c.id}">${['mean','median','mode'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>
+      ${esLl?'':`<input type="number" class="mini" value="${c.weight}" min="0" max="100" data-k="weight" data-cat="${c.id}">%
+      <select data-k="method" data-cat="${c.id}">${['mean','median','mode'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>`}
       <span class="pal">${PAL.map(([hx,n])=>`<button type="button" style="background:${hx}" class="${c.color.toUpperCase()===hx?'on':''}" data-col="${hx}" data-cat="${c.id}" title="${n}"></button>`).join('')}</span>
-      ${c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
-    <div class="fl"><button class="btn" id="kCatAf">Afegeix categoria</button><span class="${tot!==100?'avis':''}">Total: ${tot}%</span></div>`)}
+      ${!esLl&&c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
+    <div class="fl"><button class="btn" id="kCatAf">Afegeix categoria</button>${esLl?'':`<span class="${tot!==100?'avis':''}">Total: ${tot}%</span>`}</div>`)}
   ${sub.tipus==='llista'?'':cfgDet('conv','🔁 Conversions a assoliments',`Talls ${s.numCuts.map(fmt).join(' / ')} · escala 1–${s.ordMax} · FJ ${s.fjMode==='zero'?'= 0':'no compta'}`,`
     <p class="aj">Notes numèriques (sobre 10):</p>
     <div class="fl">AS a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="0" value="${s.numCuts[0]}"> · AN a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="1" value="${s.numCuts[1]}"> · AE a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="2" value="${s.numCuts[2]}"></div>
@@ -2152,7 +2152,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cCompta').checked=!!colEd?.compta;mapaV={...(colEd?.vals||{})};
   const fe=fontsExt(sub);$('#cSrc').innerHTML=fe.length?fe.map(x=>`<option value="${x.s.id}">${x.s.icon||''} ${esc(x.s.name)}${x.s.archived?' (arxivada)':''} · ${x.n} alumnes</option>`).join(''):'<option value="">Cap llibreta enllaçada (duplica\'n una primer)</option>';
   if(colEd?.src)$('#cSrc').value=colEd.src;omplItems($('#cSrc').value,colEd?.item);
-  $('#cCat').innerHTML='<option value="">— Sense categoria</option>'+sub.categories.map(c=>`<option value="${c.id}">${esc(c.sigla)} · ${esc(c.name)} (${c.weight}%)</option>`).join('');
+  $('#cCat').innerHTML='<option value="">— Sense categoria</option>'+sub.categories.map(c=>`<option value="${c.id}">${esc(c.sigla)} · ${esc(c.name)}${sub.tipus==='llista'?'':' ('+c.weight+'%)'}</option>`).join('');
   $('#cCat').value=colEd?(sub.categories.some(k=>k.id===colEd.cat)?colEd.cat:''):(sub.categories[0]?.id||'');
   $('#cTipus').disabled=!!colEd&&(Object.keys(sub.grades[colEd.id]||{}).length>0||colEd.type==='ext');
   $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;colColor=colEd?.color||'#D9D9D9';pintaColColor();
