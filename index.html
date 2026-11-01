@@ -274,8 +274,8 @@ body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
 .peu{margin-top:10px;border:1px solid var(--linia);border-radius:10px;background:#fffdf5;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
 .peu textarea{width:100%;border:0;background:transparent;font:inherit;font-size:14.5px;resize:vertical;min-height:70px;padding:2px}.peu textarea:focus{outline:2px solid var(--tar);border-radius:6px}
 @media(max-width:1000px){.cap.ambbar{flex-wrap:wrap}.cap.ambbar .captit{max-width:none}.cap.ambbar .capbar{align-items:flex-start}.cbr1,.cbr2{justify-content:flex-start}}
-.ordt{font-weight:700;font-size:13px;color:var(--suau);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}.ordll{display:flex;flex-direction:column;gap:4px;max-height:52vh;overflow:auto}
-.ordit{display:flex;align-items:center;gap:8px;padding:7px 8px;border:1px solid var(--linia);border-radius:8px;background:#fff;cursor:grab}.ordit.arr{opacity:.45;border-style:dashed;border-color:var(--tar)}
+.ordt{font-weight:700;font-size:13px;color:var(--suau);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}.ordll{display:flex;flex-direction:column;gap:2px;max-height:60vh;overflow:auto}
+.ordit{display:flex;align-items:center;gap:6px;padding:3px 6px;font-size:14px;border:1px solid var(--linia);border-radius:8px;background:#fff;cursor:grab}.ordit.arr{opacity:.45;border-style:dashed;border-color:var(--tar)}
 .ordh{color:#aaa;font-size:16px}.ordn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ordit button{border:1px solid var(--linia);background:#fff;border-radius:5px;cursor:pointer;padding:1px 7px;font-size:12px}.ordit button:disabled{opacity:.3;cursor:default}
 .tilew{position:relative}.tilew .acc{position:absolute;top:4px;right:4px;display:none;gap:2px}.tilew:hover .acc{display:flex}
 .tilew .acc button{border:0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;padding:1px 5px}.tilew .acc button:disabled{opacity:.3}
@@ -545,7 +545,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
   <div id="afW"></div><div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="afCanc">Cancel·la</button><button class="btn" id="afOk">Afegeix</button></div></dialog>
 <dialog id="dlgLl" style="width:min(680px,94vw)"><h3>👥 Llistats · curs <span id="llCurs"></span></h3><div id="llW"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="llX">Tanca</button><button class="btn" id="llCopia">📋 Copia</button></div></dialog>
-<dialog id="dlgOrd" style="width:min(520px,94vw)"><h3>↕ Ordre de les llibretes</h3><p class="aj">Arrossega-les amb el ratolí o fes servir ▲▼.</p><div id="ordW"></div>
+<dialog id="dlgOrd" style="width:min(420px,94vw)"><h3 style="margin:0 0 8px">↕ Ordre</h3><div id="ordW"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="ordCanc">Cancel·la</button><button class="btn" id="ordOk">Fet</button></div></dialog>
 <dialog id="dlgCurs"><h3 id="cuTit"></h3><p class="aj">Desmarca les que vulguis continuar fent servir aquest curs.</p><div id="cuLl" class="cull"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="cuCanc">Cancel·la</button><button class="btn" id="cuOk">Arxiva les marcades</button></div></dialog>
@@ -641,7 +641,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 19:10';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:40';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1103,9 +1103,8 @@ function exporta(){const sub=cur(),cols=[...colsClasse(sub),...grups(sub).flatMa
 
 /* ======================= Render general ======================= */
 function renderSel(){const sel=$('#selSub');if(!state){sel.innerHTML='';return}
-  const c=cur(),op=s=>`<option value="${s.id}" ${s.id===c?.id?'selected':''}>${s.icon||''} ${esc(s.name)}</option>`,act=actives(),nt=act.filter(s=>s.tipus!=='llista'),ll=act.filter(s=>s.tipus==='llista');
-  sel.innerHTML=(ll.length?`<optgroup label="Llibretes">${nt.map(op).join('')}</optgroup><optgroup label="Llistes">${ll.map(op).join('')}</optgroup>`:nt.map(op).join(''))+
-    (c?.archived?`<option value="${c.id}" selected>${c.icon||''} ${esc(c.name)} (arxivada)</option>`:'')+(act.length>1?'<option disabled>──────────</option><option value="__ord">↕ Ordena les llibretes…</option>':'');
+  const c=cur(),op=s=>`<option value="${s.id}" ${s.id===c?.id?'selected':''}>${s.icon||''} ${esc(s.name)}</option>`,act=actives();
+  sel.innerHTML=act.map(op).join('')+(c?.archived?`<option value="${c.id}" selected>${c.icon||''} ${esc(c.name)} (arxivada)</option>`:'')+(act.length>1?'<option value="__ord">↕ ordena</option>':'');
   const al=(state.posits||[]).filter(p=>nivPosit(p)),b=$('#bdg');b.hidden=!al.length;b.textContent=al.length;
   b.classList.toggle('tar',!al.some(p=>nivPosit(p)!=='taronja'));b.classList.toggle('blink',al.some(p=>nivPosit(p)==='avui'&&p.vist!==avui()));
   b.parentElement.title=al.length?`Eines · ${al.length} pòsit${al.length===1?'':'s'} en alerta`:'Eines'}
@@ -2246,10 +2245,10 @@ $('#sOk').onclick=()=>{const n=$('#sNom').value.trim();if(!n)return toast('Posa 
 $('#selSub').onchange=e=>{if(e.target.value==='__ord'){e.target.value=state.cur;return obreOrd()}state.cur=e.target.value;save();render()};
 /* Ordre de les llibretes del desplegable: arrossegar o ▲▼ */
 let ORD=null;
-function obreOrd(){const act=actives();ORD={nt:act.filter(s=>s.tipus!=='llista').map(s=>s.id),ll:act.filter(s=>s.tipus==='llista').map(s=>s.id)};pintaOrd();$('#dlgOrd').showModal()}
+function obreOrd(){ORD={nt:actives().map(s=>s.id),ll:[]};pintaOrd();$('#dlgOrd').showModal()}
 function pintaOrd(){const S=id=>state.subjects.find(x=>x.id===id),bloc=(k,t)=>ORD[k].length?`${t?`<div class="ordt">${t}</div>`:''}<div class="ordll" data-ok="${k}">${ORD[k].map((id,i)=>`<div class="ordit" draggable="true" data-oid="${id}"><span class="ordh">⠿</span><span class="ordn">${S(id).icon||''} ${esc(S(id).name)}</span>
     <button data-om="-1" data-oid="${id}" ${i===0?'disabled':''}>▲</button><button data-om="1" data-oid="${id}" ${i===ORD[k].length-1?'disabled':''}>▼</button></div>`).join('')}</div>`:'';
-  $('#ordW').innerHTML=bloc('nt',ORD.ll.length?'Llibretes':'')+bloc('ll','Llistes');
+  $('#ordW').innerHTML=bloc('nt','');
   const llista=id=>ORD.nt.includes(id)?'nt':'ll';
   $$('#ordW [data-om]').forEach(b=>b.onclick=()=>{const k=llista(b.dataset.oid),a=ORD[k],i=a.indexOf(b.dataset.oid),j=i+ +b.dataset.om;[a[i],a[j]]=[a[j],a[i]];pintaOrd()});
   $$('#ordW .ordit').forEach(el=>{if(el.dataset.oid===ORD.arr)el.classList.add('arr');
