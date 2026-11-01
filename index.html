@@ -15,7 +15,7 @@ header{background:var(--neg);color:#fff;display:flex;align-items:center;gap:10px
 .hsep{width:1px;height:22px;background:#444;margin:0 3px}
 .icbtn.nou{background:var(--tar);color:#111;font-weight:800}.icbtn.nou:hover{background:#ffa142}
 .icbtn.tabic.on{background:var(--tar);color:#111}
-.icbtn{position:relative}
+.icbtn{position:relative}.icbtn .ico{display:block}.icbtn:has(.ico){padding:6px 9px}
 .icbtn .badge{top:-5px;right:-6px}
 .logo{font-weight:800;letter-spacing:.3px;white-space:nowrap}.logo b{color:var(--tar)}
 nav{display:flex;gap:0;height:100%}
@@ -151,7 +151,7 @@ td.inc{cursor:pointer;text-align:center;white-space:nowrap;padding:0 8px;min-wid
 .card p.aj{color:var(--suau);margin:4px 0 10px;font-size:13.5px}
 details.card summary{cursor:pointer;font-size:17px;font-weight:700}
 details.card[open] summary{margin-bottom:10px}
-details.cfg{padding:10px 16px;margin-bottom:8px}details.cfg>summary{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;list-style:none}
+details.cfg{padding:10px 16px;margin-bottom:8px;border-color:#a9a9a9}details.cfg>summary{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;list-style:none}
 details.cfg>summary::-webkit-details-marker{display:none}details.cfg>summary::before{content:'▸';color:#888;width:12px;font-size:13px}details.cfg[open]>summary::before{content:'▾'}
 details.cfg>summary .cres{font-size:13px;font-weight:500;color:var(--suau)}details.cfg[open]>summary .cres{display:none}
 .cfgtop{display:flex;gap:6px;margin:0 0 8px;max-width:1000px;justify-content:flex-end}.cfgtop .btn{padding:4px 10px;font-size:13px}
@@ -271,12 +271,13 @@ th.nomh{position:sticky}.nomres{position:absolute;top:0;right:0;bottom:0;width:7
 body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
 .cap.ambbar{flex-wrap:nowrap;align-items:center}.cap.ambbar .captit{flex:0 0 auto;max-width:38%}.cap.ambbar .capbar{flex:1 1 auto;flex-direction:column;align-items:flex-end;gap:5px;padding-right:28px}
 .cbr1,.cbr2{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;justify-content:flex-end}.cbr2{font-size:12.5px;color:#555;gap:4px 14px}.cbr2 label{font-size:12.5px!important}
-.peu{margin-top:10px;border:1px solid var(--linia);border-radius:10px;background:#fffdf5;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
+.peu{margin-top:16px;border:1px solid var(--linia);border-radius:10px;background:#fffdf5;padding:8px 12px}.peut{font-weight:700;font-size:14px;margin-bottom:4px}.peut span{font-weight:400;color:var(--suau);font-size:12.5px}
 .peu textarea{width:100%;border:0;background:transparent;font:inherit;font-size:14.5px;resize:vertical;min-height:70px;padding:2px}.peu textarea:focus{outline:2px solid var(--tar);border-radius:6px}
 @media(max-width:1000px){.cap.ambbar{flex-wrap:wrap}.cap.ambbar .captit{max-width:none}.cap.ambbar .capbar{align-items:flex-start}.cbr1,.cbr2{justify-content:flex-start}}
 .ordt{font-weight:700;font-size:13px;color:var(--suau);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}.ordll{display:flex;flex-direction:column;gap:2px;max-height:60vh;overflow:auto}
 .ordit{display:flex;align-items:center;gap:6px;padding:3px 6px;font-size:14px;border:1px solid var(--linia);border-radius:8px;background:#fff;cursor:grab}.ordit.arr{opacity:.45;border-style:dashed;border-color:var(--tar)}
 .ordh{color:#aaa;font-size:16px}.ordn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ordit button{border:1px solid var(--linia);background:#fff;border-radius:5px;cursor:pointer;padding:1px 7px;font-size:12px}.ordit button:disabled{opacity:.3;cursor:default}
+.fitxa.fitxar{min-height:0;padding:10px 14px}
 .tilew{position:relative}.tilew .acc{position:absolute;top:4px;right:4px;display:none;gap:2px}.tilew:hover .acc{display:flex}
 .tilew .acc button{border:0;border-radius:4px;background:#fff;cursor:pointer;font-size:11px;padding:1px 5px}.tilew .acc button:disabled{opacity:.3}
 .posit .vtxt{color:#b00020;font-weight:800;font-size:12px}
@@ -309,7 +310,7 @@ body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
 #calc .kp button{font-size:18px;padding:10px 0;border:1px solid #ccc;background:#f7f7f7;border-radius:6px;cursor:pointer}
 #calc .kp button:hover{background:var(--tar2)}
 #calc .kp button.op{background:#eee;font-weight:700}
-#calc .kp button.eq{background:var(--tar);color:#fff;border-color:var(--tar)}
+#calc .kp button.eq{grid-column:1/-1;background:var(--tar);color:#fff;border-color:var(--tar)}
 #calc .hist{font-size:12px;color:#888;text-align:right;padding:0 12px;min-height:16px}
 /* Taula: notes centrades, files alternes, capçaleres netes */
 td input.g,td select.g{text-align:center;text-align-last:center}
@@ -420,10 +421,10 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
     <button class="icbtn" id="tpill" title="Torna al temporitzador"></button>
     <button class="icbtn" id="btnUndo" title="Desfés (Ctrl+Z)">↶</button><button class="icbtn" id="btnRedo" title="Refés (Ctrl+Y)">↷</button>
     <span class="hsep"></span>
-    <button class="icbtn tabic" data-t="eines" title="Eines">🧰<span class="badge" id="bdg" hidden></span></button>
-    <button class="icbtn" id="btnMob" title="Torna al mode consulta del mòbil">📱</button><button class="icbtn" id="btnCalc" title="Calculadora">🧮</button><button class="icbtn" id="btnFS" title="Pantalla completa">⛶</button>
+    <button class="icbtn tabic" data-t="eines" title="Eines"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8.5 8V6.2A1.7 1.7 0 0 1 10.2 4.5h3.6a1.7 1.7 0 0 1 1.7 1.7V8"/><path d="M3 13.5h18"/><path d="M10.5 12h3v3h-3z"/></svg><span class="badge" id="bdg" hidden></span></button>
+    <button class="icbtn" id="btnMob" title="Torna al mode consulta del mòbil">📱</button><button class="icbtn" id="btnCalc" title="Calculadora"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><circle cx="9" cy="13.5" r=".6" fill="currentColor"/><circle cx="12" cy="13.5" r=".6" fill="currentColor"/><circle cx="15" cy="13.5" r=".6" fill="currentColor"/><circle cx="9" cy="17.5" r=".6" fill="currentColor"/><circle cx="12" cy="17.5" r=".6" fill="currentColor"/><circle cx="15" cy="17.5" r=".6" fill="currentColor"/></svg></button><button class="icbtn" id="btnFS" title="Pantalla completa"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M15 4h5v5"/><path d="M20 15v5h-5"/><path d="M9 20H4v-5"/></svg></button>
     <span class="hsep"></span>
-    <button class="icbtn tabic" data-t="config" title="Configuració">⚙</button><button class="icbtn tabic" data-t="arxiu" title="Arxiu">🗄️</button>
+    <button class="icbtn tabic" data-t="config" title="Configuració"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/><circle cx="12" cy="12" r="6.6"/></svg></button><button class="icbtn tabic" data-t="arxiu" title="Arxiu"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></svg></button>
     <span class="hsep"></span>
     <span class="estat" id="estat"></span>
     <button id="btnCopia" hidden></button><button id="btnSurt" hidden></button>
@@ -449,7 +450,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 </aside>
 
 <div id="calc">
-  <div class="ch" id="calcH">🧮 Calculadora <button id="calcX" title="Tanca">✕</button></div>
+  <div class="ch" id="calcH">Calculadora <button id="calcX" title="Tanca">✕</button></div>
   <div class="hist" id="calcHist"></div>
   <input id="calcIn" autocomplete="off" placeholder="0">
   <div class="kp" id="calcKp"></div>
@@ -600,8 +601,8 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
   <h3 id="rTit">Nou enllaç</h3>
   <div class="fl"><label class="lb">Nom</label><input type="text" id="rNom" placeholder="p. ex. Rúbrica exposicions" style="flex:1"></div>
   <div class="fl"><label class="lb">Adreça</label><input type="text" id="rUrl" placeholder="https://…" style="flex:1"></div>
-  <div class="fl"><label class="lb">Grup</label><input type="text" id="rGrup" list="rGrups" placeholder="p. ex. Avaluació"><datalist id="rGrups"></datalist></div>
-  <div class="fl"><label class="lb">Icona</label><input type="text" id="rIc" class="mini" placeholder="🔗" style="font-size:18px"></div>
+  <div style="display:none"><input type="text" id="rGrup" list="rGrups"><datalist id="rGrups"></datalist></div>
+  <div style="display:none"><input type="text" id="rIc"></div>
   <div class="fl"><label class="lb">On</label><select id="rOn"><option value="ll">Aquesta llibreta</option><option value="gen">General (totes)</option></select></div>
   <div class="fl" style="margin-top:14px;justify-content:space-between">
     <button class="btn perill" id="rDel">Elimina</button>
@@ -641,7 +642,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 18:40';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 20:45';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1173,6 +1174,9 @@ function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="$
   case 'lliure':return td('',`<input class="g lliure" ${a} ${dis} value="${esc(v??'')}">`);
   case 'inc':return td('inc',incHtml(v),1);
   }}
+/* La taula ocupa tota l'alçada fins a baix de la pantalla; el quadre de notes queda a sota, fora de la vista */
+function ajustaTaula(){const tw=$('#tw');if(!tw||tab!=='llibreta'||document.body.classList.contains('mob'))return;const top=tw.getBoundingClientRect().top+scrollY;tw.style.maxHeight=Math.max(260,innerHeight-top-8)+'px'}
+addEventListener('resize',ajustaTaula);
 /* ----- Amplada de la columna Nom: arrossegar o doble clic per ajustar-la al nom més llarg ----- */
 function ajustaNom(sub){const td=$('#tw td.fx.nomc');const st=td?getComputedStyle(td):null,cx=document.createElement('canvas').getContext('2d');cx.font=st?`${st.fontWeight} ${st.fontSize} ${st.fontFamily}`:'700 15px system-ui';
   const w=Math.max(cx.measureText('Nom').width,...sub.students.map(x=>cx.measureText(x.nom||'').width));return Math.min(420,Math.max(50,Math.ceil(w+24)))}
@@ -1297,8 +1301,8 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     h+=`<tfoot><tr>`+fix.map((f,i)=>`<td class="fx tot ${f.last?'fxlast':''}" style="${stf(f)}">${i===0?'Totals ('+sts.length+')':''}</td>`).join('')+
       gs.map(g=>g.folded?totalCat(sub,g.cat,sts):g.cols.map(c=>totalCella(sub,c,sts)).join('')).join('')+`</tr></tfoot>`}
   h+=`</table></div>`;
-  h+=`<div class="peu"><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} placeholder="Horari, aula, dates d'examen, recordatoris, acords amb el grup…">${esc(sub.info||'')}</textarea></div>`;
-  m.innerHTML=h;const tw=$('#tw');tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub);const ta=$('.peu textarea');if(ta){const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(70,ta.scrollHeight+2)+'px'};fit();ta.addEventListener('input',fit)}}
+  h+=`<div class="peu"><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} aria-label="Notes de la llibreta">${esc(sub.info||'')}</textarea></div>`;
+  m.innerHTML=h;const tw=$('#tw');ajustaTaula();tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub);const ta=$('.peu textarea');if(ta){const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(70,ta.scrollHeight+2)+'px'};fit();ta.addEventListener('input',fit)}}
 function plegCella(sub,cat,st){const r=catResult(sub,cat,st);return `<td class="plegc ${r?'l'+r.lvl:''}" data-plegc="${cat.id}" data-s="${st.id}">${r?esc(r.label):'—'}</td>`}
 function amplada(sub,c){const a=c.amp||'normal';if(a==='plegada')return 20;if(a==='ampla')return c.type==='lliure'?240:170;if(a==='estreta')return 50;return sub.compacte?54:(c.type==='lliure'?190:110)}
 function lligaBarra(sub){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
@@ -1503,7 +1507,7 @@ function rAlumnes(){const sub=cur(),W=$('#alW');if(!sub||!W)return;const ro=RO()
   const sm=$('#detAl>summary .cres');if(sm)sm.textContent=`${sub.students.length} alumne${sub.students.length===1?'':'s'}`;
   const clsLl=classesDe(sub);
   W.innerHTML=`<fieldset ${ro?'disabled':''}><div class="fl" style="margin-top:8px"><button class="btn" id="aDesAl">📇 Afegeix des dels llistats del curs</button><button class="btn sec" id="aDesLl">📋 Copia d'una altra llibreta</button></div><p class="aj" style="margin-top:6px">Has d'enganxar una llista? Fes-ho a <a href="#" id="aVesAlum">📇 Llistats del curs</a> i després afegeix-los des d'aquí.</p>
-    <h3 style="margin:14px 0 4px;font-size:15px">Afegeix-ne un</h3><p class="aj" style="margin:0 0 4px">També s'afegeix als llistats del curs, amb la classe que triïs.</p>
+    <h3 style="margin:14px 0 4px;font-size:15px">Afegeix-ne un</h3>
     <div class="fl"><input type="text" id="aCg" placeholder="Cognoms" style="min-width:240px"><input type="text" id="aNom" placeholder="Nom">${selClasseHtml(sub,'aClUn',clSel[sub.id]||'')}<button class="btn" id="aAf">Afegeix</button><button class="btn sec" id="aOrd">Ordena la llista per cognoms</button></div>
     ${sub.students.length?`<div class="fl" style="margin-top:14px;padding:6px 8px;background:var(--gris);border-radius:8px"><label><input type="checkbox" id="aTots"> Selecciona'ls tots</label><button class="btn perill" id="aDelSel" disabled style="padding:5px 10px">Elimina els seleccionats (0)</button></div>`:''}
     <div class="llista">${sub.students.map(s=>`<div class="fl"><input type="checkbox" data-sel="${s.id}" title="Selecciona"><input type="text" value="${esc(s.cognoms||'')}" data-ren="${s.id}" data-k="cognoms" style="min-width:240px" placeholder="Cognoms"><input type="text" value="${esc(s.nom)}" data-ren="${s.id}" data-k="nom" placeholder="Nom">${clsLl.length?`<select data-scl="${s.id}" title="Classe">${['',...clsLl].map(c=>`<option value="${esc(c)}" ${classeDe(sub,s)===c?'selected':''}>${c?esc(c):'—'}</option>`).join('')}</select>`:''}<button class="x" data-del="${s.id}" title="Elimina">✕</button></div>`).join('')}</div></fieldset>`;
@@ -1727,7 +1731,7 @@ function partLiniaAlumnat(l,grupDef){l=l.replace(/\s+$/,'');if(!l.trim())return 
 let alCurs=null;const alGrupsOberts=new Set();
 function rAlumnat(){const W=$('#alumW');if(!W)return;const cursos=[...new Set([cursKey(),...(state.alumnat||[]).map(a=>a.curs)])].sort().reverse();alCurs=alCurs&&cursos.includes(alCurs)?alCurs:cursKey();
   const tots=alumnatDe(alCurs,true),grups=[...new Set(tots.map(a=>a.grup||'—'))].sort(grupOrd);
-  W.innerHTML=`<p class="aj">Els llistats oficials de principi de curs, comuns a totes les llibretes. Des d'<b>Alumnes</b> de cada llibreta els afegeixes amb la classe omplerta sola, i a <b>🧰 Eines › 📇 Llistats</b> els consultes i copies.</p>
+  W.innerHTML=`
     <div class="fl"><label>Curs</label><select id="alC">${cursos.map(k=>`<option value="${k}" ${k===alCurs?'selected':''}>${k}${k===cursKey()?' (actual)':''}</option>`).join('')}</select><span class="aj" style="margin:0">${tots.filter(a=>!a.baixa).length} alumnes · ${grups.length} grups</span></div>
     <div class="card" style="background:var(--gris);border:0"><b>Enganxa un llistat</b><p class="aj" style="margin:4px 0">De l'Excel, tres columnes: <b>Cognoms | Nom | Grup</b>. O una llista de noms («Cognoms, Nom» o «Cognoms | Nom») i escrius el grup a sota.</p>
       <textarea id="alTxt" placeholder="Soler Pons&#9;Martina&#9;1r BAT A&#10;Ferrer Gil&#9;Pol&#9;1r BAT B" style="min-height:80px"></textarea>
@@ -1819,11 +1823,11 @@ function icDesplegable(id,sel,obert){return `<details class="icdet" ${obert?'ope
 const CFGK='llibreta-cfg-obert';
 function cfgOb(){try{return JSON.parse(localStorage.getItem(CFGK))||{al:1,llib:1}}catch{return {al:1,llib:1}}}
 function cfgDesa(o){try{localStorage.setItem(CFGK,JSON.stringify(o))}catch{}}
-function cfgDet(k,tit,res,body,id=''){return `<details class="card cfg" data-cfg="${k}" ${id?`id="${id}"`:''} ${cfgOb()[k]?'open':''}><summary><span class="ctit">${tit}</span><span class="cres">${res||''}</span></summary>${body}</details>`}
+function cfgDet(k,tit,res,body,id=''){tit=tit.replace(/^[^\p{L}\p{N}]+/u,'');return `<details class="card cfg" data-cfg="${k}" ${id?`id="${id}"`:''} ${cfgOb()[k]?'open':''}><summary><span class="ctit">${tit}</span><span class="cres">${res||''}</span></summary>${body}</details>`}
 function lligaCfg(){$$('details[data-cfg]').forEach(d=>d.ontoggle=()=>{const o=cfgOb();o[d.dataset.cfg]=d.open?1:0;cfgDesa(o)})}
 function plegaCfg(obre){const o=cfgOb();$$('details[data-cfg]').forEach(d=>{o[d.dataset.cfg]=obre?1:0;d.open=obre});cfgDesa(o)}
 function colorsHtml(){const j=state.colors,c=colorsAss(),cj=k=>k==='pers'?{...JOCS.pal.c,...(j.pers||{})}:JOCS[k].c;
-  return cfgDet('colors','🎨 Colors dels assoliments',j.joc==='pers'?'Personalitzat':(JOCS[j.joc]||JOCS.pal).nom,`<p class="aj">Afecta tota l'app (totes les llibretes).</p>
+  return cfgDet('colors','🎨 Colors dels assoliments',j.joc==='pers'?'Personalitzat':(JOCS[j.joc]||JOCS.pal).nom,`
     <div class="fl">${[['pal','Pàl·lid'],['int','Intens'],['pers','Personalitzat']].map(([k,n])=>`<label class="jocop ${j.joc===k?'on':''}"><input type="radio" name="kJoc" value="${k}" ${j.joc===k?'checked':''}> ${n}<span class="mostra">${['na','as','an','ae'].map(x=>`<i style="background:${cj(k)[x]}">${x.toUpperCase()}</i>`).join('')}</span></label>`).join('')}</div>
     ${j.joc==='pers'?`<div class="fl">${['na','as','an','ae'].map(x=>`<label>${x.toUpperCase()} <input type="color" data-pcolr="${x}" value="${c[x]}"></label>`).join('')}<button class="btn sec" id="kPersRes">Torna als colors pàl·lids</button></div>`:''}`)}
 function lligaColors(){$$('input[name=kJoc]').forEach(r=>r.onchange=()=>{const j=state.colors;if(r.value==='pers'&&!j.pers)j.pers={...colorsAss()};j.joc=r.value;save('colors');aplicaColors();rConfig()});
@@ -1840,7 +1844,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     <div class="fl" ${sub.tipus==='llista'?'hidden':''}><label>Aplica una plantilla de categories</label><select id="kTpl"><option value="batx">Batxillerat (Exàmens 70 · Tasques 25 · CPS 5)</option><option value="eso">ESO · mateix pes (Activitats 100)</option></select><button class="btn sec" id="kTplOk">Aplica</button></div>
     <div class="fl"><label>Classroom</label><button class="btn sec" id="kCls">🎓 ${sub.cls?esc(sub.cls.nom):'Connecta amb un curs de Classroom…'}</button>${mode!=='drive'?'<span class="aj" style="margin:0">(cal entrar amb Google)</span>':''}</div>
     <div class="fl" style="margin-top:10px"><button class="btn" id="kDup">Duplica la llibreta…</button><button class="btn sec" id="kArx">Arxiva la llibreta…</button><button class="btn perill" id="kDelSub">Elimina la llibreta</button></div>`)}
-  ${sub.tipus==='llista'?'':cfgDet('cats','⚖️ Categories i ponderació',sub.categories.map(c=>esc(c.sigla||c.name)+' '+c.weight+'%').join(' · ')+(tot!==100?' · <b class="avis">⚠ '+tot+'%</b>':''),`<p class="aj">Les columnes s'agrupen per categoria, en aquest ordre (també les pots moure amb ◀ ▶ a la taula). Els 8 colors són segurs per a daltonisme i la sigla ajuda a distingir-les. La mitjana només es pot fer si totes les columnes de la categoria són numèriques o d'una altra llibreta (o si actives l'opció de les conversions).</p>
+  ${sub.tipus==='llista'?'':cfgDet('cats','⚖️ Categories i ponderació',sub.categories.map(c=>esc(c.sigla||c.name)+' '+c.weight+'%').join(' · ')+(tot!==100?' · <b class="avis">⚠ '+tot+'%</b>':''),`
     <div class="llista">${sub.categories.map((c,i)=>`<div class="fl">
       <span class="ord"><button data-cmv="-1" data-cat="${c.id}" ${i===0?'disabled':''}>▲</button><button data-cmv="1" data-cat="${c.id}" ${i===sub.categories.length-1?'disabled':''}>▼</button></span>
       <input type="text" class="sigin" maxlength="3" value="${esc(c.sigla||'')}" data-k="sigla" data-cat="${c.id}" title="Sigla (fins a 3 lletres)">
@@ -1851,7 +1855,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
       ${c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
     <div class="fl"><button class="btn" id="kCatAf">Afegeix categoria</button><span class="${tot!==100?'avis':''}">Total: ${tot}%</span></div>`)}
   ${sub.tipus==='llista'?'':cfgDet('conv','🔁 Conversions a assoliments',`Talls ${s.numCuts.map(fmt).join(' / ')} · escala 1–${s.ordMax} · FJ ${s.fjMode==='zero'?'= 0':'no compta'}`,`
-    <p class="aj">Notes numèriques (sobre 10). Indica on comença cada assoliment.</p>
+    <p class="aj">Notes numèriques (sobre 10):</p>
     <div class="fl">AS a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="0" value="${s.numCuts[0]}"> · AN a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="1" value="${s.numCuts[1]}"> · AE a partir de <input type="number" step="0.01" class="mini" data-cut="numCuts" data-i="2" value="${s.numCuts[2]}"></div>
     <p class="aj">Escala ordinal: de l'1 al <input type="number" id="kOrdMax" class="mini" min="2" max="10" value="${s.ordMax}"> (sense zero).</p>
     <div class="fl">AS a partir de <input type="number" step="0.01" class="mini" data-cut="ordCuts" data-i="0" value="${s.ordCuts[0]}"> · AN a partir de <input type="number" step="0.01" class="mini" data-cut="ordCuts" data-i="1" value="${s.ordCuts[1]}"> · AE a partir de <input type="number" step="0.01" class="mini" data-cut="ordCuts" data-i="2" value="${s.ordCuts[2]}"></div>
@@ -1897,8 +1901,8 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
 let bancObert=false;const bancCatObertes=new Set();
 function rBanc(){const W=$('#bancW');if(!W)return;const b=state.banc,nivSel=(v,attr)=>`<select ${attr} title="Nivell (opcional): el comentari se suggerirà als alumnes amb aquest nivell">${['','NA','AS','AN','AE'].map(n=>`<option value="${n}" ${v===n?'selected':''}>${n||'—'}</option>`).join('')}</select>`;
   const cats=[...b.cats,{id:'',nom:'Sense categoria'}];
-  W.innerHTML=`<p class="aj">Frases per als comentaris de l'Avaluació, comunes a totes les llibretes. Si poses un <b>nivell</b>, la frase surt com a suggeriment als alumnes que tenen aquell assoliment.</p>
-    <div class="card" style="background:var(--gris);border:0"><b>Afegeix comentaris</b><p class="aj" style="margin:4px 0">Un per línia: pots enganxar-ne un bloc sencer de l'Excel.</p>
+  W.innerHTML=`
+    <div class="card" style="background:var(--gris);border:0"><b>Afegeix comentaris</b> <span class="aj">(un per línia)</span>
       <textarea id="bNous" placeholder="Bona feina. Cal que continuï treballant com fins ara.&#10;Ha de lliurar totes les tasques de forma puntual." style="min-height:70px"></textarea>
       <div class="fl"><label>Categoria</label><select id="bNCat">${cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select><label>Nivell</label>${nivSel('','id="bNNiv"')}<button class="btn" id="bAf">Afegeix</button></div>
       <div class="fl" style="margin-top:10px"><b>Nova categoria</b><input type="text" id="bCatNom" placeholder="p. ex. Felicitacions"><button class="btn sec" id="bCatAf">Crea</button></div></div>
@@ -1920,19 +1924,19 @@ function rBanc(){const W=$('#bancW');if(!W)return;const b=state.banc,nivSel=(v,a
 /* Secció de dades (sempre editable, també amb la llibreta arxivada) */
 function rDades(dins){const el=dins?$('#dades'):$('#main');
   const drive=mode==='drive';
-  el.innerHTML=`${dins?'':'<div class="cfgtop"></div>'}<details class="card cfg" data-cfg="dades" ${cfgOb().dades?'open':''}><summary><span class="ctit">💾 Dades</span><span class="cres">${drive?'☁ al teu Google Drive'+(state?.copiaSetmanal?' · última còpia '+state.copiaSetmanal.split('-').reverse().join('/'):''):'en aquest ordinador'}</span></summary>
-    ${drive?`<p class="aj">☁ Les dades es desen al teu Google Drive, al fitxer <b>${FNAME}</b>. Si fas servir un ordinador compartit, clica <b>Surt</b> en acabar.</p>
+  el.innerHTML=`${dins?'':'<div class="cfgtop"></div>'}<details class="card cfg" data-cfg="dades" ${cfgOb().dades?'open':''}><summary><span class="ctit">Dades</span><span class="cres">${drive?'☁ al teu Google Drive'+(state?.copiaSetmanal?' · última còpia '+state.copiaSetmanal.split('-').reverse().join('/'):''):'en aquest ordinador'}</span></summary>
+    ${drive?`
       <div class="fl"><button class="btn" id="dSurt">Surt</button><button class="btn sec" id="dCopia">Descarrega una còpia</button><button class="btn sec" id="dObre">Carrega una còpia…</button><button class="btn sec" id="dLocal">Passa a mode «aquest ordinador»</button></div>
       <h3 style="margin:16px 0 4px;font-size:15px">📦 Còpies setmanals</h3>
-      <p class="aj">Cada setmana, el primer cop que obres la llibreta a partir de divendres, es desa sola una còpia a la carpeta «${CARPETA}» del teu Drive. Es guarden les ${MAXCOPIES} últimes.${state?.copiaSetmanal?' Última còpia: <b>'+state.copiaSetmanal.split('-').reverse().join('/')+'</b>.':''}</p>
-      <h3 style="margin:16px 0 4px;font-size:15px">📄 PDF</h3><div class="fl"><button class="btn sec" id="dPdf">📄 Descarrega el PDF de totes les llibretes</button><span class="aj" style="margin:0">Totes les actives en un sol PDF horitzontal, amb índex.</span></div>
+      ${state?.copiaSetmanal?'<p class="aj">Última còpia setmanal: <b>'+state.copiaSetmanal.split('-').reverse().join('/')+'</b>.</p>':''}
+      <h3 style="margin:16px 0 4px;font-size:15px">📄 PDF</h3><div class="fl"><button class="btn sec" id="dPdf">📄 Descarrega el PDF de totes les llibretes</button></div>
       <h3 style="margin:16px 0 4px;font-size:15px">Còpies</h3><div class="fl"><button class="btn sec" id="dCopNow">Fes una còpia ara</button><button class="btn sec" id="dCopList">Mostra les còpies</button></div><div id="dCopies"></div>`
     :`<p class="aj">${FS?'Les dades es desen automàticament al fitxer que triïs i, de reserva, al navegador. La còpia de seguretat desa un fitxer amb la data a la carpeta que triïs (Google Drive o OneDrive per a escriptori).':'Aquest navegador no permet desar directament en un fitxer: fes servir Chrome o Edge. Mentrestant, les dades es desen al navegador; fes còpies sovint.'}</p>
       <div class="fl">${FS?'<button class="btn" id="dNou">Desa en un fitxer nou…</button>':''}<button class="btn sec" id="dObre">Obre un fitxer o una còpia…</button>
       <button class="btn sec" id="dCopia">Fes còpia de seguretat</button><button class="btn sec" id="dPdf">📄 Descarrega el PDF de totes les llibretes</button>${'showDirectoryPicker' in window?'<button class="btn sec" id="dCarp">Canvia la carpeta de còpies</button>':''}</div>`}
     </details>
     ${cfgDet('gd','🔑 Google Drive del centre',G.clientId===CLIENT_ID_CENTRE?'ID de client del centre':G.clientId?'ID de client propi':'sense ID de client',`
-      <p class="aj">Per fer servir la llibreta des de qualsevol ordinador amb el compte @insjuliaminguell.net. Cal l'ID de client de Google Cloud i obrir la llibreta des de la pàgina publicada (GitHub), no des del fitxer.</p>
+
       <div class="fl"><label>ID de client</label><input type="text" id="dCid" value="${esc(G.clientId)}" placeholder="….apps.googleusercontent.com" style="min-width:420px"><button class="btn sec" id="dCidOk">Desa l'ID</button></div>
       ${drive?'':'<div class="fl"><button class="btn" id="dDrive">Entra amb Google i passa a Drive</button></div>'}`)}${ajudaHtml()}`;
   lligaCfg();
@@ -2279,8 +2283,8 @@ function rEines(){const sub=cur(),E=state.eines;
   const pos=state.posits.filter(p=>!p.llib||p.llib===sub?.id||!state.subjects.some(s=>s.id===p.llib)||nivPosit(p));
   const vistAra=new Set(pos.filter(p=>nivPosit(p)==='avui'&&p.vist!==avui()).map(p=>p.id));
   const grupsRec=list=>{const g=new Map();list.forEach(r=>{const k=r.grup||'Altres';if(!g.has(k))g.set(k,[]);g.get(k).push(r)});return [...g.entries()]};
-  const fitxes=(list,on)=>grupsRec(list).map(([k,rs])=>`<div class="grupr"><h3>${esc(k)}</h3><div class="fitxes">${rs.map(r=>`
-    <a class="fitxa" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span class="fi">${esc(r.icon||'🔗')}</span><span>${esc(r.name)}</span>
+  const fitxes=(list,on)=>[['',list]].filter(([,rs])=>rs.length).map(([k,rs])=>`<div class="grupr"><div class="fitxes">${rs.map(r=>`
+    <a class="fitxa fitxar" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span>${esc(r.name)}</span>
       <span class="acc"><button data-rmv="-1" data-rid="${r.id}" data-on="${on}" title="Mou">◀</button><button data-rmv="1" data-rid="${r.id}" data-on="${on}" title="Mou">▶</button><button data-red="${r.id}" data-on="${on}" title="Edita">✎</button></span></a>`).join('')}</div></div>`).join('')||'<p style="color:var(--suau)">Encara no hi ha enllaços.</p>';
   const opLl=p=>{const ll=state.subjects.filter(s=>!s.archived||s.id===p.llib);return `<option value="">General</option>`+ll.map(s=>`<option value="${s.id}" ${p.llib===s.id?'selected':''}>${s.icon||''} ${esc(s.name)}</option>`).join('')};
   const posHtml=pos.map(p=>{const niv=nivPosit(p),altra=p.llib&&p.llib!==sub?.id?state.subjects.find(s=>s.id===p.llib):null;
@@ -2292,14 +2296,14 @@ function rEines(){const sub=cur(),E=state.eines;
       <div class="pb"><span class="dots">${PCOL.map(c=>`<button style="background:${c}" data-pcol="${c}" data-pid="${p.id}"></button>`).join('')}</span></div>
       <div class="pb">📅 <input type="date" value="${esc(p.data||'')}" data-pdata="${p.id}"><select data-pll="${p.id}">${opLl(p)}</select></div>
       <div class="pb"><label class="pfet"><input type="checkbox" data-pfet="${p.id}" ${p.fet?'checked':''}> Fet ✔</label><span style="flex:1"></span><button data-pmv="-1" data-pid="${p.id}" class="ed" title="Mou">◀</button><button data-pmv="1" data-pid="${p.id}" class="ed" title="Mou">▶</button></div></div>`}).join('')
-    ||'<p style="color:var(--suau)">Cap pòsit. Si li poses data, avisa: taronja una setmana abans, vermell els dos últims dies i parpellejant el mateix dia.</p>';
+    ||'';
   const nAl=pos.filter(p=>nivPosit(p)).length;
   const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
         <span class="acc"><button data-emv="-1" data-e="${k}" ${i===0?'disabled':''} title="Mou">◀</button><button data-emv="1" data-e="${k}" ${i===a.length-1?'disabled':''} title="Mou">▶</button></span></div>`).join('')}</div>`},
     posits:{t:`📝 Pòsits <span class="ebn">${pos.length}${nAl?` · <b class="${pos.some(p=>['avui','vermell','vencut'].includes(nivPosit(p)))?'r':'t'}">${nAl} en alerta</b>`:''}</span>`,x:'<button class="btn sec" id="eNouP" style="padding:4px 10px">＋ Nou pòsit</button>',h:`<div class="posits">${posHtml}</div>`},
-    recll:{t:`🔗 Recursos ${sub?`de la llibreta ${sub.icon||''}`:'de la llibreta'} <span class="ebn">${sub?sub.recursos.length:0}</span>`,x:`<button class="btn sec" id="eNouRL" style="padding:4px 10px" ${sub?'':'disabled'}>＋ Enllaç</button>`,h:sub?fitxes(sub.recursos,'ll'):''},
-    recgen:{t:`🌐 Recursos generals <span class="ebn">${state.recursos.length}</span>`,x:'<button class="btn sec" id="eNouRG" style="padding:4px 10px">＋ Enllaç</button>',h:fitxes(state.recursos,'gen')}};
-  $('#main').innerHTML=`<div class="cap"><span class="capic">🧰</span><div><h1>Eines</h1><div class="capsub">Els blocs es poden moure (▲▼) i plegar, i l'ordre és el mateix per a totes les llibretes. Els elements de dins es mouen amb ◀ ▶.</div></div></div>`+
+    recll:{t:`Recursos de la llibreta <span class="ebn">${sub?sub.recursos.length:0}</span>`,x:`<button class="btn sec" id="eNouRL" style="padding:4px 10px" ${sub?'':'disabled'}>＋ Enllaç</button>`,h:sub?fitxes(sub.recursos,'ll'):''},
+    recgen:{t:`Recursos generals <span class="ebn">${state.recursos.length}</span>`,x:'<button class="btn sec" id="eNouRG" style="padding:4px 10px">＋ Enllaç</button>',h:fitxes(state.recursos,'gen')}};
+  $('#main').innerHTML=`<div class="cap"><span class="capic">🧰</span><div><h1>Eines</h1></div></div>`+
     E.ordre.map((k,i)=>{const b=B[k],pl=!!E.pleg[k];return `<div class="seccio eb ${pl?'pl':''}"><h2><button class="ebp" data-ebp="${k}" title="${pl?'Desplega':'Plega'}">${pl?'▸':'▾'}</button><span class="ebt" data-ebp="${k}">${b.t}</span>${pl?'':b.x||''}
       <span class="ebmv"><button data-ebm="-1" data-eb="${k}" ${i===0?'disabled':''} title="Puja el bloc">▲</button><button data-ebm="1" data-eb="${k}" ${i===E.ordre.length-1?'disabled':''} title="Baixa el bloc">▼</button></span></h2>${pl?'':b.h}</div>`}).join('');
   const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
@@ -2320,7 +2324,7 @@ function rEines(){const sub=cur(),E=state.eines;
     const a=state.posits,i=a.indexOf(pos[k]),j=a.indexOf(pos[l]);[a[i],a[j]]=[a[j],a[i]];save('moure pòsit');rEines()});
   $$('[data-red]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();obreRec(b.dataset.red,b.dataset.on)});
   $$('[data-rmv]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const a=b.dataset.on==='ll'?cur().recursos:state.recursos;
-    const i=a.findIndex(r=>r.id===b.dataset.rid),r=a[i];let j=i+ +b.dataset.rmv;while(j>=0&&j<a.length&&(a[j].grup||'')!==(r.grup||''))j+= +b.dataset.rmv;
+    const i=a.findIndex(r=>r.id===b.dataset.rid);let j=i+ +b.dataset.rmv;
     if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save('moure enllaç');rEines()});
   if(vistAra.size){vistAra.forEach(id=>P(id).vist=avui());save(null,true);renderSel()}}
 let recEd=null,recOn='ll';
@@ -2331,7 +2335,7 @@ function obreRec(id,on){recOn=on;const a=on==='ll'?cur().recursos:state.recursos
   $('#dlgRec').showModal();$('#rNom').focus()}
 $('#rCanc').onclick=()=>$('#dlgRec').close();
 $('#rOk').onclick=()=>{let url=$('#rUrl').value.trim();const name=$('#rNom').value.trim();if(!name||!url)return toast('Cal un nom i una adreça.');
-  if(!/^https?:\/\//i.test(url))url='https://'+url;const o={name,url,grup:$('#rGrup').value.trim(),icon:$('#rIc').value.trim()};
+  if(!/^https?:\/\//i.test(url))url='https://'+url;const o={name,url,grup:'',icon:$('#rIc').value.trim()};
   const desti=$('#rOn').value==='ll'?cur().recursos:state.recursos;const orig=recOn==='ll'?cur().recursos:state.recursos;
   if(recEd){Object.assign(recEd,o);if(desti!==orig){orig.splice(orig.indexOf(recEd),1);desti.push(recEd)}}else desti.push({id:uid(),...o});
   save();$('#dlgRec').close();rEines()};
@@ -2442,10 +2446,12 @@ window.addEventListener('keydown',e=>{
 
 /* ----- Calculadora ----- */
 const calc=$('#calc'),cin=$('#calcIn');
-$('#calcKp').innerHTML=['C','(',')','←','7','8','9','÷','4','5','6','×','1','2','3','−','0',',','=','+'].map(k=>`<button class="${'÷×−+()←C'.includes(k)?'op':k==='='?'eq':''}">${k}</button>`).join('');
+$('#calcKp').innerHTML=['C','(',')','←','7','8','9','÷','4','5','6','×','1','2','3','−','0',',','%','+','='].map(k=>`<button class="${'÷×−+()←C%'.includes(k)?'op':k==='='?'eq':''}">${k}</button>`).join('');
 function calcObre(forca){const vis=calc.style.display==='block';calc.style.display=forca||!vis?'block':'none';if(calc.style.display==='block')cin.focus()}
 function calcAvalua(){let e=cin.value.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/,/g,'.').replace(/\s/g,'');
   if(!e)return;if(!/^[0-9+\-*/().%]*$/.test(e))return $('#calcHist').textContent='Expressió no vàlida';
+  /* percentatges com al mòbil: 200+10% = 220 · 200-15% = 170 · 50*20% = 10 · 15% = 0,15 */
+  for(let m,g=0;(m=/([+\-])(\d+(?:\.\d+)?)%/.exec(e))&&g<20;g++){const i=m.index,esq=e.slice(0,i);e=esq?`(${esq})${m[1]}(${esq})*${m[2]}/100`+e.slice(i+m[0].length):`${m[1]}${m[2]}/100`+e.slice(i+m[0].length)}
   e=e.replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
   try{const r=Function('"use strict";return('+e+')')();if(!isFinite(r))throw 0;$('#calcHist').textContent=cin.value+' =';cin.value=String(Math.round(r*1e10)/1e10).replace('.',',')}catch{$('#calcHist').textContent='Error'}}
 $('#calcKp').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.textContent;
