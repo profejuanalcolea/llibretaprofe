@@ -246,7 +246,7 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 .cull{display:flex;flex-direction:column;gap:4px;max-height:50vh;overflow:auto}.cuit{display:flex;gap:6px;align-items:center;padding:4px 6px;border-radius:6px;background:var(--gris)}
 .aftabs{display:flex;gap:6px;margin-bottom:10px}.aftab{flex:1;padding:8px;border:1px solid var(--linia);border-radius:8px;background:#fff;font:inherit;font-weight:700;cursor:pointer}.aftab.on{background:var(--neg);color:#fff;border-color:var(--neg)}
 .afgr{display:flex;flex-wrap:wrap;gap:6px}.xip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--linia);border-radius:16px;padding:3px 10px;cursor:pointer;font-size:13.5px;background:#fff}.xip.on{background:var(--tar2);border-color:var(--tar)}.xip input{margin:0}
-.afll{display:flex;flex-direction:column;gap:2px;max-height:46vh;overflow:auto;border:1px solid var(--linia);border-radius:8px;padding:6px}.afit{display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:5px}.afit:hover{background:var(--gris)}.afit.ja{opacity:.5}
+.afll{display:flex;flex-direction:column;gap:2px;max-height:46vh;overflow:auto;border:1px solid var(--linia);border-radius:8px;padding:6px}.afit{display:flex;gap:6px;align-items:center;padding:3px 4px;border-radius:5px}.afit:hover{background:var(--gris)}.afit.ja{opacity:.5}.afcompl{color:#a14d00!important}
 .albaixa input[type=text]{text-decoration:line-through;color:#888}.llres{border:1px solid var(--linia);border-radius:8px;padding:6px 10px;margin-top:6px;max-height:160px;overflow:auto;line-height:1.9}
 #tw tbody td:not(.fx){position:relative}td.anh{box-shadow:inset 0 0 0 3px #ffe600}td.anh input.g,td.anh select.g{background:#fff9b0!important}.vrow.anh,.mbal.anh{background:#fff9b0!important}
 .antri{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid #e65100;border-left:9px solid transparent;pointer-events:none}
@@ -642,7 +642,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='1/11 21:20';
+const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='2/11 11:25';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1767,19 +1767,23 @@ function afegeixLletra(c,v){if(!v)return;const o=(c.lletres||[]).map(l=>((c.nive
 const AF={mode:'alumnat',grups:new Set(),font:'',classe:''};
 function obreAfAl(mode){AF.mode=mode;pintaAfAl();$('#dlgAfAl').showModal()}
 function pintaAfAl(){const sub=cur(),ja=new Set(sub.students.map(s=>s.aid).filter(Boolean)),jaNom=new Set(sub.students.map(s=>norm(nomComplet(s))));
+  /* un alumne que ja és a la llibreta però sense classe es pot completar (no es duplica) */
+  const marca=x=>{const est=sub.students.find(s=>(x.aid&&s.aid===x.aid)||norm(nomComplet(s))===norm(nomComplet(x)));
+    if(!est)return x;if(x.classe&&!classeDe(sub,est))return {...x,ja:false,compl:est.id};return {...x,ja:true}};
   let llista=[],cap='';
   if(AF.mode==='alumnat'){const gs=grupsDe();if(!gs.length){$('#afW').innerHTML='<p class="aj">Encara no has enganxat cap llistat del curs. Fes-ho a <b>⚙ Configuració › 📇 Llistats del curs</b>.</p>';$('#afOk').disabled=true;return}
     cap=`<div class="afgr">${gs.map(g=>`<label class="xip ${AF.grups.has(g)?'on':''}"><input type="checkbox" data-afg="${esc(g)}" ${AF.grups.has(g)?'checked':''}> ${esc(g)}</label>`).join('')}</div>`;
-    llista=alumnatDe().filter(a=>AF.grups.has(a.grup||'—')).sort((a,b)=>grupOrd(a.grup||'',b.grup||'')||ordAl(a,b)).map(a=>({k:a.id,nom:a.nom,cognoms:a.cognoms,classe:a.grup,aid:a.id,ja:ja.has(a.id)||jaNom.has(norm(nomComplet(a)))}))}
+    llista=alumnatDe().filter(a=>AF.grups.has(a.grup||'—')).sort((a,b)=>grupOrd(a.grup||'',b.grup||'')||ordAl(a,b)).map(a=>({k:a.id,nom:a.nom,cognoms:a.cognoms,classe:a.grup,aid:a.id,ja:ja.has(a.id)||jaNom.has(norm(nomComplet(a)))})).map(marca)}
   else{const fonts=state.subjects.filter(x=>x.id!==sub.id);if(!fonts.length){$('#afW').innerHTML='<p class="aj">No tens cap altra llibreta.</p>';$('#afOk').disabled=true;return}
     if(!fonts.some(x=>x.id===AF.font))AF.font=fonts[0].id;const f=state.subjects.find(x=>x.id===AF.font),cls=classesDe(f);if(!cls.includes(AF.classe))AF.classe='';
     cap=`<div class="fl"><select id="afFont">${fonts.map(x=>`<option value="${x.id}" ${x.id===AF.font?'selected':''}>${x.icon||''} ${esc(x.name)}${x.archived?' (arxivada)':''}</option>`).join('')}</select>${cls.length?`<select id="afCl"><option value="">totes les classes</option>${cls.map(c=>`<option ${c===AF.classe?'selected':''}>${esc(c)}</option>`).join('')}</select>`:''}</div>`;
-    llista=[...f.students].sort(ordAl).filter(st=>!AF.classe||classeDe(f,st)===AF.classe).map(st=>({k:st.id,nom:st.nom,cognoms:st.cognoms,classe:classeDe(f,st),aid:st.aid,ja:(st.aid&&ja.has(st.aid))||jaNom.has(norm(nomComplet(st)))}))}
+    llista=[...f.students].sort(ordAl).filter(st=>!AF.classe||classeDe(f,st)===AF.classe).map(st=>({k:st.id,nom:st.nom,cognoms:st.cognoms,classe:classeDe(f,st),aid:st.aid,ja:(st.aid&&ja.has(st.aid))||jaNom.has(norm(nomComplet(st)))})).map(marca)}
   AF.llista=llista;const nous=llista.filter(x=>!x.ja).length;
-  $('#afW').innerHTML=cap+(llista.length?`<div class="fl" style="margin:8px 0 4px"><label><input type="checkbox" id="afTots" ${nous?'checked':''}> Tots (${nous})</label></div><div class="afll">${llista.map(x=>`<label class="afit ${x.ja?'ja':''}"><input type="checkbox" data-afk="${x.k}" ${x.ja?'disabled':'checked'}> ${esc(x.cognoms?x.cognoms+', ':'')}<b>${esc(x.nom)}</b>${x.classe?` <span class="aj" style="margin:0">${esc(x.classe)}</span>`:''}${x.ja?' <span class="aj" style="margin:0">· ja hi és</span>':''}</label>`).join('')}</div>`
+  $('#afW').innerHTML=cap+(llista.length?`<div class="fl" style="margin:8px 0 4px"><label><input type="checkbox" id="afTots" ${nous?'checked':''}> Tots (${nous})</label></div><div class="afll">${llista.map(x=>`<label class="afit ${x.ja?'ja':''}"><input type="checkbox" data-afk="${x.k}" ${x.ja?'disabled':'checked'}> ${esc(x.cognoms?x.cognoms+', ':'')}<b>${esc(x.nom)}</b>${x.classe?` <span class="aj" style="margin:0">${esc(x.classe)}</span>`:''}${x.ja?' <span class="aj" style="margin:0">· ja hi és</span>':''}${x.compl?` <span class="aj afcompl" style="margin:0">· ja hi és · li posarà ${esc(x.classe)}</span>`:''}</label>`).join('')}</div>`
     :`<p class="aj">${AF.mode==='alumnat'?'Tria un o diversos grups.':'Aquesta llibreta no té alumnes.'}</p>`);
   $$('#dlgAfAl .aftab').forEach(b=>b.classList.toggle('on',b.dataset.m===AF.mode));
-  const upd=()=>{const n=$$('[data-afk]:checked').length;$('#afOk').disabled=!n;$('#afOk').textContent=n?`Afegeix ${n} alumne${n===1?'':'s'}`:'Afegeix'};upd();
+  const upd=()=>{const ks=new Set($$('[data-afk]:checked').map(c=>c.dataset.afk)),sel=llista.filter(x=>ks.has(x.k)),nc=sel.filter(x=>x.compl).length,na=sel.length-nc;$('#afOk').disabled=!sel.length;
+    $('#afOk').textContent=!sel.length?'Afegeix':[na?`Afegeix ${na}`:'',nc?`completa ${nc}`:''].filter(Boolean).join(' · ').replace(/^c/,'C')};upd();
   $$('[data-afk]').forEach(c=>c.onchange=upd);const t=$('#afTots');if(t)t.onchange=()=>{$$('[data-afk]:not(:disabled)').forEach(c=>c.checked=t.checked);upd()};
   $$('[data-afg]').forEach(c=>c.onchange=()=>{c.checked?AF.grups.add(c.dataset.afg):AF.grups.delete(c.dataset.afg);pintaAfAl()});
   const fo=$('#afFont');if(fo)fo.onchange=()=>{AF.font=fo.value;AF.classe='';pintaAfAl()};const cl=$('#afCl');if(cl)cl.onchange=()=>{AF.classe=cl.value;pintaAfAl()}}
@@ -1788,9 +1792,12 @@ $$('#dlgAfAl .aftab').forEach(b=>b.onclick=()=>{AF.mode=b.dataset.m;pintaAfAl()}
 $('#afOk').onclick=()=>{const sub=cur(),ks=new Set($$('[data-afk]:checked').map(c=>c.dataset.afk)),sel=AF.llista.filter(x=>ks.has(x.k));if(!sel.length)return;
   let cl=colsClasse(sub)[0];const ambClasse=sel.some(x=>x.classe);
   if(ambClasse&&!cl){cl={id:uid(),name:'Classe',type:'classe',cat:'',nivell:'',lletres:[]};sub.columns.unshift(cl)}
-  sel.forEach(x=>{const st={id:uid(),nom:x.nom,cognoms:x.cognoms||''};if(x.aid)st.aid=x.aid;sub.students.push(st);if(x.classe&&cl){afegeixLletra(cl,x.classe);setG(sub,cl.id,st.id,x.classe,1)}});
+  let nA=0,nC=0;
+  sel.forEach(x=>{let st;if(x.compl){st=sub.students.find(z=>z.id===x.compl);if(!st)return;if(x.aid&&!st.aid&&AF.mode==='alumnat')st.aid=x.aid;nC++}
+    else{st={id:uid(),nom:x.nom,cognoms:x.cognoms||''};if(x.aid)st.aid=x.aid;sub.students.push(st);nA++}
+    if(x.classe&&cl){afegeixLletra(cl,x.classe);setG(sub,cl.id,st.id,x.classe,1)}});
   if(cl)cl.lletres=[...new Set(cl.lletres||[])];
-  save('afegir alumnes');$('#dlgAfAl').close();rAlumnes();toast(`${sel.length} alumne(s) afegit(s)${ambClasse?' amb la classe':''}.`)};
+  save(nC&&!nA?'completar classes':'afegir alumnes');$('#dlgAfAl').close();rAlumnes();toast([nA?`${nA} alumne(s) afegit(s)`:'',nC?`${nC} completat(s) amb la classe`:''].filter(Boolean).join(' · ')+'.')};
 /* Llistats per consultar i copiar (Eines) */
 const LL={grups:new Set(),cerca:'',fmt:'cn',num:false,sep:true};
 try{Object.assign(LL,JSON.parse(localStorage.getItem('llibreta-llistats-fmt'))||{});LL.grups=new Set()}catch{}
