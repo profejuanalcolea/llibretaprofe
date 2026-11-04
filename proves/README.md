@@ -20,6 +20,7 @@ python3 proves/proves.py
 - `python3 proves/proves.py --fitxer altre.html` prova un altre fitxer (per exemple, una versió en preparació).
 - `python3 proves/proves.py --referencia` torna a generar `referencia-mitjanes.json`. Feu-ho **només** quan un canvi
   hagi de canviar les mitjanes de la llibreta EXEMPLE a propòsit, i reviseu-ne la diferència.
+- `PROVES_CAPTURES=carpeta` desa captures de pantalla d'algunes proves.
 - La prova de PDF necessita jsPDF 2.5.1 i jspdf-autotable 3.8.2. Si no hi ha accés a jsDelivr, indiqueu una carpeta
   `node_modules` amb tots dos paquets a la variable `PROVES_NPM`. Si no es troben, la prova surt com a «omesa».
 
@@ -37,8 +38,14 @@ python3 proves/proves.py
 | Avaluació | La pestanya Avaluació es pinta per a tots els alumnes |
 | Arxiu | Arxivar, veure-la a l'Arxiu i desarxivar |
 | Llista | Una llista sense notes no té pestanya d'Avaluació |
-| Calculadora | Operacions, coma decimal i percentatges |
+| Calculadora | Càlcul propi: operacions, coma decimal, percentatges i missatges d'error |
 | Mode mòbil | Un telèfon obre la vista de consulta |
 | PDF | Es genera el PDF de la llibreta EXEMPLE |
+| Seguretat (SRI) | Una biblioteca de PDF manipulada no s'executa |
+| Textos llargs | Rètol amb el text complet i punts suspensius a les columnes Lliure |
+| Sons | Tots els sons del temporitzador sonen, sense saturar i més curts que l'interval |
+| Bloc | Pestanyes, text desat, pòsits al Bloc i fora d'Eines, número d'avís a la icona |
+| Migració del Bloc | Dades antigues amb pòsits a Eines passen al Bloc sense perdre res |
+| Sortides | Menú al nom, botó a la barra, avís, Esperem, tornada, consulta, PDF i curs nou |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

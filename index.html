@@ -126,6 +126,7 @@ table.compact th.colh.vert{height:92px;padding:0;overflow:visible;vertical-align
 th.colh .vt{position:absolute;left:14px;bottom:8px;transform-origin:left bottom;transform:rotate(-45deg);white-space:nowrap;max-width:112px;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600;pointer-events:none}
 table.compact td input.g,table.compact td select.g{min-width:0;padding:5px 3px;height:30px;text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none}
 table.compact td input.lliure{text-align:left}
+input.lliure{text-overflow:ellipsis}input.lliure:focus{text-overflow:clip}
 table.compact td.clk{min-width:0;font-size:17px}
 table.compact td.inc,table.compact td.url,table.compact td.ext{min-width:0;padding:0 3px}
 table.compact td.fin .calc{display:none}
@@ -209,6 +210,19 @@ table.prev{font-size:13px;margin-top:8px}table.prev td,table.prev th{padding:4px
 .fitxa:hover .acc{display:flex}
 .acc button{border:0;background:#fff;border-radius:4px;cursor:pointer;font-size:12px;padding:2px 4px;color:#555}
 .posits{display:flex;flex-wrap:wrap;gap:12px}
+.blocw{display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start}
+.blocn{display:flex;flex-direction:column;min-width:0}
+.blpt{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-end;border-bottom:2px solid var(--neg)}
+.blp{border:1px solid var(--linia);border-bottom:0;background:var(--gris);border-radius:8px 8px 0 0;padding:7px 14px;font:inherit;font-weight:600;cursor:pointer;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.blp.on{background:var(--neg);color:#fff;border-color:var(--neg)}.blp.nou{font-weight:700;padding:7px 11px}.blp.mou{opacity:.4}
+.blx{border:0;background:none;font:inherit;color:var(--suau);cursor:pointer;padding:6px 8px}.blx:hover{color:var(--text,#111)}
+#blTxt{width:100%;height:calc(100vh - 150px);min-height:300px;resize:none;border:1px solid var(--linia);border-top:0;border-radius:0 0 8px 8px;padding:14px 16px;font:inherit;font-size:16px;line-height:1.55;background:#fff;color:#111}
+.blocp h2{display:flex;align-items:center;gap:8px;margin:4px 0 10px;font-size:18px;white-space:nowrap}.blocp h2 .ebn{font-size:13px;font-weight:400}
+#blFil{font:inherit;font-size:13px;padding:3px 4px;max-width:140px}.blocp h2 .btn{white-space:nowrap;font-size:14px}
+.blocp .posits{max-height:calc(100vh - 150px);overflow:auto;padding:2px}
+.blocp .posit{width:100%;max-width:none}
+@media (max-width:900px){.blocw{grid-template-columns:1fr}#blTxt{height:55vh}.blocp .posits{max-height:none}}
+
 .posit{width:220px;min-height:170px;border-radius:4px;padding:8px;box-shadow:0 3px 8px rgba(0,0,0,.15);display:flex;flex-direction:column;gap:6px;position:relative}
 .posit textarea{flex:1;min-height:90px;background:transparent;border:0;resize:vertical;font:inherit;font-size:15px;padding:2px}
 .posit textarea:focus{outline:1px dashed #0006}
@@ -250,6 +264,16 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 .albaixa input[type=text]{text-decoration:line-through;color:#888}.llres{border:1px solid var(--linia);border-radius:8px;padding:6px 10px;margin-top:6px;max-height:160px;overflow:auto;line-height:1.9}
 #tw tbody td:not(.fx){position:relative}td.anh{box-shadow:inset 0 0 0 3px #ffe600}td.anh input.g,td.anh select.g{background:#fff9b0!important}.vrow.anh,.mbal.anh{background:#fff9b0!important}
 .antri{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid #e65100;border-left:9px solid transparent;pointer-events:none}
+#soBar{display:inline-flex;gap:6px}
+.sobtn{border:0;border-radius:8px;background:#2f6fdb;color:#fff;font:inherit;font-weight:700;font-size:13px;padding:5px 10px;cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sobtn.tard{background:#e02424;animation:sobl 1.2s infinite}@keyframes sobl{50%{opacity:.6}}
+#soAvis{position:fixed;right:16px;bottom:16px;z-index:720;display:flex;flex-direction:column;gap:10px}
+.soav{background:#fff;border:3px solid #e02424;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:12px 14px;min-width:280px;font-size:15px}
+.soav b{font-size:17px}.soav .fl{margin-top:10px;justify-content:flex-end}
+.sotab{width:100%;border-collapse:collapse;font-size:14px}.sotab th,.sotab td{border-bottom:1px solid var(--linia);padding:5px 8px;text-align:left}.sotab td.n{text-align:right;font-variant-numeric:tabular-nums}
+.sofil{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px}.sofil label{display:flex;gap:6px;align-items:center}
+.soh{margin:14px 0 6px;font-size:15px}
+body.mob #soBar,body.mob #soAvis{display:none!important}
 .anmenu{display:none;position:fixed;z-index:700;background:#fff;border:1px solid var(--linia);border-radius:9px;box-shadow:0 6px 20px rgba(0,0,0,.18);padding:4px;min-width:190px}
 .anmenu button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;padding:7px 10px;border-radius:6px;cursor:pointer}.anmenu button:hover,.anmenu button:focus{background:var(--tar2);outline:0}
 .vran{font-size:13px;color:#6b4a00;background:#fff6d6;border-radius:6px;padding:3px 8px;margin:0 0 4px 12px}.mban{display:block;font-size:12.5px;color:#6b4a00;margin-top:2px}
@@ -418,11 +442,11 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
     <button class="icbtn nou" id="btnNovaSub" title="Nova llibreta">＋</button>
   </div>
   <div class="sub">
-    <button class="icbtn" id="tpill" title="Torna al temporitzador"></button>
+    <button class="icbtn" id="tpill" title="Torna al temporitzador"></button><span id="soBar"></span>
     <button class="icbtn" id="btnUndo" title="Desfés (Ctrl+Z)">↶</button><button class="icbtn" id="btnRedo" title="Refés (Ctrl+Y)">↷</button>
     <span class="hsep"></span>
-    <button class="icbtn tabic" data-t="eines" title="Eines"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8.5 8V6.2A1.7 1.7 0 0 1 10.2 4.5h3.6a1.7 1.7 0 0 1 1.7 1.7V8"/><path d="M3 13.5h18"/><path d="M10.5 12h3v3h-3z"/></svg><span class="badge" id="bdg" hidden></span></button>
-    <button class="icbtn" id="btnMob" title="Torna al mode consulta del mòbil">📱</button><button class="icbtn" id="btnCalc" title="Calculadora"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><circle cx="9" cy="13.5" r=".6" fill="currentColor"/><circle cx="12" cy="13.5" r=".6" fill="currentColor"/><circle cx="15" cy="13.5" r=".6" fill="currentColor"/><circle cx="9" cy="17.5" r=".6" fill="currentColor"/><circle cx="12" cy="17.5" r=".6" fill="currentColor"/><circle cx="15" cy="17.5" r=".6" fill="currentColor"/></svg></button><button class="icbtn" id="btnFS" title="Pantalla completa"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M15 4h5v5"/><path d="M20 15v5h-5"/><path d="M9 20H4v-5"/></svg></button>
+    <button class="icbtn tabic" data-t="eines" title="Eines"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8.5 8V6.2A1.7 1.7 0 0 1 10.2 4.5h3.6a1.7 1.7 0 0 1 1.7 1.7V8"/><path d="M3 13.5h18"/><path d="M10.5 12h3v3h-3z"/></svg></button>
+    <button class="icbtn" id="btnMob" title="Torna al mode consulta del mòbil">📱</button><button class="icbtn tabic" data-t="bloc" title="Bloc de notes i pòsits"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="5" width="15" height="16.5" rx="2"/><path d="M8 3v4M12 3v4M16 3v4"/><path d="M8 11.5h8M8 15h8M8 18.5h5"/></svg><span class="badge" id="bdg" hidden></span></button><button class="icbtn" id="btnCalc" title="Calculadora"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="2.5" width="14" height="19" rx="2"/><rect x="8" y="5.5" width="8" height="4" rx=".5"/><circle cx="9" cy="13.5" r=".6" fill="currentColor"/><circle cx="12" cy="13.5" r=".6" fill="currentColor"/><circle cx="15" cy="13.5" r=".6" fill="currentColor"/><circle cx="9" cy="17.5" r=".6" fill="currentColor"/><circle cx="12" cy="17.5" r=".6" fill="currentColor"/><circle cx="15" cy="17.5" r=".6" fill="currentColor"/></svg></button><button class="icbtn" id="btnFS" title="Pantalla completa"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5"/><path d="M15 4h5v5"/><path d="M20 15v5h-5"/><path d="M9 20H4v-5"/></svg></button>
     <span class="hsep"></span>
     <button class="icbtn tabic" data-t="config" title="Configuració"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/><circle cx="12" cy="12" r="6.6"/></svg></button><button class="icbtn tabic" data-t="arxiu" title="Arxiu"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></svg></button>
     <span class="hsep"></span>
@@ -540,6 +564,9 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 
 <!-- Nova llibreta -->
 <div id="anMenu" class="anmenu" role="menu"></div>
+<div id="soMenu" class="anmenu" role="menu"></div><div id="soAvis"></div>
+<dialog id="dlgSo" style="width:min(760px,95vw)"><h3 style="margin:0 0 8px">🚻 Sortides de l'aula</h3><div id="soW"></div>
+  <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="soX">Tanca</button><button class="btn sec" id="soCopia">📋 Copia</button><button class="btn" id="soPdf">PDF</button></div></dialog>
 <dialog id="dlgCls" style="width:min(720px,94vw)"><h3>🎓 Classroom</h3><div id="clsW"></div><div class="fl" id="clsBtns" style="margin-top:12px"></div></dialog>
 <dialog id="dlgAfAl" style="width:min(640px,94vw)"><h3>Afegeix alumnes</h3>
   <div class="aftabs"><button class="aftab" data-m="alumnat">📇 Dels llistats del curs</button><button class="aftab" data-m="llib">📋 D'una altra llibreta</button></div>
@@ -642,7 +669,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.1 · ammonite · novembre 2026',COMPILACIO='2/11 11:25';
+const VERSIO='2.2 · ammonite · en proves (tanda 1)',COMPILACIO='4/11 22:32';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -725,11 +752,11 @@ function demo(){
   s.recursos=[{id:uid(),name:'Rúbrica pràctiques',url:'https://example.org',grup:'Avaluació',icon:'📋'}];
   return {versio:5,savedAt:Date.now(),cur:s.id,subjects:[s],banc:{cats:[],items:[]},recursos:[{id:uid(),name:'Calendari d\'avaluacions',url:'https://example.org',grup:'Centre',icon:'📅'}],
     posits:[{id:uid(),text:'Recuperació de l\'examen d\'en Clint',color:PCOL[0],data:avui(),llib:s.id},{id:uid(),text:'Lliurar les notes a tutoria',color:PCOL[1],data:diesDes(5),llib:''}],
-    colors:{joc:'pal'},alumnat:[],eines:{ordre:['aula','posits','recll','recgen'],pleg:{},aula:['temp','atz','par','calc','llist']}};
+    colors:{joc:'pal'},alumnat:[],eines:{ordre:['aula','recll','recgen'],pleg:{},aula:['temp','atz','par','calc','llist','sort']}};
 }
 
 function migra(d){
-  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','posits','recll','recgen'];d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.banc??={cats:[],items:[]};d.banc.cats??=[];d.banc.items??=[];
+  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','recll','recgen'];d.eines.ordre=d.eines.ordre.filter(k=>k!=='posits');d.bloc??={pestanyes:[],actiu:null};if(!d.bloc.pestanyes.length)d.bloc.pestanyes.push({id:uid(),nom:'Notes',text:''});d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.sortidesMin??=7;if(!d.eines.aula.includes('sort'))d.eines.aula.push('sort');d.banc??={cats:[],items:[]};d.banc.cats??=[];d.banc.items??=[];
   for(const s of d.subjects){
     s.students=(s.students||[]).map(st=>st.nom!==undefined?st:{id:st.id,nom:st.name||'',cognoms:''});
     s.columns=(s.columns||[]).map(c=>{if(c.type==='text')c.type='lliure';delete c.tema;return c});
@@ -1108,9 +1135,10 @@ function renderSel(){const sel=$('#selSub');if(!state){sel.innerHTML='';return}
   sel.innerHTML=act.map(op).join('')+(c?.archived?`<option value="${c.id}" selected>${c.icon||''} ${esc(c.name)} (arxivada)</option>`:'')+(act.length>1?'<option value="__ord">↕ ordena</option>':'');
   const al=(state.posits||[]).filter(p=>nivPosit(p)),b=$('#bdg');b.hidden=!al.length;b.textContent=al.length;
   b.classList.toggle('tar',!al.some(p=>nivPosit(p)!=='taronja'));b.classList.toggle('blink',al.some(p=>nivPosit(p)==='avui'&&p.vist!==avui()));
-  b.parentElement.title=al.length?`Eines · ${al.length} pòsit${al.length===1?'':'s'} en alerta`:'Eines'}
+  b.parentElement.title=al.length?`Bloc de notes i pòsits · ${al.length} pòsit${al.length===1?'':'s'} en alerta`:'Bloc de notes i pòsits'}
 let cursComprovat=false;
 async function comprovaCursNou(){const k=cursKey();if(!state)return;if(!state.cursVist){state.cursVist=k;save(null,true);return}if(state.cursVist===k)return;
+  await soCursNou();
   const prev=state.cursVist;state.cursVist=k;save(null,true);const act=actives();if(!act.length)return;
   const r=await pregunta('Curs nou',`Ha començat el curs ${cursCurt(k)}. Vols arxivar les llibretes del curs anterior?`,[{t:'Ara no',v:0,cls:'sec'},{t:'Tria quines…',v:1}]);if(!r)return;
   const d=$('#dlgCurs');$('#cuTit').textContent=`Arxiva a «Curs ${prev}»`;$('#cuLl').innerHTML=act.map(x=>`<label class="cuit"><input type="checkbox" value="${x.id}" checked> ${x.icon||''} ${esc(x.name)}</label>`).join('');d.showModal();
@@ -1121,7 +1149,7 @@ function render(){if(!state)return;aplicaColors();{const s0=cur();if(s0?.cls&&!s
   const esLl=cur()?.tipus==='llista';$('#tabs [data-t=resum]').hidden=esLl;if(esLl&&tab==='resum')tab=tabPrincipal='llibreta';
   renderSel();document.body.classList.toggle('mob',esMobil());if(esMobil()){tancaPanell();VA.on=false;rMobil();estat();return}$$('#tabs button,.tabic').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));if(tab!=='resum'){tancaPanell();VA.on=false}
   if(tab==='alumnes'){tab='config';alObert=true}
-  ({llibreta:rLlibreta,resum:rResum,config:rConfig,eines:rEines,arxiu:rArxiu})[tab]();estat();btnHist()}
+  ({llibreta:rLlibreta,resum:rResum,config:rConfig,eines:rEines,arxiu:rArxiu,bloc:rBloc})[tab]();estat();btnHist();pintaSortides()}
 const capPlegada=()=>{try{return localStorage.getItem('llibreta-cap-plegada')==='1'}catch{return false}};
 function plegaCap(){try{localStorage.setItem('llibreta-cap-plegada',capPlegada()?'0':'1')}catch{}render()}
 function capcalera(sub,barra='',llg=''){if(!sub)return '';const n=sub.students.length;
@@ -1171,7 +1199,7 @@ function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="$
   case 'check':return td('clk',checkHtml(v),1);
   case 'icones':return td('clk',v?esc(v):'<span class="buida">·</span>',1);
   case 'url':return td('url',urlHtml(v,RO()),1);
-  case 'lliure':return td('',`<input class="g lliure" ${a} ${dis} value="${esc(v??'')}">`);
+  case 'lliure':return td('',`<input class="g lliure" ${a} ${dis} value="${esc(v??'')}"${v?` title="${esc(v)}"`:''}>`);
   case 'inc':return td('inc',incHtml(v),1);
   }}
 /* La taula ocupa tota l'alçada fins a baix de la pantalla; el quadre de notes queda a sota, fora de la vista */
@@ -1642,9 +1670,12 @@ $('#dlgCls').addEventListener('click',async e=>{const b=e.target.closest('[data-
 $('#main').addEventListener('click',e=>{if(e.target.closest('[data-clsx]')){e.stopPropagation();obreCls()}},true);
 
 /* ======================= PDF (horitzontal, marges de 10 mm) ======================= */
-const PDFLIB=['https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js'];
+/* Biblioteques de PDF amb empremta de seguretat (SRI): si el fitxer de jsDelivr no és exactament aquest, el navegador no l'executa.
+   Si s'actualitza la versió, cal tornar a calcular l'empremta (openssl dgst -sha384 -binary fitxer | openssl base64 -A). */
+const PDFLIB=[['https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js','sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk'],
+  ['https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js','sha384-fCAW/rDWORTbQXSiB7mOg0QtQ5c+r0f544y6XoKjuVva0nMBlCpNUjiFeG5iMdS3']];
 const CARPDF='Llibreta del Profe · PDF';
-function carregaScript(u){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=()=>rej(new Error('No s\'ha pogut carregar el generador de PDF. Hi ha connexió?'));document.head.appendChild(s)})}
+function carregaScript([u,sri]){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;if(sri){s.integrity=sri;s.crossOrigin='anonymous'}s.onload=res;s.onerror=()=>{s.remove();rej(new Error('No s\'ha pogut carregar de manera segura el generador de PDF. Comprova la connexió i torna-ho a provar.'))};document.head.appendChild(s)})}
 async function carregaPDF(){if(!window.jspdf)await carregaScript(PDFLIB[0]);if(!window.jspdf.jsPDF.API.autoTable)await carregaScript(PDFLIB[1])}
 /* La lletra estàndard del PDF no té emojis: es treuen i es canvien els símbols que en tenen equivalent */
 const pt=x=>String(x??'').replace(/✔/g,'Sí').replace(/✘/g,'No').replace(/👍/g,'+').replace(/👎/g,'-').replace(/[←-⇿⌀-➿️‍]|[\uD800-\uDFFF]./g,'').replace(/\s+/g,' ').trim();
@@ -1872,6 +1903,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     <div class="fl" style="margin-top:8px"><label><b class="vF">F</b> (falta): compta com la nota mínima (0, 1 o NA).</label></div>
     <div class="fl"><label><b class="vFJ">FJ</b> (falta justificada):</label><select id="kFJ"><option value="skip" ${s.fjMode!=='zero'?'selected':''}>no compta (recomanat)</option><option value="zero" ${s.fjMode==='zero'?'selected':''}>compta com un 0</option></select></div>`)}
   ${cfgDet('taula','▦ Taula',s.filaTotals?'amb fila de totals':'sense fila de totals',`<label><input type="checkbox" id="kTot" ${s.filaTotals?'checked':''}> Mostra una fila de totals al final de la taula (mitjanes, valor més repetit, fets, targetes…)</label>`)}
+  ${cfgDet('sortides','🚻 Sortides de l\'aula','avís als '+state.sortidesMin+' min',`<label>Avisa quan un alumne porta fora <input type="number" id="kSoMin" min="1" max="60" value="${state.sortidesMin}" style="width:64px"> minuts</label>`)}
   </fieldset>${cfgDet('alumnat','📇 Llistats del curs '+cursCurt(cursKey()),`${alumnatDe().length} alumnes · ${grupsDe().length} grups`,'<div id="alumW"></div>')}${colorsHtml()}${cfgDet('banc','💬 Banc de comentaris',state.banc.items.length+' comentari'+(state.banc.items.length===1?'':'s')+' · '+state.banc.cats.length+' categori'+(state.banc.cats.length===1?'a':'es'),'<div id="bancW"></div>','detBanc')}<div id="dades"></div>`;
   rDades(true);rAlumnes();rAlumnat();rBanc();lligaCfg();lligaColors();$('#cfgPl').onclick=()=>plegaCfg(false);$('#cfgDp').onclick=()=>plegaCfg(true);
   if(ro)return;
@@ -1903,7 +1935,8 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
   on('#kOrdMax','onchange',e=>{s.ordMax=Math.max(2,Math.min(10,+e.target.value||4));save();rConfig()});
   on('#kOrdMean','onchange',e=>{s.allowOrdMean=e.target.checked;save();rConfig()});
   on('#kFJ','onchange',e=>{s.fjMode=e.target.value;save('falta justificada')});
-  on('#kTot','onchange',e=>{s.filaTotals=e.target.checked;save('fila de totals')})}
+  on('#kTot','onchange',e=>{s.filaTotals=e.target.checked;save('fila de totals')});
+  on('#kSoMin','onchange',e=>{const v=Math.round(+e.target.value);if(v>=1&&v<=60){state.sortidesMin=v;save('temps d\'avís de sortides')}else e.target.value=state.sortidesMin})}
 /* ----- Banc de comentaris (comú a totes les llibretes) ----- */
 let bancObert=false;const bancCatObertes=new Set();
 function rBanc(){const W=$('#bancW');if(!W)return;const b=state.banc,nivSel=(v,attr)=>`<select ${attr} title="Nivell (opcional): el comentari se suggerirà als alumnes amb aquest nivell">${['','NA','AS','AN','AE'].map(n=>`<option value="${n}" ${v===n?'selected':''}>${n||'—'}</option>`).join('')}</select>`;
@@ -2285,16 +2318,35 @@ function nivPosit(p){if(!p.data||p.fet)return '';const d=Math.round((new Date(p.
   return d<0?'vencut':d===0?'avui':d<=2?'vermell':d<=7?'taronja':''}
 function diesPosit(p){return Math.round((new Date(p.data+'T12:00')-new Date(avui()+'T12:00'))/864e5)}
 function textAvis(p){const n=nivPosit(p),d=diesPosit(p);return n==='vencut'?`⚠ Vençut fa ${-d} ${d===-1?'dia':'dies'}`:n==='avui'?'⚠ És avui':d===1?'⚠ Demà':`⚠ D'aquí a ${d} dies`}
-const EINA={temp:['⏱️','Temporitzador',()=>obreTemp()],atz:['🎲',"Alumne a l'atzar",()=>obreAtzar()],par:['👥','Fer parelles',()=>obreParelles()],calc:['🧮','Calculadora',()=>calcObre(true)],llist:['📇','Llistats',()=>obreLlistats()]};
+const EINA={temp:['⏱️','Temporitzador',()=>obreTemp()],atz:['🎲',"Alumne a l'atzar",()=>obreAtzar()],par:['👥','Fer parelles',()=>obreParelles()],calc:['🧮','Calculadora',()=>calcObre(true)],llist:['📇','Llistats',()=>obreLlistats()],sort:['🚻','Sortides',()=>obreSortides()]};
 function rEines(){const sub=cur(),E=state.eines;
-  const pos=state.posits.filter(p=>!p.llib||p.llib===sub?.id||!state.subjects.some(s=>s.id===p.llib)||nivPosit(p));
-  const vistAra=new Set(pos.filter(p=>nivPosit(p)==='avui'&&p.vist!==avui()).map(p=>p.id));
   const grupsRec=list=>{const g=new Map();list.forEach(r=>{const k=r.grup||'Altres';if(!g.has(k))g.set(k,[]);g.get(k).push(r)});return [...g.entries()]};
   const fitxes=(list,on)=>[['',list]].filter(([,rs])=>rs.length).map(([k,rs])=>`<div class="grupr"><div class="fitxes">${rs.map(r=>`
     <a class="fitxa fitxar" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span>${esc(r.name)}</span>
       <span class="acc"><button data-rmv="-1" data-rid="${r.id}" data-on="${on}" title="Mou">◀</button><button data-rmv="1" data-rid="${r.id}" data-on="${on}" title="Mou">▶</button><button data-red="${r.id}" data-on="${on}" title="Edita">✎</button></span></a>`).join('')}</div></div>`).join('')||'<p style="color:var(--suau)">Encara no hi ha enllaços.</p>';
+  const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
+        <span class="acc"><button data-emv="-1" data-e="${k}" ${i===0?'disabled':''} title="Mou">◀</button><button data-emv="1" data-e="${k}" ${i===a.length-1?'disabled':''} title="Mou">▶</button></span></div>`).join('')}</div>`},
+    recll:{t:`Recursos de la llibreta <span class="ebn">${sub?sub.recursos.length:0}</span>`,x:`<button class="btn sec" id="eNouRL" style="padding:4px 10px" ${sub?'':'disabled'}>＋ Enllaç</button>`,h:sub?fitxes(sub.recursos,'ll'):''},
+    recgen:{t:`Recursos generals <span class="ebn">${state.recursos.length}</span>`,x:'<button class="btn sec" id="eNouRG" style="padding:4px 10px">＋ Enllaç</button>',h:fitxes(state.recursos,'gen')}};
+  $('#main').innerHTML=`<div class="cap"><span class="capic">🧰</span><div><h1>Eines</h1></div></div>`+
+    E.ordre.filter(k=>B[k]).map((k,i,ord)=>{const b=B[k],pl=!!E.pleg[k];return `<div class="seccio eb ${pl?'pl':''}"><h2><button class="ebp" data-ebp="${k}" title="${pl?'Desplega':'Plega'}">${pl?'▸':'▾'}</button><span class="ebt" data-ebp="${k}">${b.t}</span>${pl?'':b.x||''}
+      <span class="ebmv"><button data-ebm="-1" data-eb="${k}" ${i===0?'disabled':''} title="Puja el bloc">▲</button><button data-ebm="1" data-eb="${k}" ${i===ord.length-1?'disabled':''} title="Baixa el bloc">▼</button></span></h2>${pl?'':b.h}</div>`}).join('');
+  const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
+  $$('[data-eina]').forEach(b=>b.onclick=()=>EINA[b.dataset.eina][2]());
+  $$('[data-emv]').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=E.aula,i=a.indexOf(b.dataset.e),j=i+ +b.dataset.emv;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save(null,true);rEines()});
+  $$('[data-ebp]').forEach(b=>b.onclick=()=>{const k=b.dataset.ebp;E.pleg[k]=!E.pleg[k];save(null,true);rEines()});
+  $$('[data-ebm]').forEach(b=>b.onclick=()=>{const a=E.ordre,i=a.indexOf(b.dataset.eb),j=i+ +b.dataset.ebm;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save(null,true);rEines()});
+  on('#eNouRL','onclick',()=>obreRec(null,'ll'));on('#eNouRG','onclick',()=>obreRec(null,'gen'));
+  $$('[data-red]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();obreRec(b.dataset.red,b.dataset.on)});
+  $$('[data-rmv]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const a=b.dataset.on==='ll'?cur().recursos:state.recursos;
+    const i=a.findIndex(r=>r.id===b.dataset.rid);let j=i+ +b.dataset.rmv;
+    if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save('moure enllaç');rEines()});
+}
+/* Pòsits: es mostren a la pantalla del Bloc (abans eren a 🧰 Eines) */
+function positsDe(sub,tots){return tots?state.posits.slice():state.posits.filter(p=>!p.llib||p.llib===sub?.id||!state.subjects.some(s=>s.id===p.llib)||nivPosit(p))}
+function positsHtml(pos,sub,vistAra){
   const opLl=p=>{const ll=state.subjects.filter(s=>!s.archived||s.id===p.llib);return `<option value="">General</option>`+ll.map(s=>`<option value="${s.id}" ${p.llib===s.id?'selected':''}>${s.icon||''} ${esc(s.name)}</option>`).join('')};
-  const posHtml=pos.map(p=>{const niv=nivPosit(p),altra=p.llib&&p.llib!==sub?.id?state.subjects.find(s=>s.id===p.llib):null;
+  return pos.map(p=>{const niv=nivPosit(p),altra=p.llib&&p.llib!==sub?.id?state.subjects.find(s=>s.id===p.llib):null;
     return `<div class="posit ${niv?'al-'+niv:''} ${vistAra.has(p.id)?'blink':''} ${p.fet?'fet':''}" style="background:${p.color}" data-pid="${p.id}">
       <button class="pdel" data-pdel="${p.id}" title="Elimina">✕</button>
       ${altra?`<span class="pll" title="Pòsit d'una altra llibreta">${altra.icon||'📘'} ${esc(altra.name)}</span>`:''}
@@ -2303,37 +2355,127 @@ function rEines(){const sub=cur(),E=state.eines;
       <div class="pb"><span class="dots">${PCOL.map(c=>`<button style="background:${c}" data-pcol="${c}" data-pid="${p.id}"></button>`).join('')}</span></div>
       <div class="pb">📅 <input type="date" value="${esc(p.data||'')}" data-pdata="${p.id}"><select data-pll="${p.id}">${opLl(p)}</select></div>
       <div class="pb"><label class="pfet"><input type="checkbox" data-pfet="${p.id}" ${p.fet?'checked':''}> Fet ✔</label><span style="flex:1"></span><button data-pmv="-1" data-pid="${p.id}" class="ed" title="Mou">◀</button><button data-pmv="1" data-pid="${p.id}" class="ed" title="Mou">▶</button></div></div>`}).join('')
-    ||'';
-  const nAl=pos.filter(p=>nivPosit(p)).length;
-  const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
-        <span class="acc"><button data-emv="-1" data-e="${k}" ${i===0?'disabled':''} title="Mou">◀</button><button data-emv="1" data-e="${k}" ${i===a.length-1?'disabled':''} title="Mou">▶</button></span></div>`).join('')}</div>`},
-    posits:{t:`📝 Pòsits <span class="ebn">${pos.length}${nAl?` · <b class="${pos.some(p=>['avui','vermell','vencut'].includes(nivPosit(p)))?'r':'t'}">${nAl} en alerta</b>`:''}</span>`,x:'<button class="btn sec" id="eNouP" style="padding:4px 10px">＋ Nou pòsit</button>',h:`<div class="posits">${posHtml}</div>`},
-    recll:{t:`Recursos de la llibreta <span class="ebn">${sub?sub.recursos.length:0}</span>`,x:`<button class="btn sec" id="eNouRL" style="padding:4px 10px" ${sub?'':'disabled'}>＋ Enllaç</button>`,h:sub?fitxes(sub.recursos,'ll'):''},
-    recgen:{t:`Recursos generals <span class="ebn">${state.recursos.length}</span>`,x:'<button class="btn sec" id="eNouRG" style="padding:4px 10px">＋ Enllaç</button>',h:fitxes(state.recursos,'gen')}};
-  $('#main').innerHTML=`<div class="cap"><span class="capic">🧰</span><div><h1>Eines</h1></div></div>`+
-    E.ordre.map((k,i)=>{const b=B[k],pl=!!E.pleg[k];return `<div class="seccio eb ${pl?'pl':''}"><h2><button class="ebp" data-ebp="${k}" title="${pl?'Desplega':'Plega'}">${pl?'▸':'▾'}</button><span class="ebt" data-ebp="${k}">${b.t}</span>${pl?'':b.x||''}
-      <span class="ebmv"><button data-ebm="-1" data-eb="${k}" ${i===0?'disabled':''} title="Puja el bloc">▲</button><button data-ebm="1" data-eb="${k}" ${i===E.ordre.length-1?'disabled':''} title="Baixa el bloc">▼</button></span></h2>${pl?'':b.h}</div>`}).join('');
-  const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
-  $$('[data-eina]').forEach(b=>b.onclick=()=>EINA[b.dataset.eina][2]());
-  $$('[data-emv]').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=E.aula,i=a.indexOf(b.dataset.e),j=i+ +b.dataset.emv;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save(null,true);rEines()});
-  $$('[data-ebp]').forEach(b=>b.onclick=()=>{const k=b.dataset.ebp;E.pleg[k]=!E.pleg[k];save(null,true);rEines()});
-  $$('[data-ebm]').forEach(b=>b.onclick=()=>{const a=E.ordre,i=a.indexOf(b.dataset.eb),j=i+ +b.dataset.ebm;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save(null,true);rEines()});
-  on('#eNouP','onclick',()=>{state.posits.unshift({id:uid(),text:'',color:PCOL[0],data:'',llib:sub?.id||''});save('nou pòsit');rEines();$('.posit textarea')?.focus()});
-  on('#eNouRL','onclick',()=>obreRec(null,'ll'));on('#eNouRG','onclick',()=>obreRec(null,'gen'));
+    ||'<p style="color:var(--suau)">Cap pòsit.</p>';
+}
+function lligaPosits(pos,sub,vistAra,re){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
+  on('#eNouP','onclick',()=>{state.posits.unshift({id:uid(),text:'',color:PCOL[0],data:'',llib:sub?.id||''});save('nou pòsit');re();$('.posit textarea')?.focus()});
   const P=id=>state.posits.find(p=>p.id===id);
   $$('[data-ptxt]').forEach(t=>t.oninput=()=>{P(t.dataset.ptxt).text=t.value;clearTimeout(t._h);t._h=setTimeout(()=>save('pòsit'),500)});
-  $$('[data-pcol]').forEach(b=>b.onclick=()=>{P(b.dataset.pid).color=b.dataset.pcol;save('color del pòsit');rEines()});
-  $$('[data-pdata]').forEach(i=>i.onchange=()=>{const p=P(i.dataset.pdata);p.data=i.value;delete p.vist;save('data del pòsit');renderSel();rEines()});
-  $$('[data-pll]').forEach(sl=>sl.onchange=()=>{P(sl.dataset.pll).llib=sl.value;save('pòsit');rEines()});
-  $$('[data-pfet]').forEach(c=>c.onchange=()=>{P(c.dataset.pfet).fet=c.checked;save(c.checked?'pòsit fet':'pòsit pendent');renderSel();rEines()});
-  $$('[data-pdel]').forEach(b=>b.onclick=async()=>{if(!await confirma('Eliminar aquest pòsit?','Elimina'))return;state.posits=state.posits.filter(p=>p.id!==b.dataset.pdel);save('eliminar pòsit');renderSel();rEines()});
+  $$('[data-pcol]').forEach(b=>b.onclick=()=>{P(b.dataset.pid).color=b.dataset.pcol;save('color del pòsit');re()});
+  $$('[data-pdata]').forEach(i=>i.onchange=()=>{const p=P(i.dataset.pdata);p.data=i.value;delete p.vist;save('data del pòsit');renderSel();re()});
+  $$('[data-pll]').forEach(sl=>sl.onchange=()=>{P(sl.dataset.pll).llib=sl.value;save('pòsit');re()});
+  $$('[data-pfet]').forEach(c=>c.onchange=()=>{P(c.dataset.pfet).fet=c.checked;save(c.checked?'pòsit fet':'pòsit pendent');renderSel();re()});
+  $$('[data-pdel]').forEach(b=>b.onclick=async()=>{if(!await confirma('Eliminar aquest pòsit?','Elimina'))return;state.posits=state.posits.filter(p=>p.id!==b.dataset.pdel);save('eliminar pòsit');renderSel();re()});
   $$('[data-pmv]').forEach(b=>b.onclick=()=>{const k=pos.findIndex(p=>p.id===b.dataset.pid),l=k+ +b.dataset.pmv;if(l<0||l>=pos.length)return;
-    const a=state.posits,i=a.indexOf(pos[k]),j=a.indexOf(pos[l]);[a[i],a[j]]=[a[j],a[i]];save('moure pòsit');rEines()});
-  $$('[data-red]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();obreRec(b.dataset.red,b.dataset.on)});
-  $$('[data-rmv]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();const a=b.dataset.on==='ll'?cur().recursos:state.recursos;
-    const i=a.findIndex(r=>r.id===b.dataset.rid);let j=i+ +b.dataset.rmv;
-    if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];save('moure enllaç');rEines()});
+    const a=state.posits,i=a.indexOf(pos[k]),j=a.indexOf(pos[l]);[a[i],a[j]]=[a[j],a[i]];save('moure pòsit');re()});
   if(vistAra.size){vistAra.forEach(id=>P(id).vist=avui());save(null,true);renderSel()}}
+/* ======================= Sortides de l'aula (WC i sortides) =======================
+   Registre per llibreta: sub.sortides=[{id,st,tipus:'wc'|'sortida',ini,fi}] (hores en ms). No surt a la taula, ni a l'Avaluació, ni als PDF de notes. */
+const SO_TIPUS={wc:['🚻','WC'],sortida:['🚪','Sortida']};
+let soAc=null;const soAvisats=new Map();   // id -> hora del pròxim avís
+const soMin=ms=>Math.max(0,Math.floor(ms/60000));
+const soHora=ms=>{const d=new Date(ms);return p2(d.getHours())+':'+p2(d.getMinutes())};
+const soData=ms=>{const d=new Date(ms);return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`};
+function soActives(){const r=[];for(const sub of state?.subjects||[]){if(sub.archived)continue;for(const x of sub.sortides||[])if(!x.fi)r.push({sub,x,st:sub.students.find(z=>z.id===x.st)})}return r}
+function obreSoMenu(st,x,y){if(RO())return;const sub=cur(),fora=(sub.sortides||[]).find(z=>z.st===st.id&&!z.fi);
+  const m=$('#soMenu');m.innerHTML=`<div style="padding:6px 10px;font-weight:700">${esc(nomComplet(st))}</div>`+(fora?`<button data-som="torna" data-st="${st.id}">✔ Ha tornat (fora des de les ${soHora(fora.ini)})</button>`
+    :`<button data-som="wc" data-st="${st.id}">🚻 WC</button><button data-som="sortida" data-st="${st.id}">🚪 Sortida</button>`);
+  m.style.display='block';m.style.left=Math.min(x,innerWidth-260)+'px';m.style.top=Math.min(y,innerHeight-140)+'px';m.querySelector('button').focus()}
+function soSurt(sub,stId,tipus){sub.sortides??=[];if(sub.sortides.some(z=>z.st===stId&&!z.fi))return;
+  try{soAc=soAc||new (window.AudioContext||window.webkitAudioContext)();soAc.resume()}catch{}
+  sub.sortides.push({id:uid(),st:stId,tipus,ini:Date.now(),fi:null});save(tipus==='wc'?'sortida al WC':'sortida de l\'aula');pintaSortides()}
+function soTorna(sub,id){const x=(sub.sortides||[]).find(z=>z.id===id);if(!x||x.fi)return;x.fi=Date.now();soAvisats.delete(id);save('tornada a l\'aula');pintaSortides()}
+function soBip(){try{const ac=soAc;if(!ac)return;[0,.28].forEach((d,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=i?660:880;
+  g.gain.setValueAtTime(.0001,ac.currentTime+d);g.gain.exponentialRampToValueAtTime(.12,ac.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d+.35);
+  o.connect(g).connect(ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+.4)})}catch{}}
+function pintaSortides(){const bar=$('#soBar'),av=$('#soAvis');if(!bar)return;if(!state){bar.innerHTML='';av.innerHTML='';return}
+  const ara=Date.now(),lim=(state.sortidesMin||7)*60000,act=soActives();let sona=false;
+  bar.innerHTML=act.map(({sub,x,st})=>{const m=soMin(ara-x.ini),t=ara-x.ini>=lim;
+    return `<button class="sobtn ${t?'tard':''}" data-soret="${x.id}" data-sosub="${sub.id}" title="${esc(st?nomComplet(st):'')} · ${esc(sub.name)} · ${SO_TIPUS[x.tipus][1]} des de les ${soHora(x.ini)}. Clica quan torni.">${SO_TIPUS[x.tipus][0]} ${esc(st?.nom||'?')} · ${m} min</button>`}).join('');
+  const vius=new Set(act.map(a=>a.x.id));[...soAvisats.keys()].forEach(k=>{if(!vius.has(k))soAvisats.delete(k)});
+  const alert=act.filter(({x})=>{const prox=soAvisats.get(x.id)??(x.ini+lim);if(ara>=prox&&!soAvisats.has('o:'+x.id)){soAvisats.set('o:'+x.id,1);sona=true}return ara>=prox});
+  av.innerHTML=alert.map(({sub,x,st})=>`<div class="soav"><b>${SO_TIPUS[x.tipus][0]} ${esc(st?nomComplet(st):'?')}</b><br>Porta ${soMin(ara-x.ini)} minuts fora (${SO_TIPUS[x.tipus][1]}, des de les ${soHora(x.ini)}).
+    <div class="fl"><button class="btn sec" data-soesp="${x.id}">Esperem</button><button class="btn" data-soret="${x.id}" data-sosub="${sub.id}">Ja ha tornat</button></div></div>`).join('');
+  if(sona)soBip()}
+document.addEventListener('click',e=>{const r=e.target.closest('[data-soret]');if(r){const sub=state.subjects.find(z=>z.id===r.dataset.sosub);if(sub)soTorna(sub,r.dataset.soret);return}
+  const w=e.target.closest('[data-soesp]');if(w){soAvisats.set(w.dataset.soesp,Date.now()+3*60000);soAvisats.delete('o:'+w.dataset.soesp);pintaSortides();return}
+  const b=e.target.closest('#soMenu [data-som]');if(b){$('#soMenu').style.display='none';const sub=cur();
+    if(b.dataset.som==='torna'){const x=sub.sortides.find(z=>z.st===b.dataset.st&&!z.fi);if(x)soTorna(sub,x.id)}else soSurt(sub,b.dataset.st,b.dataset.som)}});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#soMenu'))$('#soMenu').style.display='none'});
+const soNomCel=e=>{if(tab!=='llibreta'||!state||esMobil())return null;const td=e.target.closest('#tw tbody td.fx');if(!td||td.classList.contains('cl'))return null;const tr=td.closest('tr[data-s]');return tr?cur().students.find(z=>z.id===tr.dataset.s):null};
+$('#main').addEventListener('contextmenu',e=>{const st=soNomCel(e);if(!st||RO())return;e.preventDefault();obreSoMenu(st,e.clientX,e.clientY)});
+$('#main').addEventListener('dblclick',e=>{const st=soNomCel(e);if(!st||RO())return;e.preventDefault();getSelection()?.removeAllRanges();obreSoMenu(st,e.clientX,e.clientY)});
+setInterval(pintaSortides,15000);
+/* Consulta: fitxa «Sortides» a 🧰 Eines */
+const SOF={sub:'',des:'',fins:''};
+function soFiltrades(){const sub=state.subjects.find(z=>z.id===SOF.sub)||cur();const des=SOF.des?new Date(SOF.des+'T00:00').getTime():0,fins=SOF.fins?new Date(SOF.fins+'T23:59:59').getTime():Infinity;
+  return {sub,llista:(sub.sortides||[]).filter(x=>x.ini>=des&&x.ini<=fins).sort((a,b)=>b.ini-a.ini)}}
+function soResum(sub,llista){const m=new Map();llista.forEach(x=>{const r=m.get(x.st)||{n:0,wc:0,so:0,t:0};r.n++;x.tipus==='wc'?r.wc++:r.so++;r.t+=(x.fi||Date.now())-x.ini;m.set(x.st,r)});
+  return [...m.entries()].map(([id,r])=>({st:sub.students.find(z=>z.id===id),...r})).sort((a,b)=>b.n-a.n||b.t-a.t)}
+const soNom=st=>st?(st.cognoms?st.cognoms+', ':'')+st.nom:'(alumne eliminat)';
+const soDur=x=>x.fi?soMin(x.fi-x.ini)+' min':'fora';
+function obreSortides(){SOF.sub=cur()?.id||'';pintaSoDlg();$('#dlgSo').showModal()}
+function pintaSoDlg(){const {sub,llista}=soFiltrades(),res=soResum(sub,llista),ll=state.subjects.filter(z=>!z.archived&&z.tipus!=='llista'||z.id===sub.id);
+  $('#soW').innerHTML=`<div class="sofil"><select id="soSub">${ll.map(z=>`<option value="${z.id}" ${z.id===sub.id?'selected':''}>${z.icon||''} ${esc(z.name)}</option>`).join('')}</select>
+    <label>Des de <input type="date" id="soDes" value="${SOF.des}"></label><label>fins a <input type="date" id="soFins" value="${SOF.fins}"></label></div>
+    ${llista.length?`<h4 class="soh">Per alumne</h4><table class="sotab"><tr><th>Alumne</th><th>Classe</th><th class="n">Sortides</th><th class="n">🚻 WC</th><th class="n">🚪 Sortida</th><th class="n">Temps total</th></tr>
+      ${res.map(r=>`<tr><td>${esc(soNom(r.st))}</td><td>${esc(r.st?classeDe(sub,r.st)||'':'')}</td><td class="n">${r.n}</td><td class="n">${r.wc}</td><td class="n">${r.so}</td><td class="n">${soMin(r.t)} min</td></tr>`).join('')}</table>
+    <h4 class="soh">Per data</h4><table class="sotab"><tr><th>Data</th><th>Alumne</th><th>Tipus</th><th>Sortida</th><th>Tornada</th><th class="n">Durada</th></tr>
+      ${llista.map(x=>{const st=sub.students.find(z=>z.id===x.st);return `<tr><td>${soData(x.ini).split('-').reverse().join('/')}</td><td>${esc(soNom(st))}</td><td>${SO_TIPUS[x.tipus].join(' ')}</td><td>${soHora(x.ini)}</td><td>${x.fi?soHora(x.fi):'—'}</td><td class="n">${soDur(x)}</td></tr>`}).join('')}</table>`
+    :'<p style="color:var(--suau)">No hi ha cap sortida registrada en aquestes dates. Per registrar-ne una: clic dret o doble clic sobre el nom de l\'alumne.</p>'}`;
+  $('#soSub').onchange=e=>{SOF.sub=e.target.value;pintaSoDlg()};$('#soDes').onchange=e=>{SOF.des=e.target.value;pintaSoDlg()};$('#soFins').onchange=e=>{SOF.fins=e.target.value;pintaSoDlg()}}
+function textSortides(){const {sub,llista}=soFiltrades();const r=soResum(sub,llista);
+  return `Sortides · ${sub.name}${SOF.des||SOF.fins?` · ${SOF.des||'…'} — ${SOF.fins||'…'}`:''}\n\nAlumne\tClasse\tSortides\tWC\tSortida\tTemps total (min)\n`+r.map(x=>[soNom(x.st),x.st?classeDe(sub,x.st)||'':'',x.n,x.wc,x.so,soMin(x.t)].join('\t')).join('\n')+
+    '\n\nData\tAlumne\tTipus\tSortida\tTornada\tDurada (min)\n'+llista.map(x=>[soData(x.ini),soNom(sub.students.find(z=>z.id===x.st)),SO_TIPUS[x.tipus][1],soHora(x.ini),x.fi?soHora(x.fi):'',x.fi?soMin(x.fi-x.ini):''].join('\t')).join('\n')}
+async function pdfSortides(sub,llista,titol){await carregaPDF();const doc=new window.jspdf.jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  doc.setFontSize(14);doc.text(titol||('Sortides de l\'aula · '+sub.name),10,14);doc.setFontSize(9);doc.text('Generat: '+new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'}),10,20);
+  const r=soResum(sub,llista);
+  doc.autoTable({startY:25,margin:{left:10,right:10},styles:{fontSize:9},headStyles:{fillColor:[17,17,17]},head:[['Alumne','Classe','Sortides','WC','Sortida','Temps total']],
+    body:r.map(x=>[soNom(x.st),x.st?classeDe(sub,x.st)||'':'',x.n,x.wc,x.so,soMin(x.t)+' min'])});
+  doc.autoTable({startY:doc.lastAutoTable.finalY+8,margin:{left:10,right:10},styles:{fontSize:9},headStyles:{fillColor:[17,17,17]},head:[['Data','Alumne','Tipus','Sortida','Tornada','Durada']],
+    body:llista.map(x=>[soData(x.ini).split('-').reverse().join('/'),soNom(sub.students.find(z=>z.id===x.st)),SO_TIPUS[x.tipus][1],soHora(x.ini),x.fi?soHora(x.fi):'',soDur(x)])});
+  return doc}
+$('#soX').onclick=()=>$('#dlgSo').close();
+$('#soCopia').onclick=()=>copiaText(textSortides());
+$('#soPdf').onclick=async()=>{const {sub,llista}=soFiltrades();if(!llista.length)return toast('No hi ha sortides per exportar.');
+  try{const d=await pdfSortides(sub,llista);d.save(nomFitxer('sortides-'+sub.name)+'.pdf')}catch(e){toast(e.message)}};
+/* Curs nou: el registre del curs anterior s'esborra (abans es pot exportar en PDF) */
+async function soCursNou(){const ini=new Date(cursKey().slice(0,4)+'-09-01T00:00').getTime();
+  const velles=state.subjects.map(sub=>({sub,llista:(sub.sortides||[]).filter(x=>x.ini<ini)})).filter(v=>v.llista.length);if(!velles.length)return;
+  const n=velles.reduce((a,v)=>a+v.llista.length,0);
+  const r=await pregunta('Sortides del curs anterior',`Hi ha ${n} sortides de l'aula registrades el curs passat. Per privacitat, el registre s'esborra en començar el curs nou.`,[{t:'Esborra-les',v:1,cls:'sec'},{t:'Exporta en PDF i esborra',v:2}]);
+  if(r===2){for(const v of velles){try{const d=await pdfSortides(v.sub,v.llista.sort((a,b)=>b.ini-a.ini),'Sortides de l\'aula · '+v.sub.name+' · curs anterior');d.save(nomFitxer('sortides-'+v.sub.name)+'.pdf')}catch(e){toast(e.message);return}}}
+  if(!r)return;velles.forEach(v=>v.sub.sortides=v.sub.sortides.filter(x=>x.ini>=ini));save('esborrar sortides del curs anterior');toast('Registre de sortides del curs anterior esborrat.')}
+/* ======================= Bloc de notes i pòsits (pantalla pròpia) ======================= */
+const blocTots=()=>{try{return localStorage.getItem('llibreta-bloc-tots')==='1'}catch{return false}};
+function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
+  if(!B.pestanyes.some(p=>p.id===B.actiu))B.actiu=B.pestanyes[0].id;const act=B.pestanyes.find(p=>p.id===B.actiu);
+  const pos=positsDe(sub,tots),vistAra=new Set(pos.filter(p=>nivPosit(p)==='avui'&&p.vist!==avui()).map(p=>p.id)),nAl=pos.filter(p=>nivPosit(p)).length;
+  $('#main').innerHTML=`<div class="blocw">
+    <section class="blocn"><div class="blpt">${B.pestanyes.map(p=>`<button class="blp ${p.id===B.actiu?'on':''}" data-blp="${p.id}" draggable="true" title="Doble clic per canviar el nom · arrossega per moure">${esc(p.nom)}</button>`).join('')}
+      <button class="blp nou" id="blNou" title="Pestanya nova">＋</button><span style="flex:1"></span>
+      ${B.pestanyes.length>1?`<button class="blx" id="blDel" title="Elimina aquesta pestanya">Elimina</button>`:''}<button class="blx" id="blTanca" title="Torna (Esc)">✕</button></div>
+      <textarea id="blTxt" spellcheck="true" placeholder="Materials, dades, recordatoris…">${esc(act.text)}</textarea></section>
+    <section class="blocp"><h2>Pòsits <span class="ebn">${pos.length}${nAl?` · <b class="${pos.some(p=>['avui','vermell','vencut'].includes(nivPosit(p)))?'r':'t'}">${nAl} en alerta</b>`:''}</span>
+      <span style="flex:1"></span><select id="blFil" title="Quins pòsits es veuen"><option value="0">Aquesta llibreta</option><option value="1" ${tots?'selected':''}>Tots</option></select>
+      <button class="btn sec" id="eNouP" style="padding:4px 10px">＋ Nou</button></h2>
+      <div class="posits">${positsHtml(pos,sub,vistAra)}</div></section></div>`;
+  const t=$('#blTxt');t.oninput=()=>{act.text=t.value;clearTimeout(t._h);t._h=setTimeout(()=>save('bloc de notes'),600)};
+  t.onblur=()=>{if(t._h){clearTimeout(t._h);t._h=null;save('bloc de notes')}};
+  $$('[data-blp]').forEach(b=>{b.onclick=()=>{if(B.actiu===b.dataset.blp)return;B.actiu=b.dataset.blp;save(null,true);rBloc();$('#blTxt').focus()};
+    b.ondblclick=async()=>{const p=B.pestanyes.find(x=>x.id===b.dataset.blp);const n=await pregunta('Nom de la pestanya','',[{t:'Cancel·la',v:0,cls:'sec'},{t:'Desa',v:1}],p.nom);if(n&&n.trim()){p.nom=n.trim().slice(0,40);save('nom de pestanya');rBloc()}};
+    b.ondragstart=e=>{e.dataTransfer.setData('text/plain',b.dataset.blp);b.classList.add('mou')};b.ondragend=()=>b.classList.remove('mou');
+    b.ondragover=e=>e.preventDefault();
+    b.ondrop=e=>{e.preventDefault();const de=e.dataTransfer.getData('text/plain'),a=B.pestanyes,i=a.findIndex(x=>x.id===de),j=a.findIndex(x=>x.id===b.dataset.blp);if(i<0||j<0||i===j)return;
+      const [x]=a.splice(i,1);a.splice(j,0,x);save('ordre de pestanyes');rBloc()}});
+  $('#blNou').onclick=async()=>{const n=await pregunta('Pestanya nova','Nom de la pestanya:',[{t:'Cancel·la',v:0,cls:'sec'},{t:'Crea',v:1}],'');if(!n||!n.trim())return;const p={id:uid(),nom:n.trim().slice(0,40),text:''};
+    B.pestanyes.push(p);B.actiu=p.id;save('pestanya nova');rBloc();$('#blTxt').focus()};
+  $('#blDel')&&($('#blDel').onclick=async()=>{if(!await confirma(`Eliminar la pestanya «${act.nom}»${act.text.trim()?' i tot el que hi ha escrit':''}?`,'Elimina'))return;
+    B.pestanyes=B.pestanyes.filter(p=>p.id!==act.id);B.actiu=B.pestanyes[0].id;save('eliminar pestanya');rBloc()});
+  $('#blTanca').onclick=()=>{tab=tabPrincipal;render()};
+  $('#blFil').onchange=e=>{try{localStorage.setItem('llibreta-bloc-tots',e.target.value)}catch{}rBloc()};
+  lligaPosits(pos,sub,vistAra,rBloc)}
+addEventListener('keydown',e=>{if(e.key!=='Escape'||tab!=='bloc'||document.querySelector('dialog[open]'))return;e.preventDefault();tab=tabPrincipal;render()});
 let recEd=null,recOn='ll';
 function obreRec(id,on){recOn=on;const a=on==='ll'?cur().recursos:state.recursos;recEd=id?a.find(r=>r.id===id):null;
   $('#rTit').textContent=recEd?'Edita l\'enllaç':'Nou enllaç';$('#rNom').value=recEd?.name||'';$('#rUrl').value=recEd?.url||'';$('#rGrup').value=recEd?.grup||'';$('#rIc').value=recEd?.icon||'';
@@ -2410,7 +2552,27 @@ function orgue(){try{const ac=T.ac,t0=ac.currentTime+.05;
 function bipSuau(){try{const ac=T.ac;[0,0.3].forEach(d=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;
   g.gain.setValueAtTime(0.0001,ac.currentTime+d);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+d+0.22);
   o.connect(g).connect(T.out||ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+0.25)})}catch{}}
-const SONS={joc:{nom:'🎮 Joc',f:()=>jingle(),cada:3800},bip:{nom:'🔔 Bip bip',f:()=>bipSuau(),cada:1500},bach:{nom:'🎹 Bach (Tocata i fuga)',f:()=>orgue(),cada:TOCATA.dur*1000+2500}};
+/* «Plou i fa sol» (cançó popular catalana, domini públic), amb so de marimba */
+const PLOU=(()=>{const n=[];let t=0,b=.26;const p=(nota,d=1)=>{n.push([nota,t]);t+=b*d};
+  /* Plou i fa sol, / les bruixes es pentinen; / plou i fa sol, / les bruixes porten dol. */
+  p('G4');p('G4');p('A4');p('G4',2);  p('G4');p('G4');p('E4');p('E4');p('G4');p('G4');p('E4',2);
+  p('G4');p('G4');p('A4');p('G4',2);  p('G4');p('G4');p('E4');p('G4');p('E4');p('C4',2.5);return {n,dur:t}})();
+function marimba(){try{const ac=T.ac,t0=ac.currentTime+.05;
+  PLOU.n.forEach(([nota,d])=>{const f=NF(nota);[[f,.24,'sine',.55],[f*4,.05,'sine',.12],[f*10.0,.015,'sine',.04]].forEach(([fr,v,tp,dec])=>{
+    const o=ac.createOscillator(),g=ac.createGain();o.type=tp;o.frequency.value=fr;
+    g.gain.setValueAtTime(0.0001,t0+d);g.gain.exponentialRampToValueAtTime(v,t0+d+.006);g.gain.exponentialRampToValueAtTime(0.0001,t0+d+dec);
+    o.connect(g).connect(T.out||ac.destination);o.start(t0+d);o.stop(t0+d+dec+.02)})})}catch{}}
+/* Rellotge de cucut (so original): tres «cu-cut» amb un toc de fusta */
+function cucut(){try{const ac=T.ac,t0=ac.currentTime+.05;
+  [0,.75,1.5].forEach(d=>{[[NF('D5'),0,.16],[NF('B4'),.2,.3]].forEach(([fr,dd,dur])=>{const o=ac.createOscillator(),fl=ac.createBiquadFilter(),g=ac.createGain();
+      o.type='triangle';o.frequency.value=fr;fl.type='lowpass';fl.frequency.value=1800;const t=t0+d+dd;
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.025);g.gain.setValueAtTime(.3,t+dur*.55);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(fl).connect(g).connect(T.out||ac.destination);o.start(t);o.stop(t+dur+.02)});
+    const o=ac.createOscillator(),g=ac.createGain(),t=t0+d-.04;o.type='square';o.frequency.value=1200;   // toc de fusta
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.05,t+.003);g.gain.exponentialRampToValueAtTime(0.0001,t+.03);
+    o.connect(g).connect(T.out||ac.destination);o.start(t);o.stop(t+.04)})}catch{}}
+const SONS={joc:{nom:'🎮 Joc',f:()=>jingle(),cada:3800},bip:{nom:'🔔 Bip bip',f:()=>bipSuau(),cada:1500},bach:{nom:'🎹 Bach (Tocata i fuga)',f:()=>orgue(),cada:TOCATA.dur*1000+2500},
+  plou:{nom:'☔ Plou i fa sol',f:()=>marimba(),cada:PLOU.dur*1000+1800},cucut:{nom:'🐦 Cucut',f:()=>cucut(),cada:3600}};
 const soTemp=()=>{try{const v=localStorage.getItem('llibreta-so-temp');return SONS[v]?v:'joc'}catch{return 'joc'}};
 const nouOut=()=>{try{T.out?.disconnect()}catch{}try{T.out=T.ac.createGain();T.out.connect(T.ac.destination)}catch{T.out=null}};
 function comencaAlarma(){T.sona=true;T.njingle=0;nouOut();const so=SONS[soTemp()];so.f();T.beep=setInterval(so.f,so.cada);if(ov.style.display!=='flex'||!$('#tGran'))vistaTempCorrent();mostraAlarma()}
@@ -2455,12 +2617,37 @@ window.addEventListener('keydown',e=>{
 const calc=$('#calc'),cin=$('#calcIn');
 $('#calcKp').innerHTML=['C','(',')','←','7','8','9','÷','4','5','6','×','1','2','3','−','0',',','%','+','='].map(k=>`<button class="${'÷×−+()←C%'.includes(k)?'op':k==='='?'eq':''}">${k}</button>`).join('');
 function calcObre(forca){const vis=calc.style.display==='block';calc.style.display=forca||!vis?'block':'none';if(calc.style.display==='block')cin.focus()}
-function calcAvalua(){let e=cin.value.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/,/g,'.').replace(/\s/g,'');
-  if(!e)return;if(!/^[0-9+\-*/().%]*$/.test(e))return $('#calcHist').textContent='Expressió no vàlida';
-  /* percentatges com al mòbil: 200+10% = 220 · 200-15% = 170 · 50*20% = 10 · 15% = 0,15 */
-  for(let m,g=0;(m=/([+\-])(\d+(?:\.\d+)?)%/.exec(e))&&g<20;g++){const i=m.index,esq=e.slice(0,i);e=esq?`(${esq})${m[1]}(${esq})*${m[2]}/100`+e.slice(i+m[0].length):`${m[1]}${m[2]}/100`+e.slice(i+m[0].length)}
-  e=e.replace(/(\d+(?:\.\d+)?)%/g,'($1/100)');
-  try{const r=Function('"use strict";return('+e+')')();if(!isFinite(r))throw 0;$('#calcHist').textContent=cin.value+' =';cin.value=String(Math.round(r*1e10)/1e10).replace('.',',')}catch{$('#calcHist').textContent='Error'}}
+/* Càlcul propi: només entén números (coma o punt decimal), + − × ÷, % i parèntesis. No executa mai el text com a codi.
+   Percentatges com al mòbil: 200+10% = 220 · 200-15% = 170 · 50×20% = 10 · 15% = 0,15. «2(3+1)» és 2×(3+1). */
+function calcula(txt){
+  const t=[];let i=0;const x=String(txt).replace(/\s/g,'');
+  while(i<x.length){const c=x[i];
+    if(/[0-9.,]/.test(c)){let j=i;while(j<x.length&&/[0-9.,]/.test(x[j]))j++;const n=x.slice(i,j).replace(',','.');
+      if((x.slice(i,j).match(/[.,]/g)||[]).length>1||n==='.')throw new Error('Número mal escrit: '+x.slice(i,j));t.push({k:'n',v:parseFloat(n)});i=j;continue}
+    const op={'+':'+','-':'-','−':'-','*':'*','×':'*','x':'*','X':'*','/':'/','÷':'/',':':'/','(':'(',')':')','%':'%'}[c];
+    if(!op)throw new Error('Caràcter no vàlid: «'+c+'»');t.push({k:op});i++}
+  if(!t.length)throw new Error('Escriu una operació');
+  let p=0;const mira=()=>t[p]?.k,pren=()=>t[p++];
+  function factor(){const k=mira();
+    if(k==='-'){pren();return -factor()}if(k==='+'){pren();return factor()}
+    if(k==='n')return pren().v;
+    if(k==='('){pren();const v=expr();if(mira()!==')')throw new Error('Falta tancar un parèntesi');pren();return v}
+    if(k===')')throw new Error('Sobra un parèntesi o falta un número');
+    throw new Error(k===undefined?'Falta un número al final':'Falta un número abans de «'+({'*':'×','/':'÷'}[k]||k)+'»')}
+  function postfix(){let v=factor(),pc=false;while(mira()==='%'){pren();v/=100;pc=true}
+    while(mira()==='n'||mira()==='('){v*=factor();pc=false;while(mira()==='%'){pren();v/=100;pc=true}}  // 2(3+1)
+    return {v,pc}}
+  function terme(){let r=postfix(),v=r.v,pc=r.pc;
+    while(mira()==='*'||mira()==='/'){const o=pren().k,d=postfix().v;pc=false;
+      if(o==='/'){if(d===0)throw new Error('No es pot dividir per zero');v/=d}else v*=d}
+    return {v,pc}}
+  function expr(){let v=terme().v;
+    while(mira()==='+'||mira()==='-'){const o=pren().k,r=terme();const d=r.pc?v*r.v:r.v;v=o==='+'?v+d:v-d}
+    return v}
+  const v=expr();if(p<t.length)throw new Error(mira()===')'?'Sobra un parèntesi':'Expressió incompleta');
+  if(!isFinite(v))throw new Error('Resultat massa gran');return Math.round(v*1e10)/1e10}
+function calcAvalua(){const e=cin.value.trim();if(!e)return;
+  try{const r=calcula(e);$('#calcHist').textContent=cin.value+' =';cin.value=String(r).replace('.',',')}catch(err){$('#calcHist').textContent=err.message}}
 $('#calcKp').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.textContent;
   if(k==='C'){cin.value='';$('#calcHist').textContent=''}else if(k==='←')cin.value=cin.value.slice(0,-1);else if(k==='=')calcAvalua();else cin.value+=k;cin.focus()};
 cin.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();calcAvalua()}if(e.key==='Escape')calc.style.display='none'};
@@ -2469,6 +2656,7 @@ $('#btnCalc').onclick=()=>calcObre(false);$('#btnMob').onclick=()=>{try{sessionS
   addEventListener('mousemove',e=>{if(!drag)return;calc.style.left=Math.max(0,Math.min(innerWidth-260,e.clientX-dx))+'px';calc.style.top=Math.max(0,Math.min(innerHeight-60,e.clientY-dy))+'px';calc.style.right='auto'});
   addEventListener('mouseup',()=>drag=false)})();
 
+document.addEventListener('input',e=>{const el=e.target;if(el.matches?.('input.lliure'))el.title=el.value},true);
 addEventListener('beforeunload',e=>{if(mode==='drive'){if(G.brut){guardaCache();driveDesa();e.preventDefault();e.returnValue=''}return}if(pend){escriuFitxer();e.preventDefault();e.returnValue=''}});
 
 /* ======================= Inici ======================= */

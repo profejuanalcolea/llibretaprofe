@@ -5,6 +5,7 @@
     python3 proves/proves.py                 # passa totes les proves contra index.html
     python3 proves/proves.py --referencia    # torna a generar proves/referencia-mitjanes.json
     python3 proves/proves.py --fitxer altre.html
+    python3 proves/proves.py --nomes pdf,sri       # només les proves que contenen aquests noms
 
 Requisits: Python 3 i Playwright amb Chromium (pip install playwright; playwright install chromium).
 Per a la prova de PDF cal jsPDF 2.5.1 i jspdf-autotable 3.8.2: es baixen de jsDelivr o, si no hi ha
@@ -21,7 +22,11 @@ REF = os.path.join(ARREL, 'proves', 'referencia-mitjanes.json')
 args = sys.argv[1:]
 FITXER = args[args.index('--fitxer') + 1] if '--fitxer' in args else 'index.html'
 GENERA_REF = '--referencia' in args
+NOMES = args[args.index('--nomes') + 1].split(',') if '--nomes' in args else []
 NPM = os.environ.get('PROVES_NPM', '')
+CAPT = os.environ.get('PROVES_CAPTURES', '')   # carpeta on desar captures de pantalla (opcional)
+def captura(pg, nom):
+    if CAPT: pg.screenshot(path=os.path.join(CAPT, nom + '.png'))
 
 # ---------------------------------------------------------------- servidor local
 class Silenci(http.server.SimpleHTTPRequestHandler):
@@ -52,7 +57,9 @@ def google_amb(FILES):
           return route.fulfill(status=200, content_type='text/javascript', body='')
       if 'cdn.jsdelivr.net' in url:
           cos = lib_pdf(url)
-          return route.fulfill(status=200, content_type='text/javascript', body=cos) if cos else route.continue_()
+          if cos and FILES.get('__manipula'): cos = cos + '\n/* manipulat */'
+          # jsDelivr envia Access-Control-Allow-Origin: *, imprescindible perquè funcioni l'empremta (SRI)
+          return route.fulfill(status=200, content_type='text/javascript', body=cos, headers={'Access-Control-Allow-Origin': '*'}) if cos else route.continue_()
       if 'googleapis.com' not in url:
           return route.continue_()
       if '/about' in url:
@@ -250,13 +257,24 @@ def p_llista(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Calculadora: operacions, coma decimal i percentatges')
+@prova('Calculadora: càlcul propi, coma decimal, percentatges i missatges d\'error')
 def p_calculadora(b):
     ctx, pg = pagina_local(b)
-    res = pg.evaluate("""(()=>{const o={};for(const e of ['7,5*0,4+8*0,6','200+10%','(2+3)*4']){calcObre(true);cin.value=e;calcAvalua();o[e]=cin.value}return o})()""")
-    comprova(res['7,5*0,4+8*0,6'] in ('7,8', '7.8'), f'7,5*0,4+8*0,6 → {res}')
-    comprova(res['200+10%'] in ('220',), f'200+10% → {res}')
-    comprova(res['(2+3)*4'] == '20', f'(2+3)*4 → {res}')
+    casos = {'7,5*0,4+8*0,6': 7.8, '200+10%': 220, '200-15%': 170, '50*20%': 10, '15%': 0.15, '(2+3)*4': 20,
+             '2(3+1)': 8, '7,5×0,4+8×0,6': 7.8, '10÷4': 2.5, '−3+5': 2, '-(2+3)': -5, '0.1+0.2': 0.3,
+             '(200+10%)*2': 440, '100+10%+10%': 121, '2*-3': -6, '1/3*3': 1}
+    res = pg.evaluate("c=>Object.fromEntries(Object.keys(c).map(e=>{try{return [e,calcula(e)]}catch(x){return [e,'ERR '+x.message]}}))", casos)
+    mal = {e: (v, res[e]) for e, v in casos.items() if not (isinstance(res[e], (int, float)) and abs(res[e] - v) < 1e-9)}
+    comprova(not mal, f'resultats incorrectes: {mal}')
+    errs = {'(2+3': 'parèntesi', '2+3)': 'parèntesi', '5/0': 'zero', '2+': 'número', '3+alert(1)': 'no vàlid',
+            '1,2,3': 'mal escrit', '': 'operació', '*4': 'número'}
+    res = pg.evaluate("c=>Object.fromEntries(Object.keys(c).map(e=>{try{return [e,'OK '+calcula(e)]}catch(x){return [e,x.message]}}))", errs)
+    mal = {e: res[e] for e, frag in errs.items() if frag not in res[e]}
+    comprova(not mal, f'missatges d\'error inesperats: {mal}')
+    pg.evaluate("calcObre(true)"); pg.fill('#calcIn', '200+10%'); pg.press('#calcIn', 'Enter')
+    comprova(pg.input_value('#calcIn') == '220' and '200+10%' in pg.inner_text('#calcHist'), 'la finestra de la calculadora no mostra 220')
+    pg.fill('#calcIn', '(2+3'); pg.press('#calcIn', 'Enter')
+    comprova('parèntesi' in pg.inner_text('#calcHist'), 'la finestra no mostra el missatge d\'error')
     ctx.close()
 
 @prova('Mode mòbil: un telèfon obre la vista de consulta')
@@ -280,17 +298,157 @@ def p_pdf(b):
     comprova(n > 5000, f'PDF massa petit ({n} bytes)')
     ctx.close()
 
+@prova('Seguretat: una biblioteca de PDF manipulada no s\'executa (empremta SRI)')
+def p_sri(b):
+    if not NPM: raise Omesa('cal PROVES_NPM')
+    ctx, pg = pagina_local(b)
+    pg.drive['__manipula'] = True
+    r = pg.evaluate("(async()=>{try{await fesPDF([state.subjects[0]],false);return 'fet'}catch(e){return e.message}})()")
+    comprova(r != 'fet', 'el PDF s\'ha fet amb una biblioteca manipulada')
+    comprova('segura' in r, f'missatge inesperat: {r}')
+    comprova(not pg.evaluate('!!window.jspdf'), 'la biblioteca manipulada s\'ha executat')
+    ctx.close()
+
+@prova('Textos llargs a Lliure: rètol amb el text complet i punts suspensius')
+def p_textllarg(b):
+    ctx, pg = pagina_local(b)
+    llarg = 'Ha portat el material de laboratori però ha oblidat la bata i les ulleres de protecció'
+    cid = pg.evaluate("cur().columns.find(c=>c.type==='lliure').id")
+    cel = pg.locator(f'td[data-c="{cid}"] input.lliure').first
+    cel.click(); cel.fill(llarg); cel.press('Tab'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(f"getG(cur(),'{cid}',alumnesVisibles(cur())[0].id)") == llarg, 'el text no es desa sencer')
+    comprova(cel.get_attribute('title') == llarg, 'el rètol no té el text complet (mentre s\'escriu)')
+    pg.evaluate("rLlibreta()"); pg.wait_for_timeout(150)
+    cel = pg.locator(f'td[data-c="{cid}"] input.lliure').first
+    comprova(cel.get_attribute('title') == llarg, 'el rètol no té el text complet (després de repintar)')
+    comprova(cel.evaluate("e=>getComputedStyle(e).textOverflow") == 'ellipsis', 'no hi ha punts suspensius')
+    comprova(cel.evaluate("e=>e.scrollWidth>e.clientWidth"), 'el text de prova hi cap sencer: la prova no serveix')
+    ctx.close()
+
+@prova('Temporitzador: tots els sons sonen, amb un volum semblant i sense saturar')
+def p_sons(b):
+    ctx, pg = pagina_local(b)
+    r = pg.evaluate("""(async()=>{const o={};for(const [k,v] of Object.entries(SONS)){
+        T.ac=new OfflineAudioContext(1,44100*9,44100);T.out=null;v.f();const buf=await T.ac.startRendering();const d=buf.getChannelData(0);
+        let pk=0,sq=0,n=0,fi=0;for(let i=0;i<d.length;i++){const a=Math.abs(d[i]);if(a>pk)pk=a;sq+=d[i]*d[i];if(a>.002)fi=i}
+        o[k]={nom:v.nom,pic:+pk.toFixed(3),durada:+(fi/44100).toFixed(2),cada:v.cada}}T.ac=null;return o})()""")
+    comprova({'joc', 'bip', 'bach', 'plou', 'cucut'} <= set(r), f'falten sons: {list(r)}')
+    for k, v in r.items():
+        comprova(v['pic'] > 0.05, f'{v["nom"]} no sona (pic {v["pic"]})')
+        comprova(v['pic'] <= 1.0, f'{v["nom"]} satura (pic {v["pic"]})')
+        comprova(v['durada'] * 1000 < v['cada'], f'{v["nom"]} dura més ({v["durada"]} s) que l\'interval de repetició')
+    p_sons.info = r
+    ctx.close()
+
+@prova('Bloc: pestanyes, text desat, pòsits al Bloc i fora d\'Eines, número d\'avís a la icona')
+def p_bloc(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("(()=>{state.posits.push({id:'pz',text:'Portar les pipetes',color:PCOL[1],data:new Date().toISOString().slice(0,10),llib:''});save();render()})()")
+    pg.wait_for_timeout(150)
+    n = pg.evaluate("String(state.posits.filter(p=>nivPosit(p)).length)")
+    comprova(pg.locator('.tabic[data-t=bloc] #bdg').is_visible() and pg.inner_text('#bdg') == n, f'el número d\'avís ({n}) no surt a la icona del Bloc')
+    pg.click('.tabic[data-t=eines]'); pg.wait_for_timeout(150)
+    comprova(pg.locator('.posit').count() == 0 and 'Pòsits' not in pg.inner_text('#main'), 'els pòsits encara surten a Eines')
+    pg.click('.tabic[data-t=bloc]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate('tab') == 'bloc', 'la icona no obre el Bloc')
+    comprova(pg.locator('.posit', has_text='Portar les pipetes').count() == 1 or pg.locator('textarea[data-ptxt=pz]').count() == 1, 'el pòsit no surt al Bloc')
+    pg.fill('#blTxt', 'Comprar guix\nReunió dimarts'); pg.wait_for_timeout(900)
+    pg.click('#blNou'); pg.fill('#qIn', 'Material'); pg.click('#qBtns button:last-child'); pg.wait_for_timeout(200)
+    comprova(pg.locator('.blp:not(.nou)').count() == 2 and pg.input_value('#blTxt') == '', 'no s\'ha creat la pestanya nova buida')
+    pg.fill('#blTxt', '30 tubs d\'assaig'); pg.wait_for_timeout(900)
+    pg.locator('.blp', has_text='Notes').click(); pg.wait_for_timeout(150)
+    comprova(pg.input_value('#blTxt') == 'Comprar guix\nReunió dimarts', 'en tornar a la primera pestanya no hi ha el text')
+    pg.locator('.blp', has_text='Material').dblclick(); pg.wait_for_timeout(150); pg.fill('#qIn', 'Laboratori'); pg.click('#qBtns button:last-child'); pg.wait_for_timeout(150)
+    comprova(pg.locator('.blp', has_text='Laboratori').count() == 1, 'el doble clic no canvia el nom')
+    pg.locator('.blp', has_text='Laboratori').drag_to(pg.locator('.blp', has_text='Notes')); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("state.bloc.pestanyes.map(p=>p.nom)") == ['Laboratori', 'Notes'], 'arrossegar no reordena les pestanyes')
+    captura(pg, 'bloc')
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate('tab') == 'llibreta', 'Esc no torna a la llibreta')
+    pg.wait_for_timeout(3000); pg.reload(); pg.wait_for_timeout(400)
+    if pg.locator('#lgEntra').is_visible(): pg.click('#lgEntra')
+    pg.wait_for_timeout(1200)
+    comprova(pg.evaluate("state.bloc.pestanyes.map(p=>p.nom+':'+p.text)") == ["Laboratori:30 tubs d'assaig", 'Notes:Comprar guix\nReunió dimarts'], 'el Bloc no es conserva en tornar a carregar')
+    pg.click('.tabic[data-t=bloc]'); pg.wait_for_timeout(200)
+    pg.click('#blDel'); pg.click('#qBtns button:last-child'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("state.bloc.pestanyes.length") == 1, 'no s\'ha eliminat la pestanya')
+    comprova(pg.locator('#blDel').count() == 0, 'es pot eliminar l\'última pestanya')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Migració: unes dades antigues amb pòsits a Eines passen al Bloc sense perdre res')
+def p_migra_bloc(b):
+    ctx, pg = pagina_local(b)
+    r = pg.evaluate("""(()=>{const d=JSON.parse(JSON.stringify(state));delete d.bloc;d.eines.ordre=['aula','posits','recll','recgen'];
+        d.posits=[{id:'p1',text:'Antic',color:PCOL[0],data:'',llib:''}];const m=migra(d);
+        return {ordre:m.eines.ordre,pest:m.bloc.pestanyes.length,posits:m.posits.map(p=>p.text)}})()""")
+    comprova(r == {'ordre': ['aula', 'recll', 'recgen'], 'pest': 1, 'posits': ['Antic']}, f'migració: {r}')
+    ctx.close()
+
+@prova('Sortides: menú al nom, botó a la barra, avís, Esperem, tornada, consulta, PDF i curs nou')
+def p_sortides(b):
+    ctx, pg = pagina_local(b)
+    nom = pg.locator('#tw tbody tr[data-s] td.fx.nomc').first
+    stid = nom.evaluate("e=>e.closest('tr').dataset.s"); snom = nom.inner_text()
+    nom.click(button='right'); pg.wait_for_timeout(100)
+    comprova(pg.is_visible('#soMenu') and pg.locator('#soMenu [data-som=wc]').count() == 1, 'el clic dret al nom no obre el menú WC/Sortida')
+    pg.click('#soMenu [data-som=wc]'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#soBar .sobtn').count() == 1 and snom in pg.inner_text('#soBar'), 'no surt el botó de l\'alumne a la barra')
+    comprova(pg.locator('#tw tbody td[data-c] .antri').count() == 0 and pg.evaluate("Object.keys(cur().anot||{}).length") == 0, 'la sortida ha tocat la taula')
+    # doble clic en un altre alumne → Sortida
+    nom2 = pg.locator('#tw tbody tr[data-s] td.fx.nomc').nth(1); nom2.dblclick(); pg.wait_for_timeout(100); pg.click('#soMenu [data-som=sortida]'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#soBar .sobtn').count() == 2, 'el doble clic no registra una segona sortida')
+    # avís als 7 minuts
+    pg.evaluate(f"(()=>{{const x=cur().sortides.find(z=>z.st==='{stid}');x.ini=Date.now()-8*60000;pintaSortides()}})()"); pg.wait_for_timeout(100)
+    comprova(pg.locator('#soAvis .soav').count() == 1 and 'Porta 8 minuts' in pg.inner_text('#soAvis'), 'no surt l\'avís als 7 minuts')
+    comprova(pg.locator('#soBar .sobtn.tard').count() == 1, 'el botó no es posa vermell')
+    pg.click('#soAvis [data-soesp]'); pg.wait_for_timeout(100)
+    comprova(pg.locator('#soAvis .soav').count() == 0, 'Esperem no amaga l\'avís')
+    comprova(pg.evaluate("[...soAvisats.values()].some(v=>v>Date.now()+170000&&v<Date.now()+190000)"), 'Esperem no torna a avisar al cap de 3 minuts')
+    pg.evaluate("soAvisats.forEach((v,k)=>{if(!String(k).startsWith('o:'))soAvisats.set(k,Date.now()-1000)});pintaSortides()"); pg.wait_for_timeout(100)
+    comprova(pg.locator('#soAvis .soav').count() == 1, 'no torna a avisar després d\'Esperem')
+    pg.click('#soAvis .soav button:has-text("Ja ha tornat")'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#soAvis .soav').count() == 0 and pg.locator('#soBar .sobtn').count() == 1, '«Ja ha tornat» no tanca la sortida')
+    pg.click('#soBar .sobtn'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#soBar .sobtn').count() == 0, 'clicar el botó de la barra no registra la tornada')
+    r = pg.evaluate("cur().sortides.map(x=>[x.tipus,!!x.fi,Math.round((x.fi-x.ini)/60000)])")
+    comprova(sorted(r) == sorted([['wc', True, 8], ['sortida', True, 0]]), f'registre: {r}')
+    # configuració dels minuts
+    pg.evaluate("state.sortidesMin=10;save()"); pg.evaluate(f"(()=>{{cur().sortides.push({{id:'q',st:'{stid}',tipus:'wc',ini:Date.now()-8*60000,fi:null}});pintaSortides()}})()")
+    comprova(pg.locator('#soAvis .soav').count() == 0, 'avisa als 8 minuts amb l\'avís posat a 10')
+    pg.evaluate("soTorna(cur(),'q')")
+    # consulta
+    pg.evaluate("obreSortides()"); pg.wait_for_timeout(150)
+    txt = pg.inner_text('#soW')
+    comprova('Per alumne' in txt and snom in txt and '16 min' in txt, 'la consulta no mostra el resum per alumne (16 min en total)')
+    comprova(pg.evaluate("textSortides().split('\\n').length") >= 8, 'el text per copiar és incomplet')
+    if NPM:
+        n = pg.evaluate("(async()=>{const {sub,llista}=soFiltrades();const d=await pdfSortides(sub,llista);return d.output('arraybuffer').byteLength})()")
+        comprova(n > 3000, 'el PDF de sortides no es genera')
+    pg.click('#soX')
+    # curs nou: les sortides del curs anterior s'esborren
+    pg.evaluate("cur().sortides.push({id:'v',st:cur().students[0].id,tipus:'wc',ini:new Date((+cursKey().slice(0,4)-1)+'-11-10T10:00').getTime(),fi:new Date((+cursKey().slice(0,4)-1)+'-11-10T10:05').getTime()})")
+    pg.evaluate("soCursNou();0"); pg.wait_for_timeout(200)
+    comprova('curs passat' in pg.inner_text('#qTxt'), 'no pregunta per les sortides del curs anterior')
+    pg.click('#qBtns button:has-text("Esborra-les")'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().sortides.some(x=>x.id==='v')") is False and pg.evaluate("cur().sortides.length") == 3, 'no s\'ha esborrat només el curs anterior')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    captura(pg, 'sortides')
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides]
     if GENERA_REF: proves = [p_mitjanes]
+    if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
     b.close()
 srv.shutdown()
 
+if getattr(p_sons, 'info', None) and '-v' in args: print(p_sons.info)
 if GENERA_REF:
     print('Referència desada a', REF); sys.exit(0)
 ok = sum(r[0] == 'OK' for r in RESULTATS); fa = [r for r in RESULTATS if r[0] == 'FALLA']; om = [r for r in RESULTATS if r[0] == 'OMESA']
