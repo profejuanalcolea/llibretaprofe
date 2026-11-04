@@ -674,7 +674,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 1)',COMPILACIO='4/11 22:44';
+const VERSIO='2.2 · ammonite · en proves (tanda 1)',COMPILACIO='4/11 22:51';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -2390,11 +2390,8 @@ function soSurt(sub,stId,tipus){sub.sortides??=[];if(sub.sortides.some(z=>z.st==
   try{soAc=soAc||new (window.AudioContext||window.webkitAudioContext)();soAc.resume()}catch{}
   sub.sortides.push({id:uid(),st:stId,tipus,ini:Date.now(),fi:null});save(tipus==='wc'?'sortida al WC':'sortida de l\'aula');pintaSortides()}
 function soTorna(sub,id){const x=(sub.sortides||[]).find(z=>z.id===id);if(!x||x.fi)return;x.fi=Date.now();soAvisats.delete(id);save('tornada a l\'aula');pintaSortides()}
-function soBip(){try{const ac=soAc;if(!ac)return;[0,.28].forEach((d,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=i?660:880;
-  g.gain.setValueAtTime(.0001,ac.currentTime+d);g.gain.exponentialRampToValueAtTime(.12,ac.currentTime+d+.02);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d+.35);
-  o.connect(g).connect(ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+.4)})}catch{}}
 function pintaSortides(){const bar=$('#soBar'),av=$('#soAvis');if(!bar)return;if(!state){bar.innerHTML='';av.innerHTML='';return}
-  const ara=Date.now(),lim=(state.sortidesMin||7)*60000,act=soActives();let sona=false;
+  const ara=Date.now(),lim=(state.sortidesMin||7)*60000,act=soActives();
   const tit=(sub,x,st)=>`${esc(st?nomComplet(st):'')} · ${esc(sub.name)} · ${SO_TIPUS[x.tipus][1]} des de les ${soHora(x.ini)}`;
   if(act.length<3){soObert=false;bar.innerHTML=act.map(({sub,x,st})=>{const m=soMin(ara-x.ini),t=ara-x.ini>=lim;
     return `<button class="sobtn ${t?'tard':''}" data-soret="${x.id}" data-sosub="${sub.id}" title="${tit(sub,x,st)}. Clica quan torni.">${SO_TIPUS[x.tipus][0]} ${esc(st?.nom||'?')} · ${m} min</button>`}).join('')}
@@ -2403,14 +2400,18 @@ function pintaSortides(){const bar=$('#soBar'),av=$('#soAvis');if(!bar)return;if
       <div id="soLlista" ${soObert?'':'hidden'}>${ord.map(({sub,x,st})=>`<div class="soit ${ara-x.ini>=lim?'tard':''}" title="${tit(sub,x,st)}"><span>${SO_TIPUS[x.tipus][0]} ${esc(st?nomComplet(st):'?')}</span><b>${soMin(ara-x.ini)} min</b>
         <button class="btn" data-soret="${x.id}" data-sosub="${sub.id}">Ha tornat</button></div>`).join('')}</div>`}
   const vius=new Set(act.map(a=>a.x.id));[...soAvisats.keys()].forEach(k=>{if(!vius.has(k))soAvisats.delete(k)});
-  const alert=act.filter(({x})=>{const prox=soAvisats.get(x.id)??(x.ini+lim);if(ara>=prox&&!soAvisats.has('o:'+x.id)){soAvisats.set('o:'+x.id,1);sona=true}return ara>=prox});
+  const alert=act.filter(({x})=>{const prox=soAvisats.get(x.id)??(x.ini+lim);return ara>=prox});
   av.innerHTML=alert.map(({sub,x,st})=>`<div class="soav"><b>${SO_TIPUS[x.tipus][0]} ${esc(st?nomComplet(st):'?')}</b><br>Porta ${soMin(ara-x.ini)} minuts fora (${SO_TIPUS[x.tipus][1]}, des de les ${soHora(x.ini)}).
     <div class="fl"><button class="btn sec" data-soesp="${x.id}">Esperem</button><button class="btn" data-soret="${x.id}" data-sosub="${sub.id}">Ja ha tornat</button></div></div>`).join('');
-  if(sona)soBip()}
+  if(alert.length&&!soLoop){soSona();soLoop=setInterval(soSona,3600)}else if(!alert.length&&soLoop){clearInterval(soLoop);soLoop=null}}
+/* So de l'avís: el cucut (tres «cu-cut», una pausa) sense parar fins que es tria «Esperem» o «Ja ha tornat» */
+let soLoop=null;
+function soSona(){try{soAc=soAc||new (window.AudioContext||window.webkitAudioContext)();if(soAc.state!=='running')soAc.resume();cucut(soAc,soAc.destination)}catch{}}
+document.addEventListener('pointerdown',()=>{if(soLoop&&soAc&&soAc.state!=='running')soAc.resume()},true);
 document.addEventListener('click',e=>{if(e.target.closest('#soGrup')){soObert=!soObert;pintaSortides();return}
   if(soObert&&!e.target.closest('#soLlista')){soObert=false;$('#soLlista')?.setAttribute('hidden','')}
   const r=e.target.closest('[data-soret]');if(r){const sub=state.subjects.find(z=>z.id===r.dataset.sosub);if(sub)soTorna(sub,r.dataset.soret);return}
-  const w=e.target.closest('[data-soesp]');if(w){soAvisats.set(w.dataset.soesp,Date.now()+3*60000);soAvisats.delete('o:'+w.dataset.soesp);pintaSortides();return}
+  const w=e.target.closest('[data-soesp]');if(w){soAvisats.set(w.dataset.soesp,Date.now()+3*60000);pintaSortides();return}
   const b=e.target.closest('#soMenu [data-som]');if(b){$('#soMenu').style.display='none';const sub=cur();
     if(b.dataset.som==='torna'){const x=sub.sortides.find(z=>z.st===b.dataset.st&&!z.fi);if(x)soTorna(sub,x.id)}else soSurt(sub,b.dataset.st,b.dataset.som)}});
 document.addEventListener('pointerdown',e=>{if(!e.target.closest('#soMenu'))$('#soMenu').style.display='none'});
@@ -2582,14 +2583,14 @@ function urba(){try{const ac=T.ac,t0=ac.currentTime+.05,out=T.out||ac.destinatio
       g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.01);g.gain.setValueAtTime(v,t+dur*.7);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
       o.connect(g).connect(out);o.start(t);o.stop(t+dur+.02)}})}catch{}}
 /* Rellotge de cucut (so original): tres «cu-cut» amb un toc de fusta */
-function cucut(){try{const ac=T.ac,t0=ac.currentTime+.05;
+function cucut(ac=T.ac,out=T.out||ac.destination){try{const t0=ac.currentTime+.05;
   [0,.75,1.5].forEach(d=>{[[NF('D5'),0,.16],[NF('B4'),.2,.3]].forEach(([fr,dd,dur])=>{const o=ac.createOscillator(),fl=ac.createBiquadFilter(),g=ac.createGain();
       o.type='triangle';o.frequency.value=fr;fl.type='lowpass';fl.frequency.value=1800;const t=t0+d+dd;
       g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.3,t+.025);g.gain.setValueAtTime(.3,t+dur*.55);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-      o.connect(fl).connect(g).connect(T.out||ac.destination);o.start(t);o.stop(t+dur+.02)});
+      o.connect(fl).connect(g).connect(out);o.start(t);o.stop(t+dur+.02)});
     const o=ac.createOscillator(),g=ac.createGain(),t=t0+d-.04;o.type='square';o.frequency.value=1200;   // toc de fusta
     g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.05,t+.003);g.gain.exponentialRampToValueAtTime(0.0001,t+.03);
-    o.connect(g).connect(T.out||ac.destination);o.start(t);o.stop(t+.04)})}catch{}}
+    o.connect(g).connect(out);o.start(t);o.stop(t+.04)})}catch{}}
 const SONS={joc:{nom:'🎮 Joc',f:()=>jingle(),cada:3800},bip:{nom:'🔔 Bip bip',f:()=>bipSuau(),cada:1500},bach:{nom:'🎹 Bach (Tocata i fuga)',f:()=>orgue(),cada:TOCATA.dur*1000+2500},
   urba:{nom:'🎧 Ritme urbà',f:()=>urba(),cada:URBA.dur*1000+1200},cucut:{nom:'🐦 Cucut',f:()=>cucut(),cada:3600}};
 const soTemp=()=>{try{const v=localStorage.getItem('llibreta-so-temp');return SONS[v]?v:'joc'}catch{return 'joc'}};
