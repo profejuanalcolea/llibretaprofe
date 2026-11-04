@@ -574,12 +574,25 @@ def p_opcions(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columnes amagades: la llista no queda oberta tapant la taula')
+def p_amagades(b):
+    ctx, pg = pagina_local(b)
+    pg.locator('th.colh[data-col]').nth(2).dblclick(); pg.wait_for_timeout(150); pg.check('#cOcu'); pg.click('#cOk'); pg.wait_for_timeout(300)
+    comprova(pg.locator('#chipOc').is_visible() and not pg.locator('#ocList').is_visible(), 'la llista de columnes amagades queda oberta')
+    pg.click('#chipOc'); pg.wait_for_timeout(100)
+    comprova(pg.locator('#ocList').is_visible(), 'clicar el xip no obre la llista')
+    pg.mouse.click(700, 500); pg.wait_for_timeout(100)
+    comprova(not pg.locator('#ocList').is_visible(), 'clicar fora no tanca la llista')
+    pg.click('#chipOc'); pg.locator('[data-obtot]').click(); pg.wait_for_timeout(200)
+    comprova(pg.locator('#chipOc').count() == 0, '«Mostra-les totes» no torna a mostrar les columnes')
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

@@ -49,6 +49,7 @@ python3 proves/proves.py
 | Sortides | Menú al nom, botó a la barra (agrupat a partir de 3), avís amb cucut, Esperem, tornada, consulta, PDF i curs nou |
 | No compta | Una columna dins d'una categoria s'exclou del càlcul, es marca amb ⊘ i torna a comptar |
 | «No ava» | nav/noava/no ava, color taronja, no compta, desplegables i «D'una altra llibreta» |
+| Columnes amagades | La llista del xip «amagades» s'obre i es tanca i no tapa la taula |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

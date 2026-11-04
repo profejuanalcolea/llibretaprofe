@@ -383,6 +383,7 @@ td[tabindex]:focus{outline:2px solid var(--tar);outline-offset:-2px}
 /* Columnes amagades */
 .ocw{position:relative}.ocx{cursor:pointer;background:#eef4ff}
 .ocl{position:absolute;top:24px;left:0;z-index:60;background:#fff;border:1px solid #aaa;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.15);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:200px}
+.ocl[hidden]{display:none}
 .ocl button{border:0;background:none;text-align:left;padding:5px 8px;border-radius:5px;cursor:pointer;font:inherit;font-size:13px}.ocl button:hover{background:var(--tar2)}
 /* Avaluació */
 table.aval td{padding:6px 8px;white-space:nowrap}
@@ -687,7 +688,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 2)',COMPILACIO='4/11 23:02';
+const VERSIO='2.2 · ammonite · en proves (tanda 2)',COMPILACIO='4/11 23:08';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1193,7 +1194,7 @@ function llegenda(sub){if(sub.tipus==='llista'){const x=ocultesXip(sub);return x
     ${sub.settings.allowOrdMean?'<span class="avis" style="font-weight:500">ⓘ Mitjana amb escales ordinals activada</span>':''}${ocultesXip(sub)}</div>`}
 function ocultesXip(sub){if(tab!=='llibreta')return '';const oc=sub.columns.filter(c=>c.oculta&&c.type!=='classe');if(!oc.length)return '';
   const pond=oc.filter(c=>compta(c)&&sub.categories.some(k=>k.id===c.cat)).length;
-  return `<span class="ocw"><span class="chip ocx" id="chipOc" title="Columnes amagades: clica per veure-les">👁 ${oc.length} amagad${oc.length===1?'a':'es'}${pond?' · '+pond+' pondera'+(pond===1?'':'n'):''}</span>
+  return `<span class="ocw"><span class="chip ocx" id="chipOc" title="Columnes amagades: clica per veure-les">👁 ${oc.length} amagad${oc.length===1?'a':'es'}${pond?' · '+pond+' compta'+(pond===1?'':'n')+' per a la nota':''}</span>
     <span class="ocl" id="ocList" hidden>${oc.map(c=>`<button data-obcol="${c.id}" title="Torna-la a mostrar">👁 ${esc(c.name)}</button>`).join('')}${RO()?'':'<button data-obtot="1"><b>Mostra-les totes</b></button>'}</span></span>`}
 
 /* ======================= Cel·les ======================= */
