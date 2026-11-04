@@ -1,0 +1,64 @@
+{
+ "EXEMPLE": {
+  "Banner, Bruce": {
+   "cats": {
+    "Activitats": "AN"
+   },
+   "final": 7.5
+  },
+  "Barton, Clint": {
+   "cats": {
+    "Activitats": "NA"
+   },
+   "final": 3
+  },
+  "Danvers, Carol": {
+   "cats": {
+    "Activitats": "AE"
+   },
+   "final": 9.5
+  },
+  "Maximoff, Wanda": {
+   "cats": {
+    "Activitats": "AN"
+   },
+   "final": 7.5
+  },
+  "Odinson, Thor": {
+   "cats": {
+    "Activitats": "AS"
+   },
+   "final": 5
+  },
+  "Parker, Peter": {
+   "cats": {
+    "Activitats": "AN"
+   },
+   "final": 7.5
+  },
+  "Rogers, Steve": {
+   "cats": {
+    "Activitats": "AN"
+   },
+   "final": 7.5
+  },
+  "Romanoff, Natasha": {
+   "cats": {
+    "Activitats": "AE"
+   },
+   "final": 9.5
+  },
+  "Stark, Tony": {
+   "cats": {
+    "Activitats": "AE"
+   },
+   "final": 9.5
+  },
+  "Udaku, Shuri": {
+   "cats": {
+    "Activitats": "AE"
+   },
+   "final": 9.5
+  }
+ }
+}
