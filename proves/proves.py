@@ -332,7 +332,7 @@ def p_sons(b):
         T.ac=new OfflineAudioContext(1,44100*9,44100);T.out=null;v.f();const buf=await T.ac.startRendering();const d=buf.getChannelData(0);
         let pk=0,sq=0,n=0,fi=0;for(let i=0;i<d.length;i++){const a=Math.abs(d[i]);if(a>pk)pk=a;sq+=d[i]*d[i];if(a>.002)fi=i}
         o[k]={nom:v.nom,pic:+pk.toFixed(3),durada:+(fi/44100).toFixed(2),cada:v.cada}}T.ac=null;return o})()""")
-    comprova({'joc', 'bip', 'bach', 'plou', 'cucut'} <= set(r), f'falten sons: {list(r)}')
+    comprova({'joc', 'bip', 'bach', 'urba', 'cucut'} <= set(r) and 'plou' not in r, f'sons: {list(r)}')
     for k, v in r.items():
         comprova(v['pic'] > 0.05, f'{v["nom"]} no sona (pic {v["pic"]})')
         comprova(v['pic'] <= 1.0, f'{v["nom"]} satura (pic {v["pic"]})')
@@ -413,6 +413,18 @@ def p_sortides(b):
     comprova(pg.locator('#soBar .sobtn').count() == 0, 'clicar el botó de la barra no registra la tornada')
     r = pg.evaluate("cur().sortides.map(x=>[x.tipus,!!x.fi,Math.round((x.fi-x.ini)/60000)])")
     comprova(sorted(r) == sorted([['wc', True, 8], ['sortida', True, 0]]), f'registre: {r}')
+    # tres o més fora: un sol botó agrupat amb la llista
+    pg.evaluate("(()=>{const s=cur();s.students.slice(2,6).forEach((st,i)=>s.sortides.push({id:'g'+i,st:st.id,tipus:'wc',ini:Date.now()-(i+1)*60000,fi:null}));pintaSortides()})()")
+    comprova(pg.locator('#soBar .sobtn').count() == 1 and '4 fora' in pg.inner_text('#soBar'), 'amb 4 fora no surt un sol botó agrupat')
+    alt = pg.evaluate("document.querySelector('header').getBoundingClientRect().height")
+    comprova(alt <= 60, f'la barra es descuadra (alçada {alt})')
+    pg.click('#soGrup'); pg.wait_for_timeout(100)
+    comprova(pg.locator('#soLlista .soit').count() == 4, 'la llista no mostra els 4 alumnes')
+    captura(pg, 'sortides_grup')
+    pg.locator('#soLlista .soit').first.locator('button').click(); pg.wait_for_timeout(100)
+    comprova('3 fora' in pg.inner_text('#soBar') and pg.locator('#soLlista .soit').count() == 3, '«Ha tornat» de la llista no funciona')
+    pg.evaluate("cur().sortides.filter(x=>!x.fi).forEach(x=>soTorna(cur(),x.id))")
+    comprova(pg.locator('#soBar .sobtn').count() == 0, 'no es buida la barra')
     # configuració dels minuts
     pg.evaluate("state.sortidesMin=10;save()"); pg.evaluate(f"(()=>{{cur().sortides.push({{id:'q',st:'{stid}',tipus:'wc',ini:Date.now()-8*60000,fi:null}});pintaSortides()}})()")
     comprova(pg.locator('#soAvis .soav').count() == 0, 'avisa als 8 minuts amb l\'avís posat a 10')
@@ -420,7 +432,8 @@ def p_sortides(b):
     # consulta
     pg.evaluate("obreSortides()"); pg.wait_for_timeout(150)
     txt = pg.inner_text('#soW')
-    comprova('Per alumne' in txt and snom in txt and '16 min' in txt, 'la consulta no mostra el resum per alumne (16 min en total)')
+    tot = pg.evaluate(f"Math.floor(cur().sortides.filter(x=>x.st==='{stid}').reduce((a,x)=>a+x.fi-x.ini,0)/60000)")
+    comprova('Per alumne' in txt and snom in txt and f'{tot} min' in txt, f'la consulta no mostra el resum per alumne ({tot} min)')
     comprova(pg.evaluate("textSortides().split('\\n').length") >= 8, 'el text per copiar és incomplet')
     if NPM:
         n = pg.evaluate("(async()=>{const {sub,llista}=soFiltrades();const d=await pdfSortides(sub,llista);return d.output('arraybuffer').byteLength})()")
@@ -431,7 +444,7 @@ def p_sortides(b):
     pg.evaluate("soCursNou();0"); pg.wait_for_timeout(200)
     comprova('curs passat' in pg.inner_text('#qTxt'), 'no pregunta per les sortides del curs anterior')
     pg.click('#qBtns button:has-text("Esborra-les")'); pg.wait_for_timeout(150)
-    comprova(pg.evaluate("cur().sortides.some(x=>x.id==='v')") is False and pg.evaluate("cur().sortides.length") == 3, 'no s\'ha esborrat només el curs anterior')
+    comprova(pg.evaluate("cur().sortides.some(x=>x.id==='v')") is False and pg.evaluate("cur().sortides.length") == 7, 'no s\'ha esborrat només el curs anterior')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     captura(pg, 'sortides')
     ctx.close()

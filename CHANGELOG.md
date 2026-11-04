@@ -2,9 +2,9 @@
 
 ## 2.2 · ammonite · en preparació
 **Tanda 1 (4/11/2026, en proves)**
-- **Sortides de l'aula:** clic dret o doble clic sobre el nom → 🚻 WC / 🚪 Sortida. Botó a la barra mentre l'alumne és fora; es clica quan torna. Avís als 7 minuts (configurable a ⚙ › Sortides de l'aula) amb «Esperem» (3 minuts més) o «Ja ha tornat». Consulta, còpia i PDF des de 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou (es pot exportar en PDF).
+- **Sortides de l'aula:** clic dret o doble clic sobre el nom → 🚻 WC / 🚪 Sortida. Botó a la barra mentre l'alumne és fora; es clica quan torna. A partir de tres alumnes fora, un sol botó «🚻 N fora» amb la llista. Avís als 7 minuts (configurable a ⚙ › Sortides de l'aula) amb «Esperem» (3 minuts més) o «Ja ha tornat». Consulta, còpia i PDF des de 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou (es pot exportar en PDF).
 - **Bloc de notes:** icona nova a la barra, pantalla pròpia amb pestanyes (＋, doble clic per canviar el nom, arrossegar per ordenar) i els **pòsits** a la dreta, que surten d'Eines. El número d'avís dels pòsits passa a la icona del Bloc. Esc torna a la llibreta.
-- **Temporitzador:** dos sons nous, ☔ «Plou i fa sol» i 🐦 cucut.
+- **Temporitzador:** dos sons nous i originals, 🎧 ritme urbà i 🐦 cucut.
 - **Columnes Lliure:** rètol amb el text complet en passar el ratolí i punts suspensius quan no hi cap.
 - **Calculadora** amb càlcul propi (ja no executa el text com a codi), «2(3+1)», «:» per dividir i missatges d'error clars.
 - **Empremta de seguretat (SRI)** a les biblioteques de PDF.

@@ -265,6 +265,11 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 #tw tbody td:not(.fx){position:relative}td.anh{box-shadow:inset 0 0 0 3px #ffe600}td.anh input.g,td.anh select.g{background:#fff9b0!important}.vrow.anh,.mbal.anh{background:#fff9b0!important}
 .antri{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid #e65100;border-left:9px solid transparent;pointer-events:none}
 #soBar{display:inline-flex;gap:6px}
+#soBar{position:relative}
+#soLlista{position:absolute;top:calc(100% + 8px);right:0;z-index:710;background:#fff;color:#111;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:330px}
+.soit{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:7px}.soit span{flex:1;font-weight:600}.soit b{font-variant-numeric:tabular-nums}
+.soit.tard{background:#fde8e8}.soit.tard b{color:#e02424}.soit .btn{padding:4px 10px;font-size:13px}
+
 .sobtn{border:0;border-radius:8px;background:#2f6fdb;color:#fff;font:inherit;font-weight:700;font-size:13px;padding:5px 10px;cursor:pointer;white-space:nowrap;font-variant-numeric:tabular-nums}
 .sobtn.tard{background:#e02424;animation:sobl 1.2s infinite}@keyframes sobl{50%{opacity:.6}}
 #soAvis{position:fixed;right:16px;bottom:16px;z-index:720;display:flex;flex-direction:column;gap:10px}
@@ -669,7 +674,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 1)',COMPILACIO='4/11 22:32';
+const VERSIO='2.2 · ammonite · en proves (tanda 1)',COMPILACIO='4/11 22:44';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -2372,7 +2377,7 @@ function lligaPosits(pos,sub,vistAra,re){const on=(id,ev,f)=>{const e=$(id);if(e
 /* ======================= Sortides de l'aula (WC i sortides) =======================
    Registre per llibreta: sub.sortides=[{id,st,tipus:'wc'|'sortida',ini,fi}] (hores en ms). No surt a la taula, ni a l'Avaluació, ni als PDF de notes. */
 const SO_TIPUS={wc:['🚻','WC'],sortida:['🚪','Sortida']};
-let soAc=null;const soAvisats=new Map();   // id -> hora del pròxim avís
+let soAc=null,soObert=false;const soAvisats=new Map();   // id -> hora del pròxim avís
 const soMin=ms=>Math.max(0,Math.floor(ms/60000));
 const soHora=ms=>{const d=new Date(ms);return p2(d.getHours())+':'+p2(d.getMinutes())};
 const soData=ms=>{const d=new Date(ms);return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`};
@@ -2390,14 +2395,21 @@ function soBip(){try{const ac=soAc;if(!ac)return;[0,.28].forEach((d,i)=>{const o
   o.connect(g).connect(ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+.4)})}catch{}}
 function pintaSortides(){const bar=$('#soBar'),av=$('#soAvis');if(!bar)return;if(!state){bar.innerHTML='';av.innerHTML='';return}
   const ara=Date.now(),lim=(state.sortidesMin||7)*60000,act=soActives();let sona=false;
-  bar.innerHTML=act.map(({sub,x,st})=>{const m=soMin(ara-x.ini),t=ara-x.ini>=lim;
-    return `<button class="sobtn ${t?'tard':''}" data-soret="${x.id}" data-sosub="${sub.id}" title="${esc(st?nomComplet(st):'')} · ${esc(sub.name)} · ${SO_TIPUS[x.tipus][1]} des de les ${soHora(x.ini)}. Clica quan torni.">${SO_TIPUS[x.tipus][0]} ${esc(st?.nom||'?')} · ${m} min</button>`}).join('');
+  const tit=(sub,x,st)=>`${esc(st?nomComplet(st):'')} · ${esc(sub.name)} · ${SO_TIPUS[x.tipus][1]} des de les ${soHora(x.ini)}`;
+  if(act.length<3){soObert=false;bar.innerHTML=act.map(({sub,x,st})=>{const m=soMin(ara-x.ini),t=ara-x.ini>=lim;
+    return `<button class="sobtn ${t?'tard':''}" data-soret="${x.id}" data-sosub="${sub.id}" title="${tit(sub,x,st)}. Clica quan torni.">${SO_TIPUS[x.tipus][0]} ${esc(st?.nom||'?')} · ${m} min</button>`}).join('')}
+  else{const tard=act.some(({x})=>ara-x.ini>=lim),ord=act.slice().sort((a,b)=>a.x.ini-b.x.ini);
+    bar.innerHTML=`<button class="sobtn ${tard?'tard':''}" id="soGrup" title="Alumnes fora de l'aula">🚻 ${act.length} fora ▾</button>
+      <div id="soLlista" ${soObert?'':'hidden'}>${ord.map(({sub,x,st})=>`<div class="soit ${ara-x.ini>=lim?'tard':''}" title="${tit(sub,x,st)}"><span>${SO_TIPUS[x.tipus][0]} ${esc(st?nomComplet(st):'?')}</span><b>${soMin(ara-x.ini)} min</b>
+        <button class="btn" data-soret="${x.id}" data-sosub="${sub.id}">Ha tornat</button></div>`).join('')}</div>`}
   const vius=new Set(act.map(a=>a.x.id));[...soAvisats.keys()].forEach(k=>{if(!vius.has(k))soAvisats.delete(k)});
   const alert=act.filter(({x})=>{const prox=soAvisats.get(x.id)??(x.ini+lim);if(ara>=prox&&!soAvisats.has('o:'+x.id)){soAvisats.set('o:'+x.id,1);sona=true}return ara>=prox});
   av.innerHTML=alert.map(({sub,x,st})=>`<div class="soav"><b>${SO_TIPUS[x.tipus][0]} ${esc(st?nomComplet(st):'?')}</b><br>Porta ${soMin(ara-x.ini)} minuts fora (${SO_TIPUS[x.tipus][1]}, des de les ${soHora(x.ini)}).
     <div class="fl"><button class="btn sec" data-soesp="${x.id}">Esperem</button><button class="btn" data-soret="${x.id}" data-sosub="${sub.id}">Ja ha tornat</button></div></div>`).join('');
   if(sona)soBip()}
-document.addEventListener('click',e=>{const r=e.target.closest('[data-soret]');if(r){const sub=state.subjects.find(z=>z.id===r.dataset.sosub);if(sub)soTorna(sub,r.dataset.soret);return}
+document.addEventListener('click',e=>{if(e.target.closest('#soGrup')){soObert=!soObert;pintaSortides();return}
+  if(soObert&&!e.target.closest('#soLlista')){soObert=false;$('#soLlista')?.setAttribute('hidden','')}
+  const r=e.target.closest('[data-soret]');if(r){const sub=state.subjects.find(z=>z.id===r.dataset.sosub);if(sub)soTorna(sub,r.dataset.soret);return}
   const w=e.target.closest('[data-soesp]');if(w){soAvisats.set(w.dataset.soesp,Date.now()+3*60000);soAvisats.delete('o:'+w.dataset.soesp);pintaSortides();return}
   const b=e.target.closest('#soMenu [data-som]');if(b){$('#soMenu').style.display='none';const sub=cur();
     if(b.dataset.som==='torna'){const x=sub.sortides.find(z=>z.st===b.dataset.st&&!z.fi);if(x)soTorna(sub,x.id)}else soSurt(sub,b.dataset.st,b.dataset.som)}});
@@ -2552,16 +2564,23 @@ function orgue(){try{const ac=T.ac,t0=ac.currentTime+.05;
 function bipSuau(){try{const ac=T.ac;[0,0.3].forEach(d=>{const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.value=880;
   g.gain.setValueAtTime(0.0001,ac.currentTime+d);g.gain.exponentialRampToValueAtTime(0.2,ac.currentTime+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+d+0.22);
   o.connect(g).connect(T.out||ac.destination);o.start(ac.currentTime+d);o.stop(ac.currentTime+d+0.25)})}catch{}}
-/* «Plou i fa sol» (cançó popular catalana, domini públic), amb so de marimba */
-const PLOU=(()=>{const n=[];let t=0,b=.26;const p=(nota,d=1)=>{n.push([nota,t]);t+=b*d};
-  /* Plou i fa sol, / les bruixes es pentinen; / plou i fa sol, / les bruixes porten dol. */
-  p('G4');p('G4');p('A4');p('G4',2);  p('G4');p('G4');p('E4');p('E4');p('G4');p('G4');p('E4',2);
-  p('G4');p('G4');p('A4');p('G4',2);  p('G4');p('G4');p('E4');p('G4');p('E4');p('C4',2.5);return {n,dur:t}})();
-function marimba(){try{const ac=T.ac,t0=ac.currentTime+.05;
-  PLOU.n.forEach(([nota,d])=>{const f=NF(nota);[[f,.24,'sine',.55],[f*4,.05,'sine',.12],[f*10.0,.015,'sine',.04]].forEach(([fr,v,tp,dec])=>{
-    const o=ac.createOscillator(),g=ac.createGain();o.type=tp;o.frequency.value=fr;
-    g.gain.setValueAtTime(0.0001,t0+d);g.gain.exponentialRampToValueAtTime(v,t0+d+.006);g.gain.exponentialRampToValueAtTime(0.0001,t0+d+dec);
-    o.connect(g).connect(T.out||ac.destination);o.start(t0+d);o.stop(t0+d+dec+.02)})})}catch{}}
+/* Ritme urbà (so original): base de dembow amb una melodia de sintetitzador pròpia. Cap cançó existent. */
+const URBA=(()=>{const bpm=96,sx=60/bpm/4,n=[];
+  for(let c=0;c<2;c++){const o=c*16*sx;[0,4,8,12].forEach(i=>n.push(['k',o+i*sx]));[3,6,11,14].forEach(i=>n.push(['s',o+i*sx]));[2,10].forEach(i=>n.push(['h',o+i*sx]))}
+  [['A4',0,2],['C5',3,1],['A4',6,2],['E5',8,3],['D5',11,1],['C5',14,2],['A4',16,2],['C5',19,1],['D5',22,2],['E5',24,2],['G5',27,1],['E5',30,2]].forEach(([t,i,d])=>n.push(['m',i*sx,d*sx*.9,t]));
+  [['A2',0],['A2',8],['F2',16],['G2',24]].forEach(([t,i])=>n.push(['b',i*sx,7*sx,t]));return {n,dur:32*sx}})();
+function urba(){try{const ac=T.ac,t0=ac.currentTime+.05,out=T.out||ac.destination;
+  const soroll=(t,dur,f,v)=>{const len=Math.ceil(ac.sampleRate*dur),buf=ac.createBuffer(1,len,ac.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
+    const src=ac.createBufferSource(),fl=ac.createBiquadFilter(),g=ac.createGain();src.buffer=buf;fl.type='bandpass';fl.frequency.value=f;fl.Q.value=.9;
+    g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);src.connect(fl).connect(g).connect(out);src.start(t);src.stop(t+dur+.01)};
+  URBA.n.forEach(([k,d,dur,nota])=>{const t=t0+d;
+    if(k==='k'){const o=ac.createOscillator(),g=ac.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(45,t+.12);
+      g.gain.setValueAtTime(.55,t);g.gain.exponentialRampToValueAtTime(.0001,t+.22);o.connect(g).connect(out);o.start(t);o.stop(t+.24)}
+    else if(k==='s')soroll(t,.12,1800,.28);
+    else if(k==='h')soroll(t,.05,7000,.12);
+    else{const o=ac.createOscillator(),g=ac.createGain(),f=NF(nota);o.type=k==='m'?'square':'triangle';o.frequency.value=f;const v=k==='m'?.07:.22;
+      g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.01);g.gain.setValueAtTime(v,t+dur*.7);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      o.connect(g).connect(out);o.start(t);o.stop(t+dur+.02)}})}catch{}}
 /* Rellotge de cucut (so original): tres «cu-cut» amb un toc de fusta */
 function cucut(){try{const ac=T.ac,t0=ac.currentTime+.05;
   [0,.75,1.5].forEach(d=>{[[NF('D5'),0,.16],[NF('B4'),.2,.3]].forEach(([fr,dd,dur])=>{const o=ac.createOscillator(),fl=ac.createBiquadFilter(),g=ac.createGain();
@@ -2572,7 +2591,7 @@ function cucut(){try{const ac=T.ac,t0=ac.currentTime+.05;
     g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(.05,t+.003);g.gain.exponentialRampToValueAtTime(0.0001,t+.03);
     o.connect(g).connect(T.out||ac.destination);o.start(t);o.stop(t+.04)})}catch{}}
 const SONS={joc:{nom:'🎮 Joc',f:()=>jingle(),cada:3800},bip:{nom:'🔔 Bip bip',f:()=>bipSuau(),cada:1500},bach:{nom:'🎹 Bach (Tocata i fuga)',f:()=>orgue(),cada:TOCATA.dur*1000+2500},
-  plou:{nom:'☔ Plou i fa sol',f:()=>marimba(),cada:PLOU.dur*1000+1800},cucut:{nom:'🐦 Cucut',f:()=>cucut(),cada:3600}};
+  urba:{nom:'🎧 Ritme urbà',f:()=>urba(),cada:URBA.dur*1000+1200},cucut:{nom:'🐦 Cucut',f:()=>cucut(),cada:3600}};
 const soTemp=()=>{try{const v=localStorage.getItem('llibreta-so-temp');return SONS[v]?v:'joc'}catch{return 'joc'}};
 const nouOut=()=>{try{T.out?.disconnect()}catch{}try{T.out=T.ac.createGain();T.out.connect(T.ac.destination)}catch{T.out=null}};
 function comencaAlarma(){T.sona=true;T.njingle=0;nouOut();const so=SONS[soTemp()];so.f();T.beep=setInterval(so.f,so.cada);if(ov.style.display!=='flex'||!$('#tGran'))vistaTempCorrent();mostraAlarma()}
