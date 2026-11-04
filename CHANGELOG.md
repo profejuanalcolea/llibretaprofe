@@ -1,6 +1,11 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.2 · ammonite · en preparació
+**Tanda 2 (4/11/2026, en proves)**
+- **Columnes que no compten:** casella «Compta per a la nota» a totes les columnes de nota. Si no compta, la columna es queda dins de la seva categoria però surt amb ⊘ i en cursiva, i a la vista alumne i al PDF hi diu «no compta».
+- **Valor «no ava» (no avaluat):** s'escriu «nav», «noava» o «no ava»; també als desplegables. Es veu en taronja i no compta a la mitjana. També es veu a «D'una altra llibreta» i als PDF.
+- **Columna «Opcions»:** desplegable amb 2 a 6 opcions pròpies, cadascuna amb color opcional. Recompte a la fila de totals. Pot comptar per a la nota (cada opció → un assoliment) o ser només informativa. Funciona a llibretes i llistes. Les Icones es deixen de proposar per a columnes noves (les que ja hi ha continuen funcionant).
+
 **Tanda 1 (4/11/2026, en proves)**
 - **Sortides de l'aula:** clic dret o doble clic sobre el nom → 🚻 WC / 🚪 Sortida. Botó a la barra mentre l'alumne és fora; es clica quan torna. A partir de tres alumnes fora, un sol botó «🚻 N fora» amb la llista. Avís als 7 minuts (configurable a ⚙ › Sortides de l'aula) amb «Esperem» (3 minuts més) o «Ja ha tornat»; mentrestant sona el cucut sense parar. Consulta, còpia i PDF des de 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou (es pot exportar en PDF).
 - **Bloc de notes:** icona nova a la barra, pantalla pròpia amb pestanyes (＋, doble clic per canviar el nom, arrossegar per ordenar) i els **pòsits** a la dreta, que surten d'Eines. El número d'avís dels pòsits passa a la icona del Bloc. Esc torna a la llibreta.

@@ -160,7 +160,7 @@ def p_mitjanes(b):
 def p_calcul(b):
     ctx, pg = pagina_local(b)
     r = pg.evaluate("""(()=>{const s=novaSub('Prova càlcul','buida','🧪');s.categories=[
-       {id:'kA',name:'Exàmens',sigla:'EX',weight:60,method:'mean'},{id:'kB',name:'Treballs',sigla:'TR',weight:40,method:'mean'}];
+       {id:'kA',name:'Exàmens',sigla:'EX',color:'#E69F00',weight:60,method:'mean'},{id:'kB',name:'Treballs',sigla:'TR',color:'#009E73',weight:40,method:'mean'}];
      s.columns=[{id:'c1',name:'Ex1',type:'num',cat:'kA',max:10},{id:'c2',name:'Ex2',type:'num',cat:'kA',max:10},
        {id:'c3',name:'Tr1',type:'num',cat:'kB',max:20},{id:'c4',name:'Tr2',type:'num',cat:'kB',max:10}];
      s.students=[{id:'a1',nom:'Ada',cognoms:'Prova'},{id:'a2',nom:'Bru',cognoms:'Prova'},{id:'a3',nom:'Cesc',cognoms:'Prova'}];
@@ -452,12 +452,134 @@ def p_sortides(b):
     captura(pg, 'sortides')
     ctx.close()
 
+CALC_JS = """(()=>{const s=novaSub('Prova càlcul','buida','🧪');s.categories=[
+       {id:'kA',name:'Exàmens',sigla:'EX',color:'#E69F00',weight:60,method:'mean'},{id:'kB',name:'Treballs',sigla:'TR',color:'#009E73',weight:40,method:'mean'}];
+     s.columns=[{id:'c1',name:'Ex1',type:'num',cat:'kA',max:10},{id:'c2',name:'Ex2',type:'num',cat:'kA',max:10},
+       {id:'c3',name:'Tr1',type:'num',cat:'kB',max:20},{id:'c4',name:'Tr2',type:'num',cat:'kB',max:10}];
+     s.students=[{id:'a1',nom:'Ada',cognoms:'Prova'},{id:'a2',nom:'Bru',cognoms:'Prova'},{id:'a3',nom:'Cesc',cognoms:'Prova'}];
+     state.subjects.push(s);state.cur=s.id;
+     setG(s,'c1','a1',6,1);setG(s,'c2','a1',8,1);setG(s,'c3','a1',10,1);setG(s,'c4','a1',7,1);
+     setG(s,'c1','a2',8,1);setG(s,'c2','a2','F',1);setG(s,'c3','a2',20,1);
+     setG(s,'c1','a3',9,1);setG(s,'c2','a3','FJ',1);save();render();return s.id})()"""
+FINALS_JS = "cur().students.map(st=>{const f=finalDe(cur(),st);return f?Math.round(f.num*1000)/1000:null})"
+
+@prova('No compta: una columna dins d\'una categoria es pot excloure del càlcul i es marca amb ⊘')
+def p_nocompta(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(FINALS_JS) == [6.6, 6.4, 9], 'el punt de partida no és [6.6, 6.4, 9]')
+    pg.locator('th.colh[data-col=c2]').dblclick(); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#cComptaF') and pg.is_checked('#cCompta'), 'la casella «Compta per a la nota» no surt marcada en una Numèrica')
+    pg.uncheck('#cCompta'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c2').noCompta") is True, 'no es desa noCompta')
+    # sense Ex2: Ada EX 6 · TR 6 → 6 · Bru EX 8 · TR 10 → 8.8 · Cesc EX 9 → 9
+    comprova(pg.evaluate(FINALS_JS) == [6, 8.8, 9], f'finals amb Ex2 exclosa: {pg.evaluate(FINALS_JS)}')
+    th = pg.locator('th.colh[data-col=c2]')
+    comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No compta' in th.get_attribute('title'), 'la capçalera no porta el signe ⊘')
+    comprova(th.locator('.hn').evaluate("e=>getComputedStyle(e).fontStyle") == 'italic', 'el nom no surt en cursiva')
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c2').cat") == 'kA', 'la columna ha sortit de la categoria')
+    # tornar a comptar
+    pg.locator('th.colh[data-col=c2]').dblclick(); pg.wait_for_timeout(150); pg.check('#cCompta'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(FINALS_JS) == [6.6, 6.4, 9], 'en tornar a marcar-la no torna a comptar')
+    # columna nova sense categoria: casella desactivada
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.select_option('#cCat', '')
+    comprova(pg.is_disabled('#cCompta') and 'Sense categoria' in pg.inner_text('#cComptaF'), 'sense categoria la casella no queda desactivada')
+    pg.select_option('#cTipus', 'check'); pg.wait_for_timeout(50)
+    comprova(not pg.is_checked('#cCompta'), 'el Check no surt desmarcat per defecte')
+    pg.click('#cCanc')
+    # vista alumne en detall
+    pg.evaluate("cur().columns.find(c=>c.id==='c2').noCompta=true;tab='resum';render()"); pg.wait_for_timeout(150)
+    pg.click('#aVA'); pg.select_option('#vaMode', 'detall'); pg.wait_for_timeout(150)
+    comprova('no compta' in pg.inner_text('.vacard'), 'la vista alumne no marca la columna que no compta')
+    if NPM:
+        n = pg.evaluate("(async()=>{const d=await fesPDF([cur()],false);return d.output('arraybuffer').byteLength})()")
+        comprova(n > 5000, 'el PDF falla amb una columna que no compta')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('«No ava»: s\'escriu com nav/noava/no ava, es veu taronja i no compta a la mitjana')
+def p_noava(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    for i, txt in enumerate(['nav', 'noava', 'No Ava']):
+        cel = pg.locator('td[data-c=c4] input.g').nth(i)
+        cel.click(); cel.fill(txt); cel.press('Tab'); pg.wait_for_timeout(120)
+    vals = pg.evaluate("cur().students.map(st=>getG(cur(),'c4',st.id))")
+    comprova(vals == ['NAV', 'NAV', 'NAV'], f'valors desats: {vals}')
+    cel = pg.locator('td[data-c=c4]').first
+    comprova(cel.locator('input').input_value() == 'no ava', 'la cel·la no mostra «no ava»')
+    comprova('vNAV' in cel.get_attribute('class') and cel.locator('input').evaluate("e=>getComputedStyle(e).color") == 'rgb(217, 72, 15)', 'no surt en taronja')
+    # Ada tenia Tr2=7; ara no compta: TR = 5 → final 0.6*7+0.4*5 = 6.2
+    comprova(pg.evaluate(FINALS_JS) == [6.2, 6.4, 9], f'finals: {pg.evaluate(FINALS_JS)}')
+    # assoliments: desplegable amb «no ava»
+    pg.evaluate("(()=>{const s=cur();s.columns.push({id:'c5',name:'Act',type:'ass',cat:'kB'});save();rLlibreta()})()"); pg.wait_for_timeout(150)
+    sel = pg.locator('td[data-c=c5] select.g').first
+    comprova('no ava' in sel.inner_text(), 'el desplegable d\'assoliments no té «no ava»')
+    sel.select_option('NAV'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("getG(cur(),'c5','a1')") == 'NAV' and pg.evaluate(FINALS_JS)[0] == 6.2, 'triar «no ava» al desplegable compta o no es desa')
+    comprova(pg.evaluate("textCella(cur(),cur().columns.find(c=>c.id==='c4'),cur().students[0])") == 'no ava', 'al PDF no surt «no ava»')
+    # d'una altra llibreta
+    r = pg.evaluate("""(()=>{const src=cur(),d=JSON.parse(JSON.stringify(src));d.id='dup';d.name='Còpia';d.columns=[{id:'e1',name:'Ext',type:'ext',cat:'kA',src:src.id,item:'c4'}];d.grades={};
+        state.subjects.push(d);const r=resolveExt(d,d.columns[0],d.students[0]);const f=finalDe(d,d.students[0]);return [r&&r.label,r&&r.k,f]})()""")
+    comprova(r == ['no ava', 'nav', None], f'«D\'una altra llibreta»: {r}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Opcions: desplegable propi, colors, recompte, comptar per a la nota, llistes i PDF')
+def p_opcions(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100)
+    comprova(pg.locator('#cTipus option[value=icones]').evaluate("e=>e.hidden"), 'les Icones encara es proposen per a columnes noves')
+    pg.select_option('#cTipus', 'opc'); pg.wait_for_timeout(100)
+    comprova(pg.locator('#cOpcL .opcr').count() == 3 and not pg.is_checked('#cCompta'), 'el tipus Opcions no surt amb 3 opcions i sense comptar')
+    pg.fill('#cNom', 'Dossier'); pg.select_option('#cCat', 'kB')
+    pg.click('#cOpcAf'); pg.locator('#cOpcL input').nth(3).fill('Copiat')
+    pg.locator('#cOpcL [data-opcc="3"][data-c="#BBDEFB"]').click()
+    pg.click('#cOk'); pg.wait_for_timeout(200)
+    c = pg.evaluate("cur().columns.find(c=>c.type==='opc')")
+    comprova(c and [o['t'] for o in c['opcions']] == ['Lliurat', 'Tard', 'No lliurat', 'Copiat'] and c['opcions'][3]['col'] == '#BBDEFB' and not c.get('compta'), f'columna: {c}')
+    cid = c['id']; ids = [o['id'] for o in c['opcions']]
+    comprova(pg.evaluate(FINALS_JS) == [6.6, 6.4, 9], 'una columna Opcions informativa ha canviat la mitjana')
+    sel = pg.locator(f'td[data-c="{cid}"] select.g')
+    sel.nth(0).select_option(ids[0]); pg.wait_for_timeout(150)
+    pg.locator(f'td[data-c="{cid}"] select.g').nth(1).select_option(ids[1]); pg.wait_for_timeout(150)
+    pg.locator(f'td[data-c="{cid}"] select.g').nth(2).select_option(ids[0]); pg.wait_for_timeout(150)
+    comprova(pg.evaluate(f"cur().students.map(st=>getG(cur(),'{cid}',st.id))") == [ids[0], ids[1], ids[0]], 'les opcions no es desen')
+    comprova(pg.locator(f'td[data-c="{cid}"]').first.evaluate("e=>getComputedStyle(e).backgroundColor") == 'rgb(200, 230, 201)', 'la cel·la no agafa el color de l\'opció')
+    pg.evaluate("cur().settings.filaTotals=true;save();rLlibreta()"); pg.wait_for_timeout(150)
+    tot = pg.locator(f'tfoot td').filter(has_text='Lliurat').inner_text()
+    comprova('2 Lliurat' in tot and '1 Tard' in tot, f'recompte a la fila de totals: {tot}')
+    comprova('⊘' in pg.locator(f'th.colh[data-col="{cid}"]').inner_text(), 'la columna informativa dins de categoria no porta ⊘')
+    # que compti: Lliurat → AN (7,5 si assVals per defecte), Tard → AS
+    pg.locator(f'th.colh[data-col="{cid}"]').dblclick(); pg.wait_for_timeout(150); pg.check('#cCompta'); pg.wait_for_timeout(100)
+    comprova(pg.locator('#cMapa select').count() == 4, 'no surt la conversió de cada opció a assoliment')
+    pg.click('#cOk'); pg.wait_for_timeout(200)
+    r = pg.evaluate("(()=>{const s=cur(),k=s.categories.find(x=>x.id==='kB');return s.students.map(st=>{const r=catResult(s,k,st);return r&&r.label})})()")
+    comprova(r[2] is not None, f'en comptar, l\'opció no entra a la categoria: {r}')
+    # enganxar text
+    comprova(pg.evaluate(f"valorDe(cur(),cur().columns.find(c=>c.id==='{cid}'),'no LLIURAT').val") == ids[2], 'enganxar el text de l\'opció no funciona')
+    comprova(pg.evaluate(f"textCella(cur(),cur().columns.find(c=>c.id==='{cid}'),cur().students[1])") == 'Tard', 'al PDF no surt el nom de l\'opció')
+    # treure una opció en ús demana confirmació
+    pg.locator(f'th.colh[data-col="{cid}"]').dblclick(); pg.wait_for_timeout(150)
+    pg.locator('#cOpcL [data-optx="1"]').click(); pg.click('#cOk'); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#dlgQ') and 'quedaran buides' in pg.inner_text('#qTxt'), 'no avisa en treure una opció en ús')
+    pg.click('#qBtns button:has-text("Continua")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(f"getG(cur(),'{cid}','a2')") is None and len(pg.evaluate(f"cur().columns.find(c=>c.id==='{cid}').opcions")) == 3, 'l\'opció treta no buida les cel·les')
+    captura(pg, 'opcions')
+    # llista sense notes
+    pg.evaluate("(()=>{const s=novaSub('Excursió','llista','📋');s.tipus='llista';s.students=[{id:'x1',nom:'Ada',cognoms:'Prova'}];s.columns=[{id:'o1',name:'Autorització',type:'opc',cat:'',opcions:[{id:'p',t:'Portada',col:''},{id:'n',t:'Pendent',col:''}]}];state.subjects.push(s);state.cur=s.id;save();tab='llibreta';render()})()")
+    pg.wait_for_timeout(150)
+    comprova(pg.locator('td[data-c=o1] select.g').count() == 1, 'la columna Opcions no funciona en una llista')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

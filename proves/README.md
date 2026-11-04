@@ -46,6 +46,9 @@ python3 proves/proves.py
 | Sons | Tots els sons del temporitzador sonen, sense saturar i més curts que l'interval |
 | Bloc | Pestanyes, text desat, pòsits al Bloc i fora d'Eines, número d'avís a la icona |
 | Migració del Bloc | Dades antigues amb pòsits a Eines passen al Bloc sense perdre res |
-| Sortides | Menú al nom, botó a la barra, avís, Esperem, tornada, consulta, PDF i curs nou |
+| Sortides | Menú al nom, botó a la barra (agrupat a partir de 3), avís amb cucut, Esperem, tornada, consulta, PDF i curs nou |
+| No compta | Una columna dins d'una categoria s'exclou del càlcul, es marca amb ⊘ i torna a comptar |
+| «No ava» | nav/noava/no ava, color taronja, no compta, desplegables i «D'una altra llibreta» |
+| Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.
