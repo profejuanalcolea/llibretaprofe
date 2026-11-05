@@ -1,6 +1,13 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.2 · ammonite · en preparació
+**Tanda 3a (5/11/2026, en proves)**
+- **«És el teu ordinador?»:** es pregunta la primera vegada que s'entra amb Google en un navegador. En un ordinador d'una altra persona, la còpia només dura mentre la pestanya és oberta, no es desa el correu, surt l'etiqueta «Ordinador d'una altra persona» i, en sortir, es recorda tancar la sessió de Google. Botó «Esborra la còpia d'aquest ordinador» a ⚙ › Dades.
+- **Arxiu:** carpetes de curs de la més nova a la més antiga; en arxivar es proposa el curs actual (i s'hi posa si es deixa buit); dins de cada carpeta, primer les llibretes i després les llistes, amb una etiqueta «notes» o «llista».
+- **Mida del fitxer** a ⚙ › Dades, amb avís a partir de 5 MB.
+- **Columnes que no compten:** ara només surt el símbol ⊘ en gris davant del nom (sense fons gris ni cursiva).
+- **Arreglat:** el resum dels minuts de l'avís de sortides a ⚙ no s'actualitzava fins a tornar a entrar.
+
 **Tanda 2 (4/11/2026, en proves)**
 - **Columnes que no compten:** casella «Compta per a la nota» a totes les columnes de nota. Si no compta, la columna es queda dins de la seva categoria però surt amb ⊘ i en cursiva, i a la vista alumne i al PDF hi diu «no compta».
 - **Valor «no ava» (no avaluat):** s'escriu «nav», «noava» o «no ava»; també als desplegables. Es veu en taronja i no compta a la mitjana. També es veu a «D'una altra llibreta» i als PDF.

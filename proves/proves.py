@@ -39,8 +39,11 @@ URL = f'http://127.0.0.1:{PORT}/{FITXER}'
 # ---------------------------------------------------------------- Google simulat
 ids = itertools.count(1)
 PDFS = []
-INIT = """window.__tok=[];window.google={accounts:{oauth2:{initTokenClient:o=>({requestAccessToken:()=>{window.__tok.push(o.scope);
+INIT_BASE = """window.__tok=[];window.google={accounts:{oauth2:{initTokenClient:o=>({requestAccessToken:()=>{window.__tok.push(o.scope);
 setTimeout(()=>o.callback({access_token:'T'+window.__tok.length,expires_in:3600,scope:o.scope}),10)}}),revoke:()=>{}}}};"""
+# per defecte, les proves fan com si l'ordinador fos de la persona (la pregunta «És el teu ordinador?» es prova a part)
+INIT = INIT_BASE + "try{localStorage.setItem('llibreta-ordinador','meu')}catch(e){}"
+
 
 def lib_pdf(url):
     nom = 'jspdf/dist/jspdf.umd.min.js' if 'jspdf@' in url else 'jspdf-autotable/dist/jspdf.plugin.autotable.min.js'
@@ -428,7 +431,11 @@ def p_sortides(b):
     comprova('3 fora' in pg.inner_text('#soBar') and pg.locator('#soLlista .soit').count() == 3, '«Ha tornat» de la llista no funciona')
     pg.evaluate("cur().sortides.filter(x=>!x.fi).forEach(x=>soTorna(cur(),x.id))")
     comprova(pg.locator('#soBar .sobtn').count() == 0, 'no es buida la barra')
-    # configuració dels minuts
+    # configuració dels minuts: el resum de ⚙ s'actualitza en el moment
+    pg.click('.tabic[data-t=config]'); pg.wait_for_timeout(150); pg.locator('details[data-cfg=sortides] > summary').click()
+    pg.fill('#kSoMin', '12'); pg.locator('details[data-cfg=sortides] > summary').click(); pg.wait_for_timeout(150)
+    comprova(pg.evaluate('state.sortidesMin') == 12 and pg.inner_text('details[data-cfg=sortides] .cres') == 'avís als 12 min', 'el resum dels minuts no s\'actualitza')
+    pg.click('.tabic[data-t=config]'); pg.wait_for_timeout(150)
     pg.evaluate("state.sortidesMin=10;save()"); pg.evaluate(f"(()=>{{cur().sortides.push({{id:'q',st:'{stid}',tipus:'wc',ini:Date.now()-8*60000,fi:null}});pintaSortides()}})()")
     comprova(pg.locator('#soAvis .soav').count() == 0, 'avisa als 8 minuts amb l\'avís posat a 10')
     pg.evaluate("soTorna(cur(),'q')")
@@ -476,7 +483,8 @@ def p_nocompta(b):
     comprova(pg.evaluate(FINALS_JS) == [6, 8.8, 9], f'finals amb Ex2 exclosa: {pg.evaluate(FINALS_JS)}')
     th = pg.locator('th.colh[data-col=c2]')
     comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No compta' in th.get_attribute('title'), 'la capçalera no porta el signe ⊘')
-    comprova(th.locator('.hn').evaluate("e=>getComputedStyle(e).fontStyle") == 'italic', 'el nom no surt en cursiva')
+    comprova(th.locator('.hn').evaluate("e=>getComputedStyle(e).fontStyle") == 'normal' and th.evaluate("e=>getComputedStyle(e).backgroundColor") != 'rgb(236, 236, 236)', 'la capçalera encara surt grisa o en cursiva')
+    comprova(th.locator('.npx').evaluate("e=>getComputedStyle(e).color") == 'rgb(153, 153, 153)', 'el símbol ⊘ no és gris')
     comprova(pg.evaluate("cur().columns.find(c=>c.id==='c2').cat") == 'kA', 'la columna ha sortit de la categoria')
     # tornar a comptar
     pg.locator('th.colh[data-col=c2]').dblclick(); pg.wait_for_timeout(150); pg.check('#cCompta'); pg.click('#cOk'); pg.wait_for_timeout(200)
@@ -587,12 +595,70 @@ def p_amagades(b):
     comprova(pg.locator('#chipOc').count() == 0, '«Mostra-les totes» no torna a mostrar les columnes')
     ctx.close()
 
+@prova('«És el teu ordinador?»: pregunta un cop, mode temporal en un ordinador aliè i botó d\'esborrar')
+def p_ordinador(b):
+    FILES = {}
+    def ctx_nou():
+        c = b.new_context(viewport={'width': 1400, 'height': 850}); c.add_init_script(INIT_BASE); c.route('**/*', google_amb(FILES)); return c
+    # 1) ordinador propi: pregunta, «Sí» queda recordat i la còpia va a localStorage
+    c1 = ctx_nou(); pg = c1.new_page(); pg.goto(URL); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(300)
+    comprova(pg.is_visible('#dlgQ') and 'És el teu ordinador' in pg.inner_text('#qTit'), 'no pregunta si l\'ordinador és propi')
+    pg.click('#qBtns button:has-text("Sí, és meu")'); pg.wait_for_timeout(1500)
+    comprova(pg.evaluate("localStorage.getItem('llibreta-ordinador')") == 'meu' and pg.evaluate("!!localStorage.getItem('llibreta-drive-cache')"), 'en un ordinador propi no es guarda la còpia')
+    comprova(not pg.locator('#alieTag').is_visible(), 'surt l\'etiqueta d\'ordinador aliè en un de propi')
+    pg.reload(); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(1200)
+    comprova(not (pg.is_visible('#dlgQ') and 'És el teu ordinador' in pg.inner_text('#qTit')), 'torna a preguntar en un ordinador que ja és propi: '+(pg.inner_text('#qTit') if pg.is_visible('#dlgQ') else ''))
+    # botó d'esborrar
+    pg.evaluate("tab='config';render()"); pg.wait_for_timeout(150); pg.evaluate("document.querySelector('details[data-cfg=dades]').open=true")
+    pg.click('#dEsbOrd'); pg.click('#qBtns button:has-text("Esborra")'); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("localStorage.getItem('llibreta-drive-cache')") is None and pg.evaluate("localStorage.getItem('llibreta-ordinador')") is None, 'el botó no esborra la còpia')
+    pg.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[0].id,2)})()"); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("localStorage.getItem('llibreta-drive-cache')") is None, 'després d\'esborrar es torna a guardar al navegador')
+    c1.close()
+    # 2) ordinador aliè: res a localStorage, etiqueta visible i avís en sortir
+    c2 = ctx_nou(); pg = c2.new_page(); pg.goto(URL); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(300)
+    pg.click('#qBtns button:has-text("No, és")'); pg.wait_for_timeout(1500)
+    comprova(pg.evaluate("localStorage.getItem('llibreta-drive-cache')") is None and pg.evaluate("!!sessionStorage.getItem('llibreta-drive-cache')"), 'en un ordinador aliè la còpia no va només a la pestanya')
+    comprova(pg.evaluate("localStorage.getItem('llibreta-email')") is None, 'en un ordinador aliè es desa el correu')
+    comprova(pg.locator('#alieTag').is_visible(), 'no surt l\'etiqueta «Ordinador d\'una altra persona»')
+    pg.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[0].id,3)})()"); pg.wait_for_timeout(2500)
+    pg.click('#btnSurt') if pg.locator('#btnSurt').is_visible() else pg.evaluate("$('#btnSurt').click()"); pg.wait_for_timeout(800)
+    comprova(pg.is_visible('#dlgQ') and 'sessió de Google' in pg.inner_text('#qTit'), 'en sortir no recorda tancar la sessió de Google')
+    comprova(pg.evaluate("sessionStorage.getItem('llibreta-drive-cache')") is None, 'en sortir queda la còpia a la pestanya')
+    c2.close()
+    # 3) la pestanya nova (sessió nova) en l'ordinador aliè torna a preguntar i no hi ha cap còpia
+    c3 = ctx_nou(); pg = c3.new_page(); pg.goto(URL); pg.wait_for_timeout(300)
+    comprova(not pg.locator('#lgOff').is_visible(), 'surt «Continua sense connexió» sense cap còpia')
+    c3.close()
+
+@prova('Arxiu: cursos del més nou al més antic, curs automàtic, llistes distingides i mida del fitxer')
+def p_arxiu2(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("""(()=>{const mk=(n,t,cat)=>{const s=novaSub(n,t==='llista'?'llista':'eso','📗');if(t==='llista')s.tipus='llista';s.archived={cat,data:'2025-06-30'};state.subjects.push(s)};
+      mk('Bio vella','notes','Curs 2024-25');mk('Excursió','llista','Curs 2025-26');mk('Bio','notes','Curs 2025-26');mk('Reunions','llista','Altres');mk('Solta','notes','');save();tab='arxiu';render()})()""")
+    pg.wait_for_timeout(200)
+    h = pg.locator('#main .seccio h2').all_inner_texts()
+    ordre = [x.split('✎')[0].replace('📁', '').strip() for x in h]
+    comprova(ordre == ['Curs 2025-26', 'Curs 2024-25', 'Altres', 'Sense categoria'], f'ordre de les carpetes: {ordre}')
+    primera = pg.locator('#main .seccio').first.locator('.fitxa').all_inner_texts()
+    comprova('Bio' in primera[0] and 'notes' in primera[0] and 'llista' in primera[1], f'dins del curs, llibretes i llistes: {primera}')
+    pg.evaluate("tab='llibreta';render();obreArx()"); pg.wait_for_timeout(100)
+    k = pg.evaluate('cursKey()')
+    comprova(pg.input_value('#aCat') == 'Curs ' + k, 'en arxivar no proposa el curs actual')
+    pg.fill('#aCat', ''); pg.click('#aOk'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("state.subjects.find(s=>s.name==='EXEMPLE').archived.cat") == 'Curs ' + k, 'arxivar sense carpeta no posa el curs')
+    pg.evaluate("desarxiva(state.subjects.find(s=>s.name==='EXEMPLE').id);tab='config';render()"); pg.wait_for_timeout(150)
+    pg.evaluate("document.querySelector('details[data-cfg=dades]').open=true")
+    comprova(re.search(r'\d+ kB', pg.inner_text('#dMida') or ''), 'no surt la mida del fitxer a ⚙ › Dades')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

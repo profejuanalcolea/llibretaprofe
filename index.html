@@ -135,9 +135,8 @@ table.compact td.fx{padding:5px 8px}
 td input.g,td select.g{min-width:0}
 .calc{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;color:#888;pointer-events:none;white-space:nowrap}
 td.ext{text-align:center;padding:0 8px;min-width:90px;font-weight:600;color:#333}
-th.colh.nopond{background:#ececec}
 .vnc{font-size:12px;color:#888;font-style:italic;font-weight:400}
-th.colh.nopond .hn,th.colh.nopond .vt{font-style:italic;color:#666}
+th.colh .npx{color:#999;font-weight:400}
 th.colh.nopond .t b{color:#777}
 .mapa{display:grid;grid-template-columns:auto auto;gap:4px 10px;align-items:center;margin:6px 0 0 103px}
 .mapa span{font-size:18px}
@@ -267,6 +266,7 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 #tw tbody td:not(.fx){position:relative}td.anh{box-shadow:inset 0 0 0 3px #ffe600}td.anh input.g,td.anh select.g{background:#fff9b0!important}.vrow.anh,.mbal.anh{background:#fff9b0!important}
 .antri{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid #e65100;border-left:9px solid transparent;pointer-events:none}
 #soBar{display:inline-flex;gap:6px}
+.alietag{font-size:12px;color:#ffd7a8;border:1px solid #8a5a2b;border-radius:6px;padding:2px 7px;white-space:nowrap}
 #soBar{position:relative}
 #soLlista{position:absolute;top:calc(100% + 8px);right:0;z-index:710;background:#fff;color:#111;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:330px}
 .soit{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:7px}.soit span{flex:1;font-weight:600}.soit b{font-variant-numeric:tabular-nums}
@@ -384,6 +384,7 @@ td[tabindex]:focus{outline:2px solid var(--tar);outline-offset:-2px}
 .ocw{position:relative}.ocx{cursor:pointer;background:#eef4ff}
 .ocl{position:absolute;top:24px;left:0;z-index:60;background:#fff;border:1px solid #aaa;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,.15);padding:6px;display:flex;flex-direction:column;gap:2px;min-width:200px}
 .ocl[hidden]{display:none}
+.tipll{display:inline-block;font-size:11px;border-radius:5px;padding:0 5px;background:#eef4ff;color:#2f4f8f;margin-right:3px}.tipll.nt{background:#fff1e0;color:#8a4b00}
 .ocl button{border:0;background:none;text-align:left;padding:5px 8px;border-radius:5px;cursor:pointer;font:inherit;font-size:13px}.ocl button:hover{background:var(--tar2)}
 /* Avaluació */
 table.aval td{padding:6px 8px;white-space:nowrap}
@@ -464,7 +465,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
     <span class="hsep"></span>
     <button class="icbtn tabic" data-t="config" title="Configuració"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/><circle cx="12" cy="12" r="6.6"/></svg></button><button class="icbtn tabic" data-t="arxiu" title="Arxiu"><svg class="ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9.5a1.5 1.5 0 0 0 1.5 1.5h11a1.5 1.5 0 0 0 1.5-1.5V9"/><path d="M10 13h4"/></svg></button>
     <span class="hsep"></span>
-    <span class="estat" id="estat"></span>
+    <span class="estat" id="estat"></span><span class="alietag" id="alieTag" hidden title="La llibreta no es guarda en aquest navegador: en tancar la pestanya no hi queda res.">Ordinador d'una altra persona</span>
     <button id="btnCopia" hidden></button><button id="btnSurt" hidden></button>
   </div>
 </header>
@@ -688,7 +689,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 2)',COMPILACIO='4/11 23:08';
+const VERSIO='2.2 · ammonite · en proves (tanda 3a)',COMPILACIO='5/11 11:22';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1020,8 +1021,18 @@ const G={clientId:localStorage.getItem(LSCID)||CLIENT_ID_CENTRE,token:null,exp:0
 const DRIVE='https://www.googleapis.com/drive/v3/files',UPL='https://www.googleapis.com/upload/drive/v3/files',FNAME='llibreta-notes.json';
 const LSCACHE='llibreta-drive-cache',CARPETA='Llibreta del Profe · còpies',MAXCOPIES=8;
 /* Còpia local en mode Drive: si cau la connexió o caduca la sessió, les notes no es perden */
-function guardaCache(){try{localStorage.setItem(LSCACHE,JSON.stringify({state,rev:G.rev,fileId:G.fileId,pendent:G.brut,email:G.email}))}catch{}}
-function llegeixCache(){try{const c=JSON.parse(localStorage.getItem(LSCACHE));return c&&valida(c.state)?c:null}catch{return null}}
+/* «És el teu ordinador?»: en un ordinador d'una altra persona la còpia només viu mentre la pestanya és oberta (sessionStorage) */
+const LSORD='llibreta-ordinador',SSALIE='llibreta-alie';
+const esAlie=()=>{try{return sessionStorage.getItem(SSALIE)==='1'}catch{return false}};
+const ordContestat=()=>{try{return esAlie()||localStorage.getItem(LSORD)==='meu'}catch{return true}};
+const magCache=()=>esAlie()?sessionStorage:localStorage;
+function posaAlie(){try{sessionStorage.setItem(SSALIE,'1');localStorage.removeItem(LSCACHE);localStorage.removeItem('llibreta-email');localStorage.removeItem(LSORD)}catch{}}
+async function preguntaOrdinador(){if(ordContestat())return;
+  const r=await pregunta('És el teu ordinador?','Si és d\'una altra persona, la llibreta no es guardarà en aquest navegador: quan tanquis la pestanya, no hi quedarà res. Només ho preguntem la primera vegada.',[{t:'No, és d\'una altra persona',v:'alie',cls:'sec'},{t:'Sí, és meu',v:'meu'}]);
+  if(r==='meu'){try{localStorage.setItem(LSORD,'meu')}catch{}}else posaAlie();pintaAlie()}
+function pintaAlie(){const t=$('#alieTag');if(t)t.hidden=!(esAlie()&&mode==='drive'&&state)}
+function guardaCache(){try{magCache().setItem(LSCACHE,JSON.stringify({state,rev:G.rev,fileId:G.fileId,pendent:G.brut,email:G.email}))}catch{}}
+function llegeixCache(){try{const c=JSON.parse(magCache().getItem(LSCACHE));return c&&valida(c.state)?c:null}catch{return null}}
 function carregaGIS(){if(window.google?.accounts?.oauth2)return Promise.resolve();
   return new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=res;s.onerror=()=>rej(new Error('No s\'ha pogut carregar l\'entrada de Google. Hi ha connexió?'));document.head.appendChild(s)})}
 const CLS_SCOPES=['classroom.courses.readonly','classroom.rosters.readonly','classroom.coursework.students.readonly'].map(x=>'https://www.googleapis.com/auth/'+x);
@@ -1057,9 +1068,10 @@ async function driveEntra(){
   $('#lgMsg').textContent='';
   if(!G.clientId){$('#lgMsg').textContent='Falta l\'ID de client de Google. Configura\'l des del mode local (Configuració › Dades).';return}
   if(location.protocol==='file:'){$('#lgMsg').textContent='L\'entrada amb Google només funciona des de la pàgina publicada (GitHub), no obrint el fitxer des de l\'ordinador.';return}
+  await preguntaOrdinador();
   try{await carregaGIS();
     try{await demanaToken(G.email?'':'select_account')}catch(e){if(!G.email)throw e;G.email='';await demanaToken('select_account')}
-    if(!G.email){try{const ab=await (await gf('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)')).json();G.email=ab.user?.emailAddress||'';if(G.email)localStorage.setItem('llibreta-email',G.email)}catch{}}
+    if(!G.email){try{const ab=await (await gf('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)')).json();G.email=ab.user?.emailAddress||'';if(G.email&&!esAlie())localStorage.setItem('llibreta-email',G.email)}catch{}}
     const q=encodeURIComponent(`name='${FNAME}' and trashed=false and not appProperties has { key='copia' and value='1' }`);
     const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id,appProperties)&orderBy=modifiedTime desc&spaces=drive`)).json();
     const cache=llegeixCache();
@@ -1076,7 +1088,7 @@ async function driveEntra(){
       let usa=state&&valida(state)?state:valida(local)?migra(local):null;
       if(usa){const r2=await pregunta('Primera vegada al Drive','Encara no hi ha cap llibreta al teu Drive. Vols pujar-hi les dades que tens en aquest ordinador?',[{t:'Comença de zero',v:'no',cls:'sec'},{t:'Puja-les',v:'si'}]);if(r2!=='si')usa=null}
       state=usa||migra(demo());mode='drive';localStorage.setItem(LSMODE,'drive');iniciaHist();await driveCrea();G.brut=false;guardaCache();render()}
-    $('#login').style.display='none';estat();toast('Connectat al Drive. Els canvis es desen sols.');
+    $('#login').style.display='none';estat();pintaAlie();toast('Connectat al Drive. Els canvis es desen sols.');
     comprovaCopia().catch(e=>console.error(e))}
   catch(e){console.error(e);$('#lgMsg').textContent=e.message==='offline'?'No hi ha connexió a internet.':'No s\'ha pogut entrar: '+e.message+'. Si diu que l\'aplicació està bloquejada, ho ha d\'autoritzar l\'administrador del domini.'}}
 /* Treballar sense connexió amb la còpia guardada en aquest ordinador */
@@ -1133,8 +1145,9 @@ async function recuperaCopia(id,nom){if(!await confirma(`Recuperar la còpia «$
     save('recuperar una còpia');render();toast('Còpia recuperada.')}catch(e){toast('No s\'ha pogut recuperar: '+e.message)}}
 
 function surt(){try{if(G.token)google.accounts.oauth2.revoke(G.token,()=>{})}catch{}
-  try{localStorage.removeItem(LSCACHE)}catch{}
-  G.token=null;G.fileId=null;G.rev=null;G.brut=false;state=null;iniciaHist();$('#main').innerHTML='';mostraLogin();estat();renderSel()}
+  try{magCache().removeItem(LSCACHE)}catch{}const alie=esAlie();
+  G.token=null;G.fileId=null;G.rev=null;G.brut=false;state=null;iniciaHist();$('#main').innerHTML='';mostraLogin();estat();renderSel();pintaAlie();
+  if(alie)pregunta('Tanca també la sessió de Google','Aquest ordinador és d\'una altra persona. La llibreta ja no hi és, però el teu compte de Google encara pot estar obert en aquest navegador: tanca-li la sessió (a google.com, la teva foto › Tanca la sessió).',[{t:'Entesos',v:1}])}
 $('#btnSurt').onclick=async()=>{if(G.brut){await driveDesa();if(G.brut&&!await confirma('Hi ha canvis que encara no s\'han pogut pujar al Drive. Si surts ara, es perdran.','Surt igualment','Canvis pendents'))return}surt()};
 function mostraLogin(){$('#login').style.display='flex';aplicaMob();const la=$('#lgAmmo');la.classList.remove('anim');void la.offsetWidth;la.classList.add('anim');const c=llegeixCache();$('#lgOff').hidden=!c;
   $('#lgOff').textContent=c?.pendent?'Continua sense connexió (hi ha canvis pendents de pujar)':'Continua sense connexió amb la còpia d\'aquest ordinador';
@@ -1345,7 +1358,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
       const tools=ro?'':`<span class="htools"><button data-mv="-1" ${g.solt?'':first?'disabled':''} title="Mou a l'esquerra">◀</button><button data-plc="${c.id}" title="Plega la columna">👁</button><button data-srt="${c.id}" title="Ordena els alumnes per aquesta columna" ${['num','ord','ass','final','ext','opc'].includes(c.type)?'':'disabled'}>⇅</button><button data-mv="1" ${g.solt?'':last?'disabled':''} title="Mou a la dreta">▶</button></span>`;
-      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''} ${vert?'vert':''}" data-col="${c.id}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} · ${esc(subtitolCol(sub,c))}${np?' · No compta per a la nota':''}${ro?'':' · doble clic per editar'}">${vert?`<span class="vt">${np?'⊘ ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span style="color:#888">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
+      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''} ${vert?'vert':''}" data-col="${c.id}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} · ${esc(subtitolCol(sub,c))}${np?' · No compta per a la nota':''}${ro?'':' · doble clic per editar'}">${vert?`<span class="vt">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
@@ -1971,7 +1984,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
   on('#kOrdMean','onchange',e=>{s.allowOrdMean=e.target.checked;save();rConfig()});
   on('#kFJ','onchange',e=>{s.fjMode=e.target.value;save('falta justificada')});
   on('#kTot','onchange',e=>{s.filaTotals=e.target.checked;save('fila de totals')});
-  on('#kSoMin','onchange',e=>{const v=Math.round(+e.target.value);if(v>=1&&v<=60){state.sortidesMin=v;save('temps d\'avís de sortides')}else e.target.value=state.sortidesMin})}
+  on('#kSoMin','onchange',e=>{const v=Math.round(+e.target.value);if(v>=1&&v<=60){state.sortidesMin=v;save('temps d\'avís de sortides');const r=document.querySelector('details[data-cfg=sortides] .cres');if(r)r.textContent='avís als '+v+' min';pintaSortides()}else e.target.value=state.sortidesMin})}
 /* ----- Banc de comentaris (comú a totes les llibretes) ----- */
 let bancObert=false;const bancCatObertes=new Set();
 function rBanc(){const W=$('#bancW');if(!W)return;const b=state.banc,nivSel=(v,attr)=>`<select ${attr} title="Nivell (opcional): el comentari se suggerirà als alumnes amb aquest nivell">${['','NA','AS','AN','AE'].map(n=>`<option value="${n}" ${v===n?'selected':''}>${n||'—'}</option>`).join('')}</select>`;
@@ -2002,6 +2015,10 @@ function rDades(dins){const el=dins?$('#dades'):$('#main');
   el.innerHTML=`${dins?'':'<div class="cfgtop"></div>'}<details class="card cfg" data-cfg="dades" ${cfgOb().dades?'open':''}><summary><span class="ctit">Dades</span><span class="cres">${drive?'☁ al teu Google Drive'+(state?.copiaSetmanal?' · última còpia '+state.copiaSetmanal.split('-').reverse().join('/'):''):'en aquest ordinador'}</span></summary>
     ${drive?`
       <div class="fl"><button class="btn" id="dSurt">Surt</button><button class="btn sec" id="dCopia">Descarrega una còpia</button><button class="btn sec" id="dObre">Carrega una còpia…</button><button class="btn sec" id="dLocal">Passa a mode «aquest ordinador»</button></div>
+      ${(()=>{const kb=new Blob([JSON.stringify(state||{})]).size/1024,gran=kb>5*1024;return `<h3 style="margin:16px 0 4px;font-size:15px">📏 Mida del fitxer</h3><p class="aj" id="dMida" style="${gran?'color:#b00020;font-weight:700':''}">${kb<1024?Math.round(kb)+' kB':(kb/1024).toFixed(1).replace('.',',')+' MB'}${gran?' · és gran: cada desat el puja sencer al Drive. Pots esborrar cursos antics des de l\'Arxiu.':''}</p>`})()}
+      <h3 style="margin:16px 0 4px;font-size:15px">💻 Aquest ordinador</h3>
+      <p class="aj">${esAlie()?'Ordinador d\'una altra persona: la llibreta no es guarda en aquest navegador.':'La llibreta es guarda en aquest navegador per poder-hi entrar sense connexió.'}</p>
+      ${esAlie()?'':'<div class="fl"><button class="btn sec" id="dEsbOrd">Esborra la còpia d\'aquest ordinador</button></div>'}
       <h3 style="margin:16px 0 4px;font-size:15px">📦 Còpies setmanals</h3>
       ${state?.copiaSetmanal?'<p class="aj">Última còpia setmanal: <b>'+state.copiaSetmanal.split('-').reverse().join('/')+'</b>.</p>':''}
       <h3 style="margin:16px 0 4px;font-size:15px">📄 PDF</h3><div class="fl"><button class="btn sec" id="dPdf">📄 Descarrega el PDF de totes les llibretes</button></div>
@@ -2018,6 +2035,8 @@ function rDades(dins){const el=dins?$('#dades'):$('#main');
   const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#dPdf','onclick',pdfTotes);on('#dNou','onclick',nouFitxer);on('#dObre','onclick',obreFitxer);on('#dCopia','onclick',()=>copia());on('#dCarp','onclick',()=>copia(true));
   on('#dSurt','onclick',()=>$('#btnSurt').click());
+  on('#dEsbOrd','onclick',async()=>{if(!await confirma('S\'esborrarà la còpia de la llibreta guardada en aquest navegador. Al Drive no es toca res. Mentre aquesta pestanya sigui oberta, no s\'hi tornarà a guardar, i la pròxima vegada es tornarà a preguntar si l\'ordinador és teu.','Esborra','Esborra la còpia d\'aquest ordinador'))return;
+    posaAlie();guardaCache();pintaAlie();rDades(dins);toast('Còpia d\'aquest ordinador esborrada.')});
   on('#dCopNow','onclick',async()=>{try{await comprovaCopia(true);rDades(dins)}catch(e){toast(e.message==='offline'?'Sense connexió: no es pot fer la còpia ara.':'No s\'ha pogut fer la còpia: '+e.message)}});
   on('#dCopList','onclick',async()=>{const w=$('#dCopies');w.innerHTML='<p class="aj">Carregant…</p>';
     try{const ll=await llistaCopies();w.innerHTML=ll.length?'<div class="llista">'+ll.map(c=>`<div class="fl"><span style="min-width:300px">📄 ${esc(c.name)}</span><span class="aj" style="margin:0">${new Date(c.createdTime).toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'})}</span><button class="btn sec" style="padding:4px 10px" data-rec="${c.id}" data-nom="${esc(c.name)}">Recupera</button></div>`).join('')+'</div>':'<p class="aj">Encara no hi ha cap còpia.</p>';
@@ -2063,11 +2082,13 @@ function catsArxiu(){return [...new Set(state.subjects.filter(s=>s.archived).map
 function rArxiu(){const arx=state.subjects.filter(s=>s.archived);
   let h=`<div class="cap"><span class="capic">🗄️</span><div><h1>Arxiu</h1><div class="capsub">${arx.length} llibreta${arx.length===1?'':'s'} arxivada${arx.length===1?'':'s'} · només lectura</div></div></div>`;
   if(!arx.length){$('#main').innerHTML=h+'<div class="buit">No hi ha cap llibreta arxivada. Pots arxivar-ne una des de <b>Configuració</b>.</div>';return}
-  const cats=catsArxiu().sort((a,b)=>a===''?1:b===''?-1:a.localeCompare(b,'ca'));
+  /* carpetes de curs de la més nova a la més antiga; després la resta per ordre alfabètic; «Sense categoria» al final */
+  const esCurs=k=>/^Curs \d{4}-\d{2}$/.test(k);
+  const cats=catsArxiu().sort((a,b)=>a===''?1:b===''?-1:esCurs(a)&&esCurs(b)?b.localeCompare(a):esCurs(a)?-1:esCurs(b)?1:a.localeCompare(b,'ca'));
   h+=`<datalist id="llCatsA">${suggCats().map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`;
-  h+=cats.map(k=>`<div class="seccio"><h2>📁 ${esc(k||'Sense categoria')}${k?`<button class="btn sec" style="padding:2px 9px;font-size:13px" data-acren="${esc(k)}" title="Canvia el nom d'aquesta categoria a totes les llibretes">✎ Canvia el nom</button>`:''}</h2><div class="fitxes">${arx.filter(s=>(s.archived.cat||'')===k).map(s=>`
+  h+=cats.map(k=>`<div class="seccio"><h2>📁 ${esc(k||'Sense categoria')}${k?`<button class="btn sec" style="padding:2px 9px;font-size:13px" data-acren="${esc(k)}" title="Canvia el nom d'aquesta categoria a totes les llibretes">✎ Canvia el nom</button>`:''}</h2><div class="fitxes">${arx.filter(s=>(s.archived.cat||'')===k).sort((x,y)=>(x.tipus==='llista')-(y.tipus==='llista')||x.name.localeCompare(y.name,'ca')).map(s=>`
     <div class="fitxa" style="width:280px;cursor:default"><span class="fi">${s.icon||'📘'}</span><div style="flex:1;min-width:0"><div>${esc(s.name)}</div>
-      <div style="font-size:12px;color:var(--suau);font-weight:400">${s.students.length} alumnes · arxivada ${esc((s.archived.data||'').split('-').reverse().join('/'))}</div>
+      <div style="font-size:12px;color:var(--suau);font-weight:400">${s.tipus==='llista'?'<span class="tipll">📋 llista</span> ':'<span class="tipll nt">📘 notes</span> '}${s.students.length} alumnes · arxivada ${esc((s.archived.data||'').split('-').reverse().join('/'))}</div>
       <div class="fl" style="margin:6px 0 0;font-size:12px;font-weight:400">📁 <input type="text" list="llCatsA" class="acat" value="${esc(s.archived.cat||'')}" data-acat="${s.id}" placeholder="Sense categoria" title="Categoria: escriu-ne una de nova o tria'n una"></div>
       <div class="fl" style="margin:6px 0 0"><button class="btn sec" style="padding:4px 9px" data-obre="${s.id}">Obre</button><button class="btn sec" style="padding:4px 9px" data-desarx="${s.id}">Desarxiva</button></div></div></div>`).join('')}</div></div>`).join('');
   $('#main').innerHTML=h;
@@ -2082,9 +2103,9 @@ const cursCurt=k=>k.slice(2,4)+'/'+k.slice(5);
 function cursActual(){return 'Curs '+cursKey()}
 function suggCats(){const c=cursActual();return [...new Set([...catsArxiu(),c,c+' · 1r trimestre',c+' · 2n trimestre',c+' · 3r trimestre','1r trimestre','2n trimestre','3r trimestre'])].filter(Boolean)}
 function omplCats(){$('#llCats').innerHTML=suggCats().map(c=>`<option value="${esc(c)}">`).join('')}
-function obreArx(){omplCats();$('#aCat').value='';$('#dlgArx').showModal();$('#aCat').focus()}
+function obreArx(){omplCats();$('#aCat').value='Curs '+cursKey();$('#dlgArx').showModal();$('#aCat').focus()}
 $('#aCanc').onclick=()=>$('#dlgArx').close();
-$('#aOk').onclick=()=>{const sub=cur();sub.archived={cat:$('#aCat').value.trim(),data:avui()};
+$('#aOk').onclick=()=>{const sub=cur();sub.archived={cat:$('#aCat').value.trim()||'Curs '+cursKey(),data:avui()};
   $('#dlgArx').close();const a=actives();state.cur=a[0]?.id||sub.id;save();tab='arxiu';render();toast('Llibreta arxivada.')};
 
 /* ======================= Duplicar ======================= */
