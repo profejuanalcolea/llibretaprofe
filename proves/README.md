@@ -55,6 +55,8 @@ python3 proves/proves.py
 | Pestanyes | Dues pestanyes i dos ordinadors: avís, una pestanya cedeix i no desa, conflicte en desar |
 | Arxiu (3) | Exportar a PDF i esborrar amb confirmació escrivint el nom, i desfer |
 | Data i duplica | Botó 📅 (nom editable, «(2)» si es repeteix) i «Duplica la columna» buida al costat |
+| Classes | Migració de Nivell+Lletres, recuperar dels Llistats (previsualització, còpia, desfer, duplicats) i propagació a llibretes actives però no arxivades |
+| Recursos | El quadre «Nou enllaç» s'obre i desa |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

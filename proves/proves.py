@@ -759,12 +759,96 @@ def p_dataduplica(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+CLASSES_JS = """(()=>{const k=cursKey();
+  state.alumnat=[{id:'r1',curs:k,cognoms:'Prova',nom:'Ada',grup:'2n Batx A'},{id:'r2',curs:k,cognoms:'Prova',nom:'Bru',grup:'2n Batx A'},
+    {id:'r3',curs:k,cognoms:'Prova',nom:'Cesc',grup:'2n Batx B'},{id:'r4',curs:k,cognoms:'Prova',nom:'Dana',grup:'2n Batx B'}];
+  const mk=(nom,arx)=>{const s=novaSub(nom,'batx','🧪');s.columns=[{id:'cl',name:'Classe',type:'classe',cat:'',nivell:'2N',lletres:['2N','BATX','A']},{id:'n1',name:'Ex',type:'num',cat:s.categories[0].id,max:10}];
+    s.students=[{id:'a',nom:'Ada',cognoms:'Prova',aid:'r1'},{id:'b',nom:'Bru',cognoms:'Prova'},{id:'c',nom:'Cesc',cognoms:'Prova'},{id:'e',nom:'Eva',cognoms:'Prova'},
+      {id:'d1',nom:'Dana',cognoms:'Prova',cid:'g1'},{id:'d2',nom:'Dana',cognoms:'Prova'}];
+    s.grades={cl:{a:'2n Batx A',c:'2n Batx A',e:'2n Batx C',d2:'2n Batx B'},n1:{a:7,d1:6,d2:8}};if(arx)s.archived={cat:'Curs 2025-26',data:'2026-06-30'};return s};
+  const d=JSON.parse(JSON.stringify(state));d.subjects.push(mk('GICA2'),mk('Tutoria'),mk('Vella',true));d.cur=d.subjects[d.subjects.length-3].id;carrega(d);return 1})()"""
+
+@prova('Classes (migració): Nivell + Lletres passen a noms sencers i les classes de fantasma desapareixen')
+def p_classes_migra(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CLASSES_JS); pg.wait_for_timeout(200)
+    c = pg.evaluate("cur().columns.find(x=>x.type==='classe')")
+    comprova('nivell' not in c and 'lletres' not in c and sorted(c['classes']) == ['2n Batx A', '2n Batx B', '2n Batx C'], f'columna migrada: {c}')
+    comprova(pg.evaluate("cur().grades.cl.a") == '2n Batx A' and pg.evaluate("cur().grades.n1.d2") == 8, 'la migració ha tocat valors o notes')
+    ops = pg.locator('td[data-c=cl] select.g').first.locator('option').all_inner_texts()
+    comprova(not any(x in ('2N', 'BATX', 'A') for x in ops), f'encara hi ha classes de fantasma: {ops}')
+    comprova(pg.evaluate("classesDe(cur())") == ['2n Batx A', '2n Batx B', '2n Batx C'], 'la distribució veuria classes sense alumnes')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Classes (recuperar): mostra els canvis, omple i vincula, no toca les diferents si no es marquen, fusiona duplicats i es pot desfer')
+def p_classes_recupera(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CLASSES_JS); pg.wait_for_timeout(200)
+    pg.evaluate("tab='config';render()"); pg.wait_for_timeout(150)
+    pg.evaluate("document.querySelector('details[data-cfg=al]').open=true"); pg.evaluate("rAlumnes()"); pg.wait_for_timeout(100)
+    pg.click('#aRecCl'); pg.wait_for_timeout(200)
+    txt = pg.inner_text('#recW')
+    comprova("S'omplirà la classe (1)" in txt and 'Bru Prova' in txt, f'omple: {txt[:300]}')
+    comprova('Classe diferent als Llistats (1)' in txt and 'Cesc Prova' in txt, 'no surt la classe diferent (Cesc)')
+    comprova('Possibles duplicats (1)' in txt, 'no detecta el duplicat (Dana)')
+    comprova('Eva' not in txt.split('Possibles duplicats')[0], 'proposa canviar un alumne que no és als Llistats')
+    comprova(not pg.locator('[data-rec="c"]').is_checked(), 'la classe diferent surt marcada per defecte')
+    pg.click('#recOk'); pg.wait_for_timeout(1500)
+    r = pg.evaluate("(()=>{const s=cur();return {b:[s.grades.cl.b,s.students.find(x=>x.id==='b').aid],c:[s.grades.cl.c,s.students.find(x=>x.id==='c').aid||null],e:s.grades.cl.e}})()")
+    comprova(r['b'] == ['2n Batx A', 'r2'], f'Bru: {r["b"]}')
+    comprova(r['c'] == ['2n Batx A', None], f'Cesc (no marcat) ha canviat: {r["c"]}')
+    comprova(r['e'] == '2n Batx C', 'ha tocat un alumne que no és als Llistats')
+    comprova(any('còpia' in (f.get('name') or '').lower() or f.get('props', {}).get('copia') == '1' for f in pg.drive.values()), 'no s\'ha fet la còpia de seguretat abans d\'aplicar')
+    # desfer
+    pg.click('#btnUndo'); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("cur().grades.cl.b") is None, '↶ no desfà la recuperació')
+    pg.click('#btnRedo'); pg.wait_for_timeout(300)
+    # fusionar Dana
+    pg.click('#aRecCl'); pg.wait_for_timeout(200); pg.click('[data-fus="0"]'); pg.click('#qBtns button:has-text("Fusiona")'); pg.wait_for_timeout(300)
+    r = pg.evaluate("(()=>{const s=cur(),d=s.students.filter(x=>x.nom==='Dana');return d.map(x=>({id:x.id,cid:x.cid||null,cl:s.grades.cl[x.id],ex:s.grades.n1[x.id]}))})()")
+    comprova(len(r) == 1 and r[0]['cid'] == 'g1' and r[0]['cl'] == '2n Batx B' and r[0]['ex'] in (6, 8), f'fusió: {r}')
+    pg.click('#recX')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Classes (Llistats): un canvi de grup arriba a totes les llibretes actives però no a les arxivades')
+def p_classes_propaga(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CLASSES_JS); pg.wait_for_timeout(200)
+    # vincular Ada (ja ho és) també a Tutoria i Vella (ho és: aid r1 a totes)
+    pg.evaluate("propagaGrup(Object.assign(state.alumnat.find(a=>a.id==='r1'),{grup:'2n Batx C'}))")
+    r = pg.evaluate("state.subjects.filter(s=>['GICA2','Tutoria','Vella'].includes(s.name)).map(s=>[s.name,s.grades.cl.a])")
+    comprova(r == [['GICA2', '2n Batx C'], ['Tutoria', '2n Batx C'], ['Vella', '2n Batx A']], f'propagació: {r}')
+    # canviar la classe d'Ada a la taula → canvia els Llistats i l'altra llibreta
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(150)
+    pg.locator('tr[data-s=a] td[data-c=cl] select.g').select_option('2n Batx B'); pg.wait_for_timeout(200)
+    r = pg.evaluate("[state.alumnat.find(a=>a.id==='r1').grup,state.subjects.find(s=>s.name==='Tutoria').grades.cl.a,state.subjects.find(s=>s.name==='Vella').grades.cl.a]")
+    comprova(r == ['2n Batx B', '2n Batx B', '2n Batx A'], f'canvi des de la taula: {r}')
+    # alumne fora dels Llistats: només canvia aquesta llibreta
+    pg.locator('tr[data-s=e] td[data-c=cl] select.g').select_option('2n Batx A'); pg.wait_for_timeout(200)
+    r = pg.evaluate("[cur().grades.cl.e,state.subjects.find(s=>s.name==='Tutoria').grades.cl.e]")
+    comprova(r == ['2n Batx A', '2n Batx C'], f'classe escrita a mà: {r}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
+def p_recursos(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='eines';render()"); pg.wait_for_timeout(150)
+    pg.click('#eNouRG'); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#rNom'), 'no s\'obre el quadre de nou enllaç')
+    pg.fill('#rNom', 'Prova'); pg.fill('#rUrl', 'https://exemple.cat'); pg.locator('#dlgRec button', has_text='Desa').first.click(); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("state.recursos.some(r=>r.name==='Prova')"), 'no es desa l\'enllaç')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

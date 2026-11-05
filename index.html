@@ -268,6 +268,9 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 #soBar{display:inline-flex;gap:6px}
 #pestOv{position:fixed;inset:0;z-index:2000;background:rgba(20,20,20,.72);display:flex;align-items:center;justify-content:center}
 .pestbox{background:#fff;border-radius:14px;padding:22px 26px;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,.4)}.pestbox h3{margin:0 0 8px}
+td.cldif select.g{background:#fff4d6!important}
+.recsec{margin:10px 0 4px;font-size:15px}.recit{display:flex;gap:8px;align-items:center;padding:3px 6px;border-radius:6px}.recit:hover{background:var(--gris)}.recit .fl{margin:0}
+.recdup{display:flex;gap:8px;align-items:center;padding:4px 6px;background:#fff4d6;border-radius:6px;margin:3px 0}
 .alietag{font-size:12px;color:#ffd7a8;border:1px solid #8a5a2b;border-radius:6px;padding:2px 7px;white-space:nowrap}
 #soBar{position:relative}
 #soLlista{position:absolute;top:calc(100% + 8px);right:0;z-index:710;background:#fff;color:#111;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:330px}
@@ -540,14 +543,15 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
       <option value="inc">Incidències (targetes)</option>
     </optgroup>
     <optgroup label="Informació">
-      <option value="classe">Classe (nivell i lletra)</option><option value="url">URL (enllaç)</option><option value="lliure">Lliure (escriu el que vulguis)</option>
+      <option value="classe">Classe (grup de l'alumne)</option><option value="url">URL (enllaç)</option><option value="lliure">Lliure (escriu el que vulguis)</option>
     </optgroup></select></div>
   <div class="fl"><label class="lb">Amplada</label><select id="cAmp"><option value="estreta">estreta</option><option value="normal">normal</option><option value="ampla">ampla</option><option value="plegada">plegada</option></select>
     <label style="margin-left:12px"><input type="checkbox" id="cOcu"> Amaga la columna</label></div>
   <div class="fl" id="cMaxF"><label class="lb">Nota màxima</label><input type="number" id="cMax" class="mini" min="1" step="1" value="10"></div>
   <div id="cClasseF">
-    <div class="fl"><label class="lb">Nivell</label><input type="text" id="cNivell" class="mini" placeholder="4t"></div>
-    <div class="fl"><label class="lb">Lletres</label><input type="text" id="cLletres" placeholder="A, B, C, D"></div>
+    <div class="fl" style="align-items:flex-start"><label class="lb">Classes</label><div style="flex:1"><textarea id="cClasses" rows="4" placeholder="Una per línia, amb el nom sencer: 4t A, 2n Batx B…" style="width:100%;font:inherit"></textarea>
+      <button type="button" class="btn sec" id="cClLl" style="padding:3px 10px;font-size:13px">Afegeix els grups dels llistats del curs</button>
+      <div class="aj" style="margin:4px 0 0">Els alumnes que són als Llistats del curs agafen la classe d'allà.</div></div></div>
   </div>
   <div id="cIconesF">
     <div class="fl"><label class="lb">Icones</label><input type="text" id="cIcones" placeholder="😀 😐 😟" style="font-size:18px;width:200px"></div>
@@ -597,6 +601,8 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="llX">Tanca</button><button class="btn" id="llCopia">📋 Copia</button></div></dialog>
 <dialog id="dlgOrd" style="width:min(420px,94vw)"><h3 style="margin:0 0 8px">↕ Ordre</h3><div id="ordW"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="ordCanc">Cancel·la</button><button class="btn" id="ordOk">Fet</button></div></dialog>
+<dialog id="dlgRecCl" style="width:min(720px,95vw)"><h3 style="margin:0 0 6px">🔁 Recupera les classes dels llistats</h3><div id="recW"></div>
+  <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="recX">Cancel·la</button><button class="btn" id="recOk">Aplica</button></div></dialog>
 <dialog id="dlgCurs"><h3 id="cuTit"></h3><p class="aj">Desmarca les que vulguis continuar fent servir aquest curs.</p><div id="cuLl" class="cull"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="cuCanc">Cancel·la</button><button class="btn" id="cuOk">Arxiva les marcades</button></div></dialog>
 <dialog id="dlgSub">
@@ -691,7 +697,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 3c)',COMPILACIO='5/11 20:25';
+const VERSIO='2.2 · ammonite · en proves (tanda 4)',COMPILACIO='5/11 20:40';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -759,7 +765,7 @@ function demo(){
   s.students=[['Tony','Stark'],['Steve','Rogers'],['Natasha','Romanoff'],['Bruce','Banner'],['Thor','Odinson'],['Wanda','Maximoff'],['Peter','Parker'],['Carol','Danvers'],['Clint','Barton'],['Shuri','Udaku']].map(([nom,cognoms])=>({id:uid(),nom,cognoms}));
   const [av]=s.categories,ac=av;
   const c=(name,type,cat,extra={})=>{const o={id:uid(),name,type,cat:cat?.id||'',max:10,...extra};s.columns.push(o);return o};
-  const cl=c('Classe','classe',null,{nivell:'4t',lletres:['A','B','C']});
+  const cl=c('Classe','classe',null,{classes:['4t A','4t B','4t C']});
   const ex=c('Examen T1','num',av), pr=c('Pràctica mitosi','ord',av), ll=c('Llibreta','ass',av),
         a1=c('Actitud octubre','ass',ac), a2=c('Actitud novembre','ass',ac),
         lu=c('Lliurament dossier','check',null), pa=c('Participació','icones',null,{icons:['👍','👎']}), tr=c('Treball','url',null),
@@ -792,6 +798,9 @@ function migra(d){
     delete s.settings.npMode;
     /* el NP antic passa a ser F (falta) */
     s.columns.forEach(c=>{if(['num','ord','ass'].includes(c.type)){const g=s.grades[c.id]||{};for(const k in g)if(g[k]==='NP')g[k]='F'}});
+    /* 2.2: la columna Classe deixa «Nivell + Lletres» i guarda la llista de classes amb el nom sencer. Les classes de fantasma (sense cap alumne) desapareixen. */
+    s.columns.forEach(c=>{if(c.type!=='classe')return;if('nivell' in c||'lletres' in c){const g=s.grades[c.id]||{},ids=new Set(s.students.map(x=>x.id));
+      c.classes=[...new Set(Object.entries(g).filter(([id,v])=>v&&ids.has(id)).map(([,v])=>String(v).trim()).filter(Boolean))];delete c.nivell;delete c.lletres}c.classes??=[]});
     sincBlocs(s);
   }
   d.versio=5;return d}
@@ -910,9 +919,24 @@ function alumnesOrdenats(sub,ordre){const o=ordre||sub.ordre||'cognoms',a=[...su
     a.sort((x,y)=>{const p=v.get(x.id),q=v.get(y.id);if(p===null&&q===null)return perCg(x,y);if(p===null)return 1;if(q===null)return -1;return (p-q)*d||perCg(x,y)})}
   return a}
 function classeDe(sub,st){const cl=colsClasse(sub)[0];return cl?(getG(sub,cl.id,st.id)||''):''}
-function classesDe(sub){const cl=colsClasse(sub)[0];if(!cl)return[];
-  const set=new Set((cl.lletres||[]).map(l=>((cl.nivell||'')+' '+l).trim()));Object.values(sub.grades[cl.id]||{}).forEach(v=>v&&set.add(v));
-  return [...set].sort((a,b)=>a.localeCompare(b,'ca'))}
+/* P. Classes: nom sencer («2n Batx A»). Si l'alumne està vinculat als Llistats del curs (st.aid), la classe ve d'allà:
+   canviar-la en una llibreta la canvia als Llistats i a totes les llibretes actives. Les arxivades no es toquen. */
+function classesDe(sub,totes){const cl=colsClasse(sub)[0];if(!cl)return[];const set=new Set();
+  Object.entries(sub.grades[cl.id]||{}).forEach(([id,v])=>{if(v&&sub.students.some(s=>s.id===id))set.add(v)});
+  if(totes){(cl.classes||[]).forEach(v=>v&&set.add(v));if(!sub.archived)grupsDe().forEach(g=>g&&g!=='—'&&set.add(g))}
+  return [...set].sort(grupOrd)}
+const alumneLl=st=>st?.aid?(state.alumnat||[]).find(a=>a.id===st.aid):null;
+/* Busca un alumne als Llistats del curs pel nom (cognoms + nom, sense accents ni majúscules). Només si n'hi ha un de sol. */
+function trobaLlistat(st,k=cursKey()){const n=norm(((st.cognoms||'')+' '+st.nom).trim()),n2=norm((st.nom+' '+(st.cognoms||'')).trim());
+  const m=alumnatDe(k,true).filter(a=>{const x=norm(((a.cognoms||'')+' '+a.nom).trim());return x===n||x===n2});return m.length===1?m[0]:null}
+function afegeixClasse(c,v){if(!v||!c)return;c.classes=[...new Set([...(c.classes||[]),v])]}
+function colClasse(sub){let cl=colsClasse(sub)[0];if(!cl){cl={id:uid(),name:'Classe',type:'classe',cat:'',classes:[]};sub.columns.unshift(cl)}return cl}
+/* Canvi de classe des d'una llibreta: si l'alumne és als Llistats, es canvia allà i a totes les llibretes actives on és */
+function canviaClasse(sub,st,v){v=(v||'').trim();const a=alumneLl(st);
+  if(!a||sub.archived){const cl=colClasse(sub);afegeixClasse(cl,v);setG(sub,cl.id,st.id,v||undefined,1);return 1}
+  a.grup=v;return propagaGrup(a)}
+function propagaGrup(a){let n=0;state.subjects.forEach(sub=>{if(sub.archived)return;sub.students.filter(x=>x.aid===a.id).forEach(x=>{const cl=colClasse(sub);afegeixClasse(cl,a.grup);
+  if((getG(sub,cl.id,x.id)||'')!==(a.grup||'')){setG(sub,cl.id,x.id,a.grup||undefined,1);n++}})});return n}
 /* Llista de files visibles: alumnes i, si cal, separadors de classe */
 function filesVisibles(sub,filtre,ordre){const a=alumnesOrdenats(sub,ordre),m=filtre??sub.mostra??'tots';
   if(!colsClasse(sub).length||m==='tots')return a.map(st=>({st}));
@@ -1258,8 +1282,8 @@ function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="$
     return td(fa||(v?'l'+LV.indexOf(v):''),`<select class="g" ${a} ${dis}>${o.map(x=>`<option value="${x}" ${(v??'')===x?'selected':''}>${x==='NAV'?NAVT:x}</option>`).join('')}</select>`)}
   case 'ext':{const r=resolveExt(sub,c,st);return td('ext '+(r?.k==='fj'?'vFJ':r?.k==='nav'?'vNAV':r?.label==='F'?'vF':r?.lvl?'l'+r.lvl:''),r?esc(r.label):'<span class="buida">—</span>',1)}
   case 'final':return td('fin '+(v!==undefined?'l'+lvlFinal(v,sub.settings):''),`<input class="g" ${a} ${dis} value="${v===undefined?'':esc(String(v).replace('.',','))}" placeholder="—">${calcHtml(sub,st)}`);
-  case 'classe':{const o=['',...(c.lletres||[]).map(l=>((c.nivell||'')+' '+l).trim())];if(v&&!o.includes(v))o.push(v);
-    return td('',`<select class="g" ${a} ${dis}>${o.map(x=>`<option ${(v??'')===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`)}
+  case 'classe':{const o=['',...classesDe(sub,true)];if(v&&!o.includes(v))o.push(v);const al=sub.archived?null:alumneLl(st),dif=al&&(al.grup||'')!==(v||'');
+    return td(dif?'cldif':'',`<select class="g" ${a} ${dis} title="${al?(dif?`Als Llistats del curs és «${esc(al.grup||'—')}». Fes «Recupera les classes» a ⚙ › Alumnes.`:'Ve dels Llistats del curs: si la canvies, es canvia allà i a totes les llibretes.'):'Classe escrita a mà (l\'alumne no és als Llistats del curs)'}">${o.map(x=>`<option value="${esc(x)}" ${(v??'')===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`)}
   case 'check':return td('clk',checkHtml(v),1);
   case 'icones':return td('clk',v?esc(v):'<span class="buida">·</span>',1);
   case 'opc':{const o=opcDe(c,v);return `<td ${a} class="${cls} opcc${anC}" style="${sty}${o?.col?';background:'+o.col:''}"${anT}><select class="g" ${a} ${dis}><option value=""></option>${(c.opcions||[]).map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.t)}</option>`).join('')}</select>${anI}</td>`}
@@ -1325,7 +1349,7 @@ function totalCat(sub,cat,sts){const rs=sts.map(st=>catResult(sub,cat,st)).filte
   const m=new Map();rs.forEach(r=>m.set(r.lvl,(m.get(r.lvl)||0)+1));let b=0,n=0;m.forEach((k,l)=>{if(k>n){b=l;n=k}});return `<td class="tot" title="Valor més repetit">${LV[b]}</td>`}
 function subtitolCol(sub,c){
   switch(c.type){case 'num':return 'Numèrica /'+c.max;case 'ord':return 'Escala 1-'+sub.settings.ordMax;
-  case 'icones':return 'Icones '+iconesDe(c).join(' ')+(c.compta?' · compta':'');case 'check':return 'Check'+(c.compta?' · compta':'');case 'classe':return 'Classe '+(c.nivell||'');
+  case 'icones':return 'Icones '+iconesDe(c).join(' ')+(c.compta?' · compta':'');case 'check':return 'Check'+(c.compta?' · compta':'');case 'classe':return 'Classe';
   case 'ext':{const s=state.subjects.find(x=>x.id===c.src);return '↪ '+(s?s.name:'llibreta esborrada')}
   default:return TIPUS[c.type]}}
 
@@ -1356,7 +1380,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   /* columnes fixes a l'esquerra */
   const cp=!!sub.compacte;
   const fix=[];if(!sub.ocult.cognoms)fix.push({k:'cognoms',w:cp?140:170,t:'Cognoms'});fix.push({k:'nom',w:sub.nomW||(cp?110:130),t:'Nom'});
-  const clsVis=sub.ocult.classe?[]:cls;clsVis.forEach((c,i)=>fix.push({k:'cl',c,w:cp?62:86,t:c.name,first:i===0}));
+  const clsVis=sub.ocult.classe?[]:cls;clsVis.forEach((c,i)=>fix.push({k:'cl',c,w:cp?78:104,t:c.name,first:i===0}));
   let left=0;fix.forEach(f=>{f.left=left;left+=f.w});fix.at(-1).last=true;
   const stf=f=>`left:${f.left}px;width:${f.w}px;min-width:${f.w}px;max-width:${f.w}px`;
   const gs=grups(sub,true),pleg=sub.plegades||[];
@@ -1600,20 +1624,20 @@ function partNom(linia){linia=linia.trim();if(!linia)return null;
 let alObert=false;
 function rAlumnes(){const sub=cur(),W=$('#alW');if(!sub||!W)return;const ro=RO();
   const sm=$('#detAl>summary .cres');if(sm)sm.textContent=`${sub.students.length} alumne${sub.students.length===1?'':'s'}`;
-  const clsLl=classesDe(sub);
-  W.innerHTML=`<fieldset ${ro?'disabled':''}><div class="fl" style="margin-top:8px"><button class="btn" id="aDesAl">📇 Afegeix des dels llistats del curs</button><button class="btn sec" id="aDesLl">📋 Copia d'una altra llibreta</button></div><p class="aj" style="margin-top:6px">Has d'enganxar una llista? Fes-ho a <a href="#" id="aVesAlum">📇 Llistats del curs</a> i després afegeix-los des d'aquí.</p>
+  const clsLl=classesDe(sub,true);
+  W.innerHTML=`<fieldset ${ro?'disabled':''}><div class="fl" style="margin-top:8px"><button class="btn" id="aDesAl">📇 Afegeix des dels llistats del curs</button><button class="btn sec" id="aDesLl">📋 Copia d'una altra llibreta</button><button class="btn sec" id="aRecCl" title="Posa a cada alumne la classe que té als Llistats del curs. Primer mostra què canviarà.">🔁 Recupera les classes dels llistats</button></div><p class="aj" style="margin-top:6px">Has d'enganxar una llista? Fes-ho a <a href="#" id="aVesAlum">📇 Llistats del curs</a> i després afegeix-los des d'aquí.</p>
     <h3 style="margin:14px 0 4px;font-size:15px">Afegeix-ne un</h3>
     <div class="fl"><input type="text" id="aCg" placeholder="Cognoms" style="min-width:240px"><input type="text" id="aNom" placeholder="Nom">${selClasseHtml(sub,'aClUn',clSel[sub.id]||'')}<button class="btn" id="aAf">Afegeix</button><button class="btn sec" id="aOrd">Ordena la llista per cognoms</button></div>
     ${sub.students.length?`<div class="fl" style="margin-top:14px;padding:6px 8px;background:var(--gris);border-radius:8px"><label><input type="checkbox" id="aTots"> Selecciona'ls tots</label><button class="btn perill" id="aDelSel" disabled style="padding:5px 10px">Elimina els seleccionats (0)</button></div>`:''}
     <div class="llista">${sub.students.map(s=>`<div class="fl"><input type="checkbox" data-sel="${s.id}" title="Selecciona"><input type="text" value="${esc(s.cognoms||'')}" data-ren="${s.id}" data-k="cognoms" style="min-width:240px" placeholder="Cognoms"><input type="text" value="${esc(s.nom)}" data-ren="${s.id}" data-k="nom" placeholder="Nom">${clsLl.length?`<select data-scl="${s.id}" title="Classe">${['',...clsLl].map(c=>`<option value="${esc(c)}" ${classeDe(sub,s)===c?'selected':''}>${c?esc(c):'—'}</option>`).join('')}</select>`:''}<button class="x" data-del="${s.id}" title="Elimina">✕</button></div>`).join('')}</div></fieldset>`;
   if(ro)return;
-  $('#aDesAl').onclick=()=>obreAfAl('alumnat');$('#aDesLl').onclick=()=>obreAfAl('llib');
+  $('#aDesAl').onclick=()=>obreAfAl('alumnat');$('#aDesLl').onclick=()=>obreAfAl('llib');$('#aRecCl').onclick=()=>obreRecClasses(sub);
   lligaSelClasse(sub,'aClUn');
   $('#aVesAlum').onclick=e=>{e.preventDefault();const d=$('details[data-cfg=alumnat]');if(!d)return;d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});setTimeout(()=>$('#alTxt')?.focus(),400)};
   const afegeix=(ll,cl)=>{ll=ll.filter(x=>x&&x.nom);if(!ll.length)return;let ambCl=0;
     ll.forEach(x=>{const st={id:uid(),nom:x.nom,cognoms:x.cognoms||''};if(x.aid)st.aid=x.aid;sub.students.push(st);const c=x.grup||cl;if(c){posaClasse(sub,st,c);ambCl++}});
     save('afegir alumnes');rAlumnes();toast(ll.length+' alumne(s) afegit(s)'+(ambCl?` · ${ambCl} amb classe`:''))};
-  $$('[data-scl]').forEach(sl=>sl.onchange=()=>{const st=sub.students.find(x=>x.id===sl.dataset.scl),cl=colsClasse(sub)[0];if(!cl)return;setG(sub,cl.id,st.id,sl.value||undefined,1);save('canviar classe')});
+  $$('[data-scl]').forEach(sl=>sl.onchange=()=>{const st=sub.students.find(x=>x.id===sl.dataset.scl),n=canviaClasse(sub,st,sl.value);save('canviar classe');if(alumneLl(st))toast(`Classe canviada als Llistats del curs${n>1?` i a ${n} llibretes`:''}.`)});
   const un=()=>{const nom=$('#aNom').value.trim(),cognoms=$('#aCg').value.trim(),cl=$('#aClUn').value==='+'?'':$('#aClUn').value;if(!nom)return toast('Escriu el nom.');
     const k=cursKey();let a=(state.alumnat||[]).find(x=>x.curs===k&&norm(x.cognoms+' '+x.nom)===norm(cognoms+' '+nom));
     if(!a){a={id:uid(),curs:k,cognoms,nom,grup:cl};(state.alumnat??=[]).push(a)}
@@ -1726,7 +1750,7 @@ $('#dlgCls').addEventListener('click',async e=>{const b=e.target.closest('[data-
   if(v==='desaPar'){let n=0,nous=0,ign=0;const clN=($('#clsNouCl')?.value||'').replace('+','');(CL.props||[]).forEach((x,i)=>{const sl=$(`[data-par="${i}"]`),val=sl?.value||'';const conf=$(`[data-conf="${i}"]`);
       if(!val)return;if(x.niv==='t'&&conf&&!conf.checked&&val===x.cand?.id)return;
       if(val==='ign'){(sub.cls.ignora??=[]).push(x.r.userId);ign++;return}
-      if(val==='+'){const st={id:uid(),nom:x.n.nom||x.n.full,cognoms:x.n.cognoms,cid:x.r.userId};sub.students.push(st);posaClasse(sub,st,clN);nous++;return}
+      if(val==='+'){const st={id:uid(),nom:x.n.nom||x.n.full,cognoms:x.n.cognoms,cid:x.r.userId};const al=trobaLlistat(st);if(al)st.aid=al.id;sub.students.push(st);posaClasse(sub,st,clN);nous++;return}
       const st=sub.students.find(z=>z.id===val);if(st&&!st.cid){st.cid=x.r.userId;n++}});
     save('aparellar Classroom');CL.msg=`${n} aparellat(s)${nous?`, ${nous} afegit(s)`:''}${ign?`, ${ign} ignorat(s)`:''}.`;CL.vista='menu';render();pintaCls();return}
   if(v==='importa'){const r=$('input[name=clsT]:checked');if(!r)return toast('Tria una tasca.');const t=CL.tasques.find(x=>x.id===r.value),cat=$('#clsCat').value,orig=$('#clsOrig').checked;
@@ -1854,23 +1878,19 @@ function rAlumnat(){const W=$('#alumW');if(!W)return;const cursos=[...new Set([c
     ll.forEach(x=>{if(!x.grup)sense++;if(ja.has(norm(x.cognoms+'|'+x.nom+'|'+x.grup)))return;state.alumnat.push({id:uid(),curs:alCurs,cognoms:x.cognoms||'',nom:x.nom,grup:x.grup||''});n++;alGrupsOberts.add(x.grup||'—')});
     save('afegir als llistats');rAlumnat();toast(`${n} alumne(s) afegit(s)${ll.length-n?` · ${ll.length-n} ja hi eren`:''}${sense?` · ${sense} sense grup`:''}.`)};
   $$('[data-alr]').forEach(i=>i.onchange=async()=>{const a=A(i.dataset.alr),k=i.dataset.k,v=i.value.trim(),ant=a[k];if(k==='nom'&&!v){i.value=ant;return}a[k]=v;
-    if(k==='grup'&&v!==ant){const on=state.subjects.map(sub=>({sub,st:sub.students.find(x=>x.aid===a.id)})).filter(x=>x.st&&colsClasse(x.sub).length);
-      if(on.length&&await confirma(`${nomComplet(a)} passa de «${ant||'—'}» a «${v}». Vols canviar-ho també a la columna Classe de ${on.length===1?'la llibreta':'les '+on.length+' llibretes'} on és (${on.map(x=>x.sub.name).join(', ')})?`,'Canvia-ho'))
-        on.forEach(({sub,st})=>{const c=colsClasse(sub)[0];afegeixLletra(c,v);setG(sub,c.id,st.id,v,1)})}
+    if(k==='grup'&&v!==ant){const n=propagaGrup(a);if(n)toast(`${nomComplet(a)}: classe canviada a ${n===1?'1 llibreta':n+' llibretes'}.`)}
     save('llistats del curs');if(k==='grup')rAlumnat()});
   $$('[data-albx]').forEach(c=>c.onchange=()=>{A(c.dataset.albx).baixa=c.checked||undefined;save(c.checked?'baixa':'treure la baixa');rAlumnat()});
   $$('[data-aldel]').forEach(b=>b.onclick=async()=>{const a=A(b.dataset.aldel);if(!await confirma(`Eliminar ${nomComplet(a)} del llistat? Si només ha marxat, millor marca'l com a baixa.`,'Elimina'))return;state.alumnat=state.alumnat.filter(x=>x!==a);save('eliminar dels llistats');rAlumnat()});
   $$('details[data-alg]').forEach(d=>d.ontoggle=()=>{d.open?alGrupsOberts.add(d.dataset.alg):alGrupsOberts.delete(d.dataset.alg)})}
 /* Classe en afegir alumnes: desplegable comú, i creació de la columna Classe si cal */
 let clSel={};
-function selClasseHtml(sub,id,val=''){const cls=classesDe(sub);if(val&&!cls.includes(val))cls.push(val);
+function selClasseHtml(sub,id,val=''){const cls=classesDe(sub,true);if(val&&!cls.includes(val))cls.push(val);
   return `<select id="${id}" class="selcl" title="Classe dels alumnes que afegeixis"><option value="">— sense classe —</option>${cls.map(c=>`<option ${c===val?'selected':''}>${esc(c)}</option>`).join('')}<option value="+">＋ nova classe…</option></select>`}
 function lligaSelClasse(sub,id){const sl=$('#'+id);if(!sl)return;sl.onchange=async()=>{if(sl.value!=='+'){clSel[sub.id]=sl.value;return}
   const n=((await demana('Nova classe','Nom de la classe (p. ex. 4t B, 1r BAT A):',''))||'').trim();
   if(!n){sl.value=clSel[sub.id]||'';return}const o=document.createElement('option');o.textContent=n;sl.insertBefore(o,sl.lastElementChild);sl.value=n;clSel[sub.id]=n}}
-function posaClasse(sub,st,v){if(!v)return;let cl=colsClasse(sub)[0];if(!cl){cl={id:uid(),name:'Classe',type:'classe',cat:'',nivell:'',lletres:[]};sub.columns.unshift(cl)}
-  afegeixLletra(cl,v);cl.lletres=[...new Set(cl.lletres||[])];setG(sub,cl.id,st.id,v,1)}
-function afegeixLletra(c,v){if(!v)return;const o=(c.lletres||[]).map(l=>((c.nivell||'')+' '+l).trim());if(o.includes(v))return;if(!c.nivell){c.lletres=[...(c.lletres||[]),v]}}
+function posaClasse(sub,st,v){const a=alumneLl(st);if(a?.grup)v=a.grup;if(!v)return;const cl=colClasse(sub);afegeixClasse(cl,v);setG(sub,cl.id,st.id,v,1)}
 /* Diàleg per afegir alumnes a una llibreta: des de l'alumnat del curs o copiant-los d'una altra llibreta */
 const AF={mode:'alumnat',grups:new Set(),font:'',classe:''};
 function obreAfAl(mode){AF.mode=mode;pintaAfAl();$('#dlgAfAl').showModal()}
@@ -1899,12 +1919,11 @@ $('#afCanc').onclick=()=>$('#dlgAfAl').close();
 $$('#dlgAfAl .aftab').forEach(b=>b.onclick=()=>{AF.mode=b.dataset.m;pintaAfAl()});
 $('#afOk').onclick=()=>{const sub=cur(),ks=new Set($$('[data-afk]:checked').map(c=>c.dataset.afk)),sel=AF.llista.filter(x=>ks.has(x.k));if(!sel.length)return;
   let cl=colsClasse(sub)[0];const ambClasse=sel.some(x=>x.classe);
-  if(ambClasse&&!cl){cl={id:uid(),name:'Classe',type:'classe',cat:'',nivell:'',lletres:[]};sub.columns.unshift(cl)}
+  if(ambClasse&&!cl)cl=colClasse(sub);
   let nA=0,nC=0;
   sel.forEach(x=>{let st;if(x.compl){st=sub.students.find(z=>z.id===x.compl);if(!st)return;if(x.aid&&!st.aid&&AF.mode==='alumnat')st.aid=x.aid;nC++}
     else{st={id:uid(),nom:x.nom,cognoms:x.cognoms||''};if(x.aid)st.aid=x.aid;sub.students.push(st);nA++}
-    if(x.classe&&cl){afegeixLletra(cl,x.classe);setG(sub,cl.id,st.id,x.classe,1)}});
-  if(cl)cl.lletres=[...new Set(cl.lletres||[])];
+    if(x.classe&&cl){afegeixClasse(cl,x.classe);setG(sub,cl.id,st.id,x.classe,1)}});
   save(nC&&!nA?'completar classes':'afegir alumnes');$('#dlgAfAl').close();rAlumnes();toast([nA?`${nA} alumne(s) afegit(s)`:'',nC?`${nC} completat(s) amb la classe`:''].filter(Boolean).join(' · ')+'.')};
 /* Llistats per consultar i copiar (Eines) */
 const LL={grups:new Set(),cerca:'',fmt:'cn',num:false,sep:true};
@@ -2205,7 +2224,9 @@ $('#main').addEventListener('change',e=>{const el=e.target;if(!el.classList.cont
   const sub=cur(),c=sub.columns.find(x=>x.id===el.dataset.c),stId=el.dataset.s;
   const r=valorDe(sub,c,el.value);
   if(!r.ok){el.classList.add('mal');toast(c.type==='final'?'Nota final: un número de 0 a 10 o NA, AS, AN, AE.':`Nota no vàlida: ha de ser entre 0 i ${c.max}, F (falta), FJ (falta justificada) o «no ava» (no avaluat).`);return}
-  el.classList.remove('mal');setG(sub,c.id,stId,r.val);
+  el.classList.remove('mal');
+  if(c.type==='classe'){const st=sub.students.find(x=>x.id===stId),n=canviaClasse(sub,st,r.val);save('canviar classe');rLlibreta();if(alumneLl(st))toast(`Classe canviada als Llistats del curs${n>1?` i a ${n} llibretes`:''}.`);return}
+  setG(sub,c.id,stId,r.val);
   if(el.tagName==='INPUT'&&typeof r.val==='string'&&c.type!=='lliure'){const vis=r.val==='NAV'?NAVT:r.val;if(el.value!==vis)el.value=vis}
   if(el.tagName==='INPUT')el.defaultValue=el.value;
   if(c.type==='opc'){refrescaCella(sub,c,stId);actualitzaFila(stId);return}
@@ -2298,7 +2319,7 @@ function omplItems(srcId,sel){const s=state.subjects.find(x=>x.id===srcId);if(!s
 function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):null;
   $('#dlgColTit').textContent=colEd?'Edita la columna':'Nova columna';
   $('#cNom').value=colEd?.name||'';$('#cTipus').value=colEd?.type||'num';$('#cMax').value=colEd?.max||10;
-  $('#cNivell').value=colEd?.nivell||'';$('#cLletres').value=(colEd?.lletres||['A','B','C']).join(', ');
+  $('#cClasses').value=(colEd?.type==='classe'?classesDe(sub,false).concat(colEd.classes||[]):[]).filter((x,i,a)=>x&&a.indexOf(x)===i).sort(grupOrd).join('\n');
   $('#cIcones').value=(colEd?.icons||['😀','😐','😟']).join(' ');
   $('#cCompta').checked=colEd?(EVAL.includes(colEd.type)?!colEd.noCompta:!!colEd.compta):true;mapaV={...(colEd?.vals||{})};
   opcEd=(colEd?.opcions||[{t:'Lliurat',col:OPCOL[1]},{t:'Tard',col:OPCOL[2]},{t:'No lliurat',col:OPCOL[3]}]).map(o=>({id:o.id||uid(),t:o.t,col:o.col||''}));pintaOpc();
@@ -2350,6 +2371,7 @@ $('#cCompta').onchange=()=>tipusUI(false);
 $('#cIcones').oninput=()=>{if(['icones'].includes($('#cTipus').value))pintaMapa()};
 $$('.preset').forEach(b=>b.onclick=()=>{$('#cIcones').value=b.dataset.ic;pintaMapa()});
 $('#cCanc').onclick=()=>$('#dlgCol').close();
+$('#cClLl').onclick=()=>{const t=$('#cClasses'),ja=t.value.split('\n').map(x=>x.trim()).filter(Boolean),gs=grupsDe().filter(g=>g&&g!=='—');t.value=[...new Set([...ja,...gs])].sort(grupOrd).join('\n');if(!gs.length)toast('Encara no hi ha grups als Llistats del curs.')};
 /* S. Data d'avui al nom de la columna i «Duplica la columna» */
 const DIES=['dg','dl','dt','dc','dj','dv','ds'];
 const dataCurta=(d=new Date())=>`${DIES[d.getDay()]} ${p2(d.getDate())}/${p2(d.getMonth()+1)}`;
@@ -2380,7 +2402,7 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   if(['icones','check','dits','opc'].includes(type)){o.compta=$('#cCompta').checked;const op=opcionsMapa();o.vals={};op.forEach(([k])=>o.vals[k]=mapaV[k]||'AS')}
   if(type==='dits'){o.type='icones';o.icons=['👍','👎']}
   if(type==='icones'){const ic=splitIcones($('#cIcones').value);if(ic.length<2)return toast('Posa com a mínim dues icones (fins a 5).');o.icons=ic}
-  if(type==='classe'){o.nivell=$('#cNivell').value.trim();o.lletres=$('#cLletres').value.split(/[,\s]+/).map(x=>x.trim().toUpperCase()).filter(Boolean);if(!o.lletres.length)o.lletres=['A']}
+  if(type==='classe'){o.classes=[...new Set($('#cClasses').value.split('\n').map(x=>x.trim()).filter(Boolean))]}
   if(type==='ext'){if(!$('#cSrc').value)return toast('No hi ha cap llibreta enllaçada. Primer duplica una llibreta.');o.src=$('#cSrc').value;o.item=$('#cItem').value}
   o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;o.color=colColor;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
   /* si una columna surt d'una categoria, es queda al costat d'on era */
@@ -2602,6 +2624,45 @@ async function soCursNou(){const ini=new Date(cursKey().slice(0,4)+'-09-01T00:00
   const r=await pregunta('Sortides del curs anterior',`Hi ha ${n} sortides de l'aula registrades el curs passat. Per privacitat, el registre s'esborra en començar el curs nou.`,[{t:'Esborra-les',v:1,cls:'sec'},{t:'Exporta en PDF i esborra',v:2}]);
   if(r===2){for(const v of velles){try{const d=await pdfSortides(v.sub,v.llista.sort((a,b)=>b.ini-a.ini),'Sortides de l\'aula · '+v.sub.name+' · curs anterior');d.save(nomFitxer('sortides-'+v.sub.name)+'.pdf')}catch(e){toast(e.message);return}}}
   if(!r)return;velles.forEach(v=>v.sub.sortides=v.sub.sortides.filter(x=>x.ini>=ini));save('esborrar sortides del curs anterior');toast('Registre de sortides del curs anterior esborrat.')}
+/* O. Recupera les classes dels llistats: vincula els alumnes amb els Llistats del curs i hi posa la classe. Primer mostra què canviarà. */
+function planClasses(sub){const cl=colsClasse(sub)[0],r=[],dup=new Set(duplicatsDe(sub).flat().map(x=>x.id));
+  sub.students.forEach(st=>{if(dup.has(st.id))return;   // els duplicats, primer s'han de fusionar
+    let a=alumneLl(st),nou=false;if(!a){a=trobaLlistat(st);nou=!!a}if(!a)return;
+    const ara=cl?(getG(sub,cl.id,st.id)||''):'',ll=(a.grup||'').trim();if(!ll)return;
+    const tipus=!ara?'omple':ara===ll?(nou?'vincula':null):'difereix';if(tipus)r.push({st,a,nou,ara,ll,tipus})});return r}
+function duplicatsDe(sub){const m=new Map();sub.students.forEach(st=>{const k=norm(((st.cognoms||'')+' '+st.nom).trim());if(!m.has(k))m.set(k,[]);m.get(k).push(st)});return [...m.values()].filter(x=>x.length>1)}
+let REC=null;
+function obreRecClasses(sub){if(RO())return;REC={sub,plan:planClasses(sub),dups:duplicatsDe(sub)};pintaRec();$('#dlgRecCl').showModal()}
+function pintaRec(){const {sub,plan,dups}=REC,cl=colsClasse(sub)[0];
+  const sec=(t,tit,ajuda,chk)=>{const ll=plan.filter(x=>x.tipus===t);if(!ll.length)return '';return `<h4 class="recsec">${tit} (${ll.length})</h4>${ajuda?`<p class="aj" style="margin:0 0 4px">${ajuda}</p>`:''}`+
+    ll.map(x=>`<label class="recit"><input type="checkbox" data-rec="${x.st.id}" ${chk?'checked':''}> <b>${esc(nomComplet(x.st))}</b>: ${t==='omple'?`<span class="aj" style="margin:0">buit</span> → ${esc(x.ll)}`:t==='vincula'?`${esc(x.ll)} <span class="aj" style="margin:0">(es vincula amb els Llistats)</span>`:`${esc(x.ara)} <span class="aj" style="margin:0">(llibreta)</span> → ${esc(x.ll)} <span class="aj" style="margin:0">(Llistats)</span>`}</label>`).join('')};
+  const n=sub.students.length,fora=sub.students.filter(st=>!alumneLl(st)&&!trobaLlistat(st)).length;
+  $('#recW').innerHTML=(plan.length||dups.length?'':`<p>No hi ha res a canviar: totes les classes coincideixen amb els Llistats del curs.</p>`)+
+    sec('omple','S\'omplirà la classe','',true)+sec('vincula','Es vincularan amb els Llistats','La classe no canvia; a partir d\'ara vindrà dels Llistats.',true)+
+    sec('difereix','Classe diferent als Llistats','No es canvia si no la marques.',false)+
+    (dups.length?`<h4 class="recsec">Possibles duplicats (${dups.length})</h4><p class="aj" style="margin:0 0 4px">Alumnes amb el mateix nom. Fusionar-los conserva les notes, la classe i l'aparellament amb Classroom. Fins que no es fusionin, no se'ls canvia la classe.</p>`+
+      dups.map((g,i)=>`<div class="recdup"><span style="flex:1"><b>${esc(nomComplet(g[0]))}</b> · ${g.length} vegades · ${g.map(st=>esc(classeDe(sub,st)||'sense classe')).join(' / ')}</span><button class="btn sec" style="padding:3px 10px" data-fus="${i}">Fusiona</button></div>`).join(''):'')+
+    (fora?`<p class="aj" style="margin-top:10px">${fora} alumne${fora===1?' no és':'s no són'} als Llistats del curs (o hi surten amb un altre nom): la seva classe es queda tal com està.</p>`:'')+
+    `<p class="aj" style="margin-top:10px">Abans d'aplicar es fa una còpia de seguretat al Drive. Les notes, les columnes i Classroom no es toquen. Es pot desfer amb ↶.</p>`;
+  const upd=()=>{const k=$$('[data-rec]:checked').length;$('#recOk').textContent=k?`Aplica (${k})`:'Aplica';$('#recOk').disabled=!k};upd();
+  $$('[data-rec]').forEach(c=>c.onchange=upd);
+  $$('[data-fus]').forEach(b=>b.onclick=async()=>{const g=REC.dups[+b.dataset.fus];if(!await confirma(`Fusionar les ${g.length} fitxes de «${nomComplet(g[0])}» en una de sola? Es conserven totes les notes; si dues fitxes tenen notes diferents a la mateixa columna, es queda la de la fitxa amb classe.`,'Fusiona'))return;
+    fusionaAlumnes(REC.sub,g);save('fusionar alumnes duplicats');REC.plan=planClasses(REC.sub);REC.dups=duplicatsDe(REC.sub);pintaRec();rAlumnes();toast('Fitxes fusionades. Es pot desfer amb ↶.')})}
+function fusionaAlumnes(sub,g){const cl=colsClasse(sub)[0],pes=st=>(st.aid?4:0)+(cl&&getG(sub,cl.id,st.id)?2:0)+(st.cid?1:0);
+  const [keep,...drop]=[...g].sort((a,b)=>pes(b)-pes(a));
+  drop.forEach(d=>{Object.values(sub.grades).forEach(gr=>{if(gr[d.id]!==undefined&&gr[keep.id]===undefined)gr[keep.id]=gr[d.id];delete gr[d.id]});
+    if(sub.comentaris?.[d.id]){if(!sub.comentaris[keep.id])sub.comentaris[keep.id]=sub.comentaris[d.id];delete sub.comentaris[d.id]}
+    Object.keys(sub.anot||{}).forEach(k=>{const [c,s]=k.split('|');if(s===d.id){const k2=c+'|'+keep.id;if(!sub.anot[k2])sub.anot[k2]=sub.anot[k];delete sub.anot[k]}});
+    (sub.sortides||[]).forEach(x=>{if(x.st===d.id)x.st=keep.id});
+    if(!keep.aid&&d.aid)keep.aid=d.aid;if(!keep.cid&&d.cid)keep.cid=d.cid});
+  const ids=new Set(drop.map(x=>x.id));sub.students=sub.students.filter(x=>!ids.has(x.id))}
+$('#recX').onclick=()=>$('#dlgRecCl').close();
+$('#recOk').onclick=async()=>{const {sub,plan}=REC,ks=new Set($$('[data-rec]:checked').map(c=>c.dataset.rec)),sel=plan.filter(x=>ks.has(x.st.id));if(!sel.length)return;
+  const b=$('#recOk');b.disabled=true;b.textContent='⏳ Fent la còpia de seguretat…';
+  if(mode==='drive'){try{await comprovaCopia(true)}catch(e){b.disabled=false;b.textContent='Aplica';
+    if(!await confirma('No s\'ha pogut fer la còpia de seguretat al Drive ('+e.message+'). Vols aplicar els canvis igualment? Es poden desfer amb ↶.','Aplica igualment'))return}}
+  const cl=colClasse(sub);sel.forEach(x=>{x.st.aid=x.a.id;afegeixClasse(cl,x.ll);setG(sub,cl.id,x.st.id,x.ll,1)});
+  save('recuperar les classes dels llistats');$('#dlgRecCl').close();rAlumnes();toast(`${sel.length} alumne${sel.length===1?'':'s'} amb la classe dels Llistats. Es pot desfer amb ↶.`,6000)};
 /* ======================= Bloc de notes i pòsits (pantalla pròpia) ======================= */
 const blocTots=()=>{try{return localStorage.getItem('llibreta-bloc-tots')==='1'}catch{return false}};
 function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();

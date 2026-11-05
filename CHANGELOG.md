@@ -1,6 +1,13 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.2 · ammonite · en preparació
+**Tanda 4: classes (5/11/2026, en proves)**
+- **La classe ve dels Llistats del curs.** Per als alumnes vinculats als Llistats, canviar-los de grup als Llistats (o des de qualsevol llibreta) ho canvia a totes les llibretes actives. Les llibretes arxivades conserven la classe que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.
+- **Columna Classe amb noms sencers** («2n Batx A»): desapareixen els camps Nivell i Lletres. Migració automàtica; les classes de fantasma (sense cap alumne) desapareixen. Botó «Afegeix els grups dels llistats del curs».
+- **🔁 Recupera les classes dels llistats** (⚙ › Alumnes): mostra què canviarà abans d'aplicar-ho (omplir, vincular, diferents —que no es canvien si no es marquen—), fa una còpia de seguretat al Drive i es pot desfer. Detecta alumnes duplicats i els fusiona conservant notes, classe i Classroom.
+- **Classroom:** en afegir un alumne nou des de l'aparellament, es busca primer als Llistats i agafa la classe d'allà.
+- Columna Classe una mica més ampla. Arreglat un conflicte intern entre dos quadres de diàleg.
+
 **Tanda 3c (5/11/2026, en proves)**
 - **Botó 📅** al costat del nom de la columna: posa la data d'avui («dc 05/11») al final del nom o on hi ha el cursor; el nom es continua podent escriure. Si ja hi ha una columna amb aquest nom, hi afegeix «(2)».
 - **⧉ Duplica** al quadre d'edició d'una columna: crea una còpia buida al costat, amb el mateix tipus, categoria i opcions i la data d'avui al nom, i l'obre per retocar-la.
