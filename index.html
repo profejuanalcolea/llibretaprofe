@@ -65,7 +65,7 @@ main{padding:12px 16px 40px}
 .btn:hover{background:var(--tar)}
 .btn.sec{background:#fff;color:var(--neg);border:1.5px solid var(--neg)}
 .btn.sec:hover{border-color:var(--tar);color:var(--tar)}
-.btn.perill{background:#b00020}
+.btn.perill{background:#b00020}.btn.sec.perill{background:#fff;color:#b00020;border-color:#b00020}
 .btn:disabled{opacity:.4;cursor:default}
 .capw .llegenda{background:transparent;padding:5px 0 0;margin:6px 0 0;border-top:1px solid rgba(0,0,0,.08);border-radius:0}
 .llegenda .chip{padding:1px 9px 1px 3px;font-size:13px}
@@ -266,6 +266,8 @@ body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{g
 #tw tbody td:not(.fx){position:relative}td.anh{box-shadow:inset 0 0 0 3px #ffe600}td.anh input.g,td.anh select.g{background:#fff9b0!important}.vrow.anh,.mbal.anh{background:#fff9b0!important}
 .antri{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid #e65100;border-left:9px solid transparent;pointer-events:none}
 #soBar{display:inline-flex;gap:6px}
+#pestOv{position:fixed;inset:0;z-index:2000;background:rgba(20,20,20,.72);display:flex;align-items:center;justify-content:center}
+.pestbox{background:#fff;border-radius:14px;padding:22px 26px;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,.4)}.pestbox h3{margin:0 0 8px}
 .alietag{font-size:12px;color:#ffd7a8;border:1px solid #8a5a2b;border-radius:6px;padding:2px 7px;white-space:nowrap}
 #soBar{position:relative}
 #soLlista{position:absolute;top:calc(100% + 8px);right:0;z-index:710;background:#fff;color:#111;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);padding:6px;min-width:330px}
@@ -689,7 +691,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 3a)',COMPILACIO='5/11 11:22';
+const VERSIO='2.2 · ammonite · en proves (tanda 3b)',COMPILACIO='5/11 16:26';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -961,7 +963,7 @@ const idb={db:null,
   async get(k){try{const db=await this.open();return await new Promise(res=>{const q=db.transaction('h').objectStore('h').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>res(null)})}catch{return null}},
   async set(k,v){try{const db=await this.open();await new Promise(res=>{const t=db.transaction('h','readwrite');t.objectStore('h').put(v,k);t.oncomplete=res;t.onerror=res})}catch{}}};
 
-function save(lbl,noHist){if(!state)return;if(!noHist)registra(lbl||'canvi');state.savedAt=Date.now();
+function save(lbl,noHist){if(!state||bloqPest)return;if(!noHist)registra(lbl||'canvi');state.savedAt=Date.now();
   if(mode==='drive'){G.brut=true;guardaCache();clearTimeout(pend);pend=setTimeout(driveDesa,1200);estat();return}
   try{localStorage.setItem(LS,JSON.stringify(state))}catch{}
   clearTimeout(pend);pend=setTimeout(escriuFitxer,700);estat()}
@@ -1074,8 +1076,8 @@ async function driveEntra(){
     if(!G.email){try{const ab=await (await gf('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)')).json();G.email=ab.user?.emailAddress||'';if(G.email&&!esAlie())localStorage.setItem('llibreta-email',G.email)}catch{}}
     const q=encodeURIComponent(`name='${FNAME}' and trashed=false and not appProperties has { key='copia' and value='1' }`);
     const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id,appProperties)&orderBy=modifiedTime desc&spaces=drive`)).json();
-    const cache=llegeixCache();
-    if(r.files?.length){G.fileId=r.files[0].id;const remot=r.files[0].appProperties?.rev||null;G.rev=remot;
+    const cache=llegeixCache();let propsRemot=null;
+    if(r.files?.length){G.fileId=r.files[0].id;const remot=r.files[0].appProperties?.rev||null;G.rev=remot;propsRemot=r.files[0].appProperties;
       const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();if(!valida(d))throw new Error('El fitxer del Drive no és una llibreta vàlida.');
       mode='drive';localStorage.setItem(LSMODE,'drive');
       if(cache&&cache.pendent&&cache.fileId===G.fileId){
@@ -1089,14 +1091,34 @@ async function driveEntra(){
       if(usa){const r2=await pregunta('Primera vegada al Drive','Encara no hi ha cap llibreta al teu Drive. Vols pujar-hi les dades que tens en aquest ordinador?',[{t:'Comença de zero',v:'no',cls:'sec'},{t:'Puja-les',v:'si'}]);if(r2!=='si')usa=null}
       state=usa||migra(demo());mode='drive';localStorage.setItem(LSMODE,'drive');iniciaHist();await driveCrea();G.brut=false;guardaCache();render()}
     $('#login').style.display='none';estat();pintaAlie();toast('Connectat al Drive. Els canvis es desen sols.');
+    avisAltreOrdinador(propsRemot);saludaPestanyes();
     comprovaCopia().catch(e=>console.error(e))}
   catch(e){console.error(e);$('#lgMsg').textContent=e.message==='offline'?'No hi ha connexió a internet.':'No s\'ha pogut entrar: '+e.message+'. Si diu que l\'aplicació està bloquejada, ho ha d\'autoritzar l\'administrador del domini.'}}
 /* Treballar sense connexió amb la còpia guardada en aquest ordinador */
 function entraOffline(){const c=llegeixCache();if(!c)return;mode='drive';G.fileId=c.fileId;G.rev=c.rev;G.brut=!!c.pendent;G.offline=!navigator.onLine||G.offline;
-  carrega(c.state);$('#login').style.display='none';estat();toast('Treballes amb la còpia d\'aquest ordinador. Quan torni la connexió, clica el núvol per pujar els canvis.',6000)}
+  carrega(c.state);$('#login').style.display='none';estat();saludaPestanyes();toast('Treballes amb la còpia d\'aquest ordinador. Quan torni la connexió, clica el núvol per pujar els canvis.',6000)}
+/* E. Llibreta oberta en dues pestanyes o en dos ordinadors */
+const NAVID=(()=>{const k='llibreta-nav';try{const st=esAlie()?sessionStorage:localStorage;let v=st.getItem(k);if(!v){v=Math.random().toString(36).slice(2,10);st.setItem(k,v)}return v}catch{return 'x'+Math.random().toString(36).slice(2,8)}})();
+const PESTID=Math.random().toString(36).slice(2,10);
+const marcaDesat=()=>({nav:NAVID,ts:String(Date.now())});
+function avisAltreOrdinador(props){if(!props?.nav||props.nav===NAVID)return;const fa=(Date.now()-(+props.ts||0))/60000;if(!(fa>=0&&fa<15))return;
+  pregunta('Potser és oberta en un altre lloc',`La llibreta s'ha desat des d'un altre ordinador o navegador fa ${Math.max(1,Math.round(fa))} min. Si s'hi treballa alhora, es poden perdre canvis: tanca-la a l'altre lloc abans de continuar aquí.`,[{t:'Entesos',v:1}])}
+let bloqPest=false;
+function bloquejaPestanya(txt){bloqPest=true;clearTimeout(pend);pend=null;let o=$('#pestOv');if(!o){o=document.createElement('div');o.id='pestOv';document.body.appendChild(o)}
+  o.innerHTML=`<div class="pestbox"><h3>La llibreta és oberta en una altra pestanya</h3><p>${txt}</p><button class="btn" id="pestTorna">Treballa en aquesta pestanya</button></div>`;
+  $('#pestTorna').onclick=()=>{try{canal?.postMessage({t:'cedeix',de:PESTID})}catch{}location.reload()}}
+let canal=null;try{canal=new BroadcastChannel('llibreta-del-profe')}catch{}
+if(canal)canal.onmessage=async e=>{const m=e.data||{};if(m.de===PESTID)return;
+  if(m.t==='hola'&&state&&!bloqPest)canal.postMessage({t:'aqui',de:PESTID,a:m.de});
+  else if(m.t==='aqui'&&m.a===PESTID&&!bloqPest&&!avisPest){avisPest=true;
+    const r=await pregunta('La llibreta ja és oberta en una altra pestanya','Si treballes en dues pestanyes alhora, una pot trepitjar els canvis de l\'altra. Tria on vols treballar.',[{t:'Tanca aquesta',v:'tanca',cls:'sec'},{t:'Treballa aquí',v:'aqui'}]);
+    if(r==='aqui'){canal.postMessage({t:'cedeix',de:PESTID})}else bloquejaPestanya('Has triat treballar a l\'altra pestanya. Ja pots tancar aquesta.')}
+  else if(m.t==='cedeix'&&!bloqPest){if(G.brut)await driveDesa();bloquejaPestanya('S\'ha començat a treballar en una altra pestanya. Aquesta ha quedat aturada perquè no es trepitgin els canvis.')}};
+let avisPest=false;
+function saludaPestanyes(){try{canal?.postMessage({t:'hola',de:PESTID})}catch{}}
 function cosMultipart(meta,dades){const b='llibreta'+uid();
   return{b,body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${JSON.stringify(dades??state)}\r\n--${b}--`}}
-async function driveCrea(){const rev=uid();const{b,body}=cosMultipart({name:FNAME,mimeType:'application/json',appProperties:{rev}});
+async function driveCrea(){const rev=uid();const{b,body}=cosMultipart({name:FNAME,mimeType:'application/json',appProperties:{rev,...marcaDesat()}});
   const r=await (await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
   G.fileId=r.id;G.rev=rev}
 async function driveDesa(forca=false){
@@ -1109,7 +1131,8 @@ async function driveDesa(forca=false){
       const r=await pregunta('La llibreta ha canviat en un altre lloc','S\'ha desat la llibreta des d\'un altre ordinador o pestanya després que l\'obrissis aquí. Si desaràs ara, trepitjaràs aquells canvis.',[{t:'Carrega la del Drive (perdo els d\'aquí)',v:'load',cls:'sec'},{t:'Desa la meva igualment',v:'force'}]);
       if(r==='load'){const d=await (await gf(`${DRIVE}/${G.fileId}?alt=media`)).json();G.rev=remot;G.brut=false;carrega(d);guardaCache();estat();return}
       if(r==='force')return driveDesa(true);estat();return}
-    const rev=uid();const{b,body}=cosMultipart({appProperties:{rev}});
+    if(bloqPest){G.saving=false;estat();return}
+    const rev=uid();const{b,body}=cosMultipart({appProperties:{rev,...marcaDesat()}});
     await gf(`${UPL}/${G.fileId}?uploadType=multipart&fields=id`,{method:'PATCH',headers:{'Content-Type':'multipart/related; boundary='+b},body});
     G.rev=rev;if(state.savedAt===enviat)G.brut=false;guardaCache();
     estat.ultim=new Date().toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'})}
@@ -1783,6 +1806,12 @@ async function fesPDF(llibretes,ambIndex){await carregaPDF();const doc=new windo
   if(ambIndex){doc.setPage(1);doc.autoTable({startY:36,margin:{left:10,right:10},theme:'plain',styles:{fontSize:11},head:[['Llibreta','Pàgina']],body:idx.map(([n,p])=>[n,String(p)]),columnStyles:{1:{halign:'right',cellWidth:30}},
     didDrawCell:d=>{if(d.section==='body'){const pg=idx[d.row.index][1];doc.link(d.cell.x,d.cell.y,d.cell.width,d.cell.height,{pageNumber:pg})}}})}
   peus(doc);return doc}
+async function pujaPDF(doc,nom){const blob=doc.output('blob');
+  let fid;const q=encodeURIComponent(`name='${CARPDF}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+  const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id)&spaces=drive`)).json();fid=r.files?.[0]?.id;
+  if(!fid)fid=(await (await gf(`${DRIVE}?fields=id`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:CARPDF,mimeType:'application/vnd.google-apps.folder'})})).json()).id;
+  const bd='pdf'+uid(),cos=new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:nom,mimeType:'application/pdf',parents:[fid]})}\r\n--${bd}\r\nContent-Type: application/pdf\r\n\r\n`,blob,`\r\n--${bd}--`]);
+  await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+bd},body:cos})}
 async function pdfAlDrive(sub){if(mode!=='drive')return toast('Per desar al Drive cal entrar amb Google. Pots descarregar-lo des de ⚙ Configuració.');
   const b=$('#aPdf');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
   try{const doc=await fesPDF([sub],false),blob=doc.output('blob'),nom=nomFitxer(`${avui()} · ${sub.name}.pdf`);
@@ -2080,22 +2109,45 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
 /* ======================= Arxiu ======================= */
 function catsArxiu(){return [...new Set(state.subjects.filter(s=>s.archived).map(s=>s.archived.cat||''))]}
 function rArxiu(){const arx=state.subjects.filter(s=>s.archived);
-  let h=`<div class="cap"><span class="capic">🗄️</span><div><h1>Arxiu</h1><div class="capsub">${arx.length} llibreta${arx.length===1?'':'s'} arxivada${arx.length===1?'':'s'} · només lectura</div></div></div>`;
+  let h=`<div class="cap"><span class="capic">🗄️</span><div><h1>Arxiu</h1><div class="capsub">${arx.length} ${arx.length===1?'llibreta arxivada':'llibretes arxivades'} · només lectura</div></div></div>`;
   if(!arx.length){$('#main').innerHTML=h+'<div class="buit">No hi ha cap llibreta arxivada. Pots arxivar-ne una des de <b>Configuració</b>.</div>';return}
   /* carpetes de curs de la més nova a la més antiga; després la resta per ordre alfabètic; «Sense categoria» al final */
   const esCurs=k=>/^Curs \d{4}-\d{2}$/.test(k);
   const cats=catsArxiu().sort((a,b)=>a===''?1:b===''?-1:esCurs(a)&&esCurs(b)?b.localeCompare(a):esCurs(a)?-1:esCurs(b)?1:a.localeCompare(b,'ca'));
   h+=`<datalist id="llCatsA">${suggCats().map(c=>`<option value="${esc(c)}">`).join('')}</datalist>`;
-  h+=cats.map(k=>`<div class="seccio"><h2>📁 ${esc(k||'Sense categoria')}${k?`<button class="btn sec" style="padding:2px 9px;font-size:13px" data-acren="${esc(k)}" title="Canvia el nom d'aquesta categoria a totes les llibretes">✎ Canvia el nom</button>`:''}</h2><div class="fitxes">${arx.filter(s=>(s.archived.cat||'')===k).sort((x,y)=>(x.tipus==='llista')-(y.tipus==='llista')||x.name.localeCompare(y.name,'ca')).map(s=>`
+  h+=cats.map(k=>`<div class="seccio"><h2>📁 ${esc(k||'Sense categoria')}${k?`<button class="btn sec" style="padding:2px 9px;font-size:13px" data-acren="${esc(k)}" title="Canvia el nom d'aquesta categoria a totes les llibretes">✎ Canvia el nom</button>`:''}<button class="btn sec" style="padding:2px 9px;font-size:13px" data-acpdf="${esc(k)}" title="Desa al Drive un PDF amb totes les llibretes d'aquesta carpeta">PDF de la carpeta</button><button class="btn sec perill" style="padding:2px 9px;font-size:13px" data-acdel="${esc(k)}" title="Esborra per sempre totes les llibretes d'aquesta carpeta">Esborra la carpeta</button></h2><div class="fitxes">${arx.filter(s=>(s.archived.cat||'')===k).sort((x,y)=>(x.tipus==='llista')-(y.tipus==='llista')||x.name.localeCompare(y.name,'ca')).map(s=>`
     <div class="fitxa" style="width:280px;cursor:default"><span class="fi">${s.icon||'📘'}</span><div style="flex:1;min-width:0"><div>${esc(s.name)}</div>
       <div style="font-size:12px;color:var(--suau);font-weight:400">${s.tipus==='llista'?'<span class="tipll">📋 llista</span> ':'<span class="tipll nt">📘 notes</span> '}${s.students.length} alumnes · arxivada ${esc((s.archived.data||'').split('-').reverse().join('/'))}</div>
       <div class="fl" style="margin:6px 0 0;font-size:12px;font-weight:400">📁 <input type="text" list="llCatsA" class="acat" value="${esc(s.archived.cat||'')}" data-acat="${s.id}" placeholder="Sense categoria" title="Categoria: escriu-ne una de nova o tria'n una"></div>
-      <div class="fl" style="margin:6px 0 0"><button class="btn sec" style="padding:4px 9px" data-obre="${s.id}">Obre</button><button class="btn sec" style="padding:4px 9px" data-desarx="${s.id}">Desarxiva</button></div></div></div>`).join('')}</div></div>`).join('');
+      <div class="fl" style="margin:6px 0 0"><button class="btn sec" style="padding:4px 9px" data-obre="${s.id}">Obre</button><button class="btn sec" style="padding:4px 9px" data-desarx="${s.id}">Desarxiva</button>
+        <button class="btn sec" style="padding:4px 9px" data-axpdf="${s.id}" title="Desa'n el PDF al Drive">PDF</button><button class="btn sec perill" style="padding:4px 9px" data-axdel="${s.id}" title="Esborra-la per sempre">Esborra</button></div></div></div>`).join('')}</div></div>`).join('');
   $('#main').innerHTML=h;
   $$('[data-acat]').forEach(i=>i.onchange=()=>{const s=state.subjects.find(x=>x.id===i.dataset.acat);s.archived.cat=i.value.trim();save('categoria de l\'arxiu');rArxiu()});
   $$('[data-acren]').forEach(b=>b.onclick=async()=>{const k=b.dataset.acren,n=await demana('Canvia el nom de la categoria',`Nou nom per a «${k}»:`,k);if(!n||!n.trim()||n.trim()===k)return;
     state.subjects.forEach(s=>{if(s.archived&&(s.archived.cat||'')===k)s.archived.cat=n.trim()});save('categoria de l\'arxiu');rArxiu()});
-  $$('[data-obre]').forEach(b=>b.onclick=()=>{state.cur=b.dataset.obre;tab='llibreta';render()})}
+  $$('[data-obre]').forEach(b=>b.onclick=()=>{state.cur=b.dataset.obre;tab='llibreta';render()});
+  const deCat=k=>state.subjects.filter(s=>s.archived&&(s.archived.cat||'')===k);
+  $$('[data-axpdf]').forEach(b=>b.onclick=()=>exportaArx([state.subjects.find(x=>x.id===b.dataset.axpdf)]));
+  $$('[data-acpdf]').forEach(b=>b.onclick=()=>exportaArx(deCat(b.dataset.acpdf),b.dataset.acpdf||'Sense categoria'));
+  $$('[data-axdel]').forEach(b=>b.onclick=()=>esborraArx([state.subjects.find(x=>x.id===b.dataset.axdel)]));
+  $$('[data-acdel]').forEach(b=>b.onclick=()=>esborraArx(deCat(b.dataset.acdel),b.dataset.acdel||'Sense categoria'))}
+/* Arxiu: exportar a PDF (al Drive o, sense Drive, descarregat) i esborrar per sempre */
+async function exportaArx(subs,carpeta){if(!subs.length)return false;toast('⏳ Generant el PDF…',2000);
+  const nom=nomFitxer(`${avui()} · Arxiu · ${carpeta||subs[0].name}.pdf`);
+  try{const doc=await fesPDF(subs,subs.length>1);
+    if(mode==='drive'){try{await pujaPDF(doc,nom);toast(`PDF desat al Drive: «${CARPDF}» › ${nom}`,6000);return true}catch(e){if(e.message!=='offline'&&e.message!=='reauth')console.error(e);doc.save(nom);toast('No s\'ha pogut desar al Drive: s\'ha descarregat a l\'ordinador.',6000);return true}}
+    doc.save(nom);toast('PDF descarregat.');return true}
+  catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000);return false}}
+async function esborraArx(subs,carpeta){subs=subs.filter(Boolean);if(!subs.length)return;
+  const nom=carpeta||subs[0].name,quines=carpeta?`la carpeta «${carpeta}» (${subs.length} ${subs.length===1?'llibreta':'llibretes'})`:`la llibreta «${subs[0].name}»`;
+  const r=await pregunta('Esborrar per sempre',`Vas a esborrar ${quines} amb totes les notes i alumnes. Abans, vols desar-ne el PDF?`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Només esborra',v:'nomes',cls:'sec'},{t:'Exporta el PDF i esborra',v:'pdf'}]);
+  if(!r)return;if(r==='pdf'&&!await exportaArx(subs,carpeta))return;
+  const t=await pregunta('Confirma l\'esborrat',`Per confirmar-ho, escriu el nom: ${nom}`,[{t:'Cancel·la',v:false,cls:'sec'},{t:'Esborra per sempre',v:true,cls:'perill'}],'');
+  if(t===false||t===null||t===undefined)return;if(norm(String(t).trim())!==norm(nom))return toast('El nom no coincideix: no s\'ha esborrat res.',5000);
+  const ids=new Set(subs.map(s=>s.id));state.subjects=state.subjects.filter(s=>!ids.has(s.id));
+  if(!state.subjects.length)state.subjects.push(novaSub('Nova llibreta','eso'));if(!state.subjects.some(s=>s.id===state.cur))state.cur=(actives()[0]||state.subjects[0]).id;
+  save(`esborrar ${subs.length===1?'llibreta':'carpeta'} de l'arxiu`);render();
+  toast(`Esborrat. Ho pots desfer amb ↶ mentre no tanquis la llibreta. Les còpies setmanals del Drive encara en poden tenir dades unes setmanes.`,8000)}
 function desarxiva(id){const s=state.subjects.find(x=>x.id===id);if(!s)return;s.archived=null;state.cur=s.id;save();render();toast('Llibreta desarxivada.')}
 /* El curs canvia l'1 de setembre */
 function cursKey(d=new Date()){const y=d.getMonth()>=8?d.getFullYear():d.getFullYear()-1;return `${y}-${String(y+1).slice(2)}`}
@@ -2185,7 +2237,7 @@ document.addEventListener('paste',async e=>{const el=document.activeElement;if(!
   const colIds=tds.slice(c0).map(t=>t.dataset.c);
   const nR=Math.min(rows.length,trs.length-r0),nC=Math.min(Math.max(...rows.map(r=>r.length)),colIds.length);
   if(rows.length>nR||Math.max(...rows.map(r=>r.length))>nC)toast('Hi ha més dades que caselles: s\'han retallat.');
-  const res=await pregunta('Enganxar de l\'Excel',`S'ompliran ${nR} alumne${nR===1?'':'s'} × ${nC} columna${nC===1?'':'s'}, començant per ${trs[r0].querySelector('.nomc')?.textContent||''}. Les caselles amb text no vàlid es deixaran com estaven. Ho podràs desfer amb «↶ Desfés».`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Enganxa',v:1}]);
+  const res=await pregunta('Enganxar de l\'Excel',`S'ompliran ${nR} alumne${nR===1?'':'s'} × ${nC} ${nC===1?'columna':'columnes'}, començant per ${trs[r0].querySelector('.nomc')?.textContent||''}. Les caselles amb text no vàlid es deixaran com estaven. Ho podràs desfer amb «↶ Desfés».`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Enganxa',v:1}]);
   if(!res)return;snapshot(sub);let ok=0,ko=0;
   for(let i=0;i<nR;i++)for(let j=0;j<nC;j++){const c=sub.columns.find(x=>x.id===colIds[j]);const raw=rows[i][j];if(raw===undefined)continue;
     if(!ENGANXABLES.includes(c.type)){ko++;continue}const r=valorDe(sub,c,raw);if(!r.ok){ko++;continue}setG(sub,c.id,trs[r0+i].dataset.s,r.val,true);ok++}

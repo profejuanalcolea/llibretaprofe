@@ -1,6 +1,12 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.2 · ammonite · en preparació
+**Tanda 3b (5/11/2026, en proves)**
+- **Dues pestanyes:** si s'obre la llibreta en una segona pestanya del mateix navegador, avisa i deixa triar «Treballa aquí» (l'altra pestanya queda aturada i no desa) o «Tanca aquesta».
+- **Dos ordinadors:** en entrar, si la llibreta s'ha desat des d'un altre ordinador o navegador fa menys de 15 minuts, avisa. En desar, si el Drive ha canviat, no trepitja els canvis (com ja feia).
+- **Arxiu:** botons «PDF» i «Esborra» a cada llibreta i «PDF de la carpeta» / «Esborra la carpeta» a cada carpeta. El PDF es desa al Drive. Per esborrar, proposa exportar abans i cal escriure el nom per confirmar; es pot desfer amb ↶ mentre la llibreta és oberta.
+- Plurals corregits («llibretes arxivades», «columnes»).
+
 **Tanda 3a (5/11/2026, en proves)**
 - **«És el teu ordinador?»:** es pregunta la primera vegada que s'entra amb Google en un navegador. En un ordinador d'una altra persona, la còpia només dura mentre la pestanya és oberta, no es desa el correu, surt l'etiqueta «Ordinador d'una altra persona» i, en sortir, es recorda tancar la sessió de Google. Botó «Esborra la còpia d'aquest ordinador» a ⚙ › Dades.
 - **Arxiu:** carpetes de curs de la més nova a la més antiga; en arxivar es proposa el curs actual (i s'hi posa si es deixa buit); dins de cada carpeta, primer les llibretes i després les llistes, amb una etiqueta «notes» o «llista».

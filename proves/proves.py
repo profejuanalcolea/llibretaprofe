@@ -606,9 +606,11 @@ def p_ordinador(b):
     pg.click('#qBtns button:has-text("Sí, és meu")'); pg.wait_for_timeout(1500)
     comprova(pg.evaluate("localStorage.getItem('llibreta-ordinador')") == 'meu' and pg.evaluate("!!localStorage.getItem('llibreta-drive-cache')"), 'en un ordinador propi no es guarda la còpia')
     comprova(not pg.locator('#alieTag').is_visible(), 'surt l\'etiqueta d\'ordinador aliè en un de propi')
+    pg.wait_for_timeout(2500)   # que acabi el desat abans de recarregar
     pg.reload(); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(1200)
     comprova(not (pg.is_visible('#dlgQ') and 'És el teu ordinador' in pg.inner_text('#qTit')), 'torna a preguntar en un ordinador que ja és propi: '+(pg.inner_text('#qTit') if pg.is_visible('#dlgQ') else ''))
     # botó d'esborrar
+    comprova(not pg.is_visible('#dlgQ'), 'diàleg inesperat després de tornar a entrar: '+(pg.inner_text('#qTit') if pg.is_visible('#dlgQ') else ''))
     pg.evaluate("tab='config';render()"); pg.wait_for_timeout(150); pg.evaluate("document.querySelector('details[data-cfg=dades]').open=true")
     pg.click('#dEsbOrd'); pg.click('#qBtns button:has-text("Esborra")'); pg.wait_for_timeout(300)
     comprova(pg.evaluate("localStorage.getItem('llibreta-drive-cache')") is None and pg.evaluate("localStorage.getItem('llibreta-ordinador')") is None, 'el botó no esborra la còpia')
@@ -638,7 +640,7 @@ def p_arxiu2(b):
       mk('Bio vella','notes','Curs 2024-25');mk('Excursió','llista','Curs 2025-26');mk('Bio','notes','Curs 2025-26');mk('Reunions','llista','Altres');mk('Solta','notes','');save();tab='arxiu';render()})()""")
     pg.wait_for_timeout(200)
     h = pg.locator('#main .seccio h2').all_inner_texts()
-    ordre = [x.split('✎')[0].replace('📁', '').strip() for x in h]
+    ordre = [x.split('\n')[0].split('✎')[0].split('PDF de la carpeta')[0].replace('📁', '').strip() for x in h]
     comprova(ordre == ['Curs 2025-26', 'Curs 2024-25', 'Altres', 'Sense categoria'], f'ordre de les carpetes: {ordre}')
     primera = pg.locator('#main .seccio').first.locator('.fitxa').all_inner_texts()
     comprova('Bio' in primera[0] and 'notes' in primera[0] and 'llista' in primera[1], f'dins del curs, llibretes i llistes: {primera}')
@@ -653,12 +655,85 @@ def p_arxiu2(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Dues pestanyes i dos ordinadors: avís en obrir, una pestanya cedeix i no es trepitgen els canvis')
+def p_pestanyes(b):
+    FILES = {}
+    def ctx_nou():
+        c = b.new_context(viewport={'width': 1400, 'height': 850}); c.add_init_script(INIT); c.route('**/*', google_amb(FILES)); return c
+    def entra(pg):
+        pg.goto(URL); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(1500)
+    c1 = ctx_nou(); p1 = c1.new_page(); entra(p1)
+    p1.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[0].id,1)})()"); p1.wait_for_timeout(2500)
+    # mateix navegador, pestanya nova: avís de pestanya, i NO l'avís d'un altre ordinador
+    p2 = c1.new_page(); entra(p2)
+    comprova(p2.is_visible('#dlgQ') and 'altra pestanya' in p2.inner_text('#qTit'), 'la segona pestanya no avisa')
+    p2.click('#qBtns button:has-text("Treballa aquí")'); p2.wait_for_timeout(400)
+    comprova(p1.locator('#pestOv').is_visible(), 'la primera pestanya no queda aturada')
+    p1.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[0].id,9)})()"); p1.wait_for_timeout(2500)
+    def nota0():
+        d = json.loads([f for f in FILES.values() if f.get('name') == 'llibreta-notes.json'][0]['content'])
+        sub = [x for x in d['subjects'] if x['name'] == 'EXEMPLE'][0]; c = [x for x in sub['columns'] if x['type'] == 'num'][0]
+        return sub['grades'][c['id']].get(sub['students'][0]['id'])
+    comprova(nota0() == 1, f'la pestanya aturada encara desa al Drive (nota {nota0()})')
+    comprova(p1.evaluate('G.brut') is False, 'la pestanya aturada marca canvis pendents')
+    # «Tanca aquesta» a la pestanya nova
+    p3 = c1.new_page(); entra(p3)
+    comprova(p3.is_visible('#dlgQ') and 'altra pestanya' in p3.inner_text('#qTit'), 'la tercera pestanya no avisa')
+    p3.click('#qBtns button:has-text("Tanca aquesta")'); p3.wait_for_timeout(300)
+    comprova(p3.locator('#pestOv').is_visible() and not p2.locator('#pestOv').is_visible(), '«Tanca aquesta» no atura la pestanya nova o atura l\'altra')
+    # un altre ordinador (un altre navegador) fa menys de 15 minuts
+    c2 = ctx_nou(); q = c2.new_page(); entra(q)
+    comprova(q.is_visible('#dlgQ') and 'altre lloc' in q.inner_text('#qTit'), 'un altre ordinador no avisa')
+    q.click('#qBtns button'); q.wait_for_timeout(200)
+    # conflicte en desar: p2 desa després que q hagi desat
+    q.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[1].id,4)})()"); q.wait_for_timeout(2500)
+    p2.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[2].id,5)})()"); p2.wait_for_timeout(2500)
+    comprova(p2.is_visible('#dlgQ') and 'canviat en un altre lloc' in p2.inner_text('#qTit'), 'en desar no avisa que el Drive ha canviat')
+    c1.close(); c2.close()
+    # el mateix navegador, més tard: no avisa d'un altre ordinador
+    c3 = ctx_nou(); r = c3.new_page(); r.goto(URL); r.evaluate("localStorage.setItem('llibreta-nav','zz')")
+    FILES_ = [f for f in FILES.values() if f.get('name') == 'llibreta-notes.json'][0]; FILES_['props']['nav'] = 'zz'
+    r.reload(); r.wait_for_timeout(300); r.click('#lgEntra'); r.wait_for_timeout(1500)
+    comprova(not (r.is_visible('#dlgQ') and 'altre lloc' in r.inner_text('#qTit')), 'avisa d\'un altre ordinador quan és el mateix navegador')
+    c3.close()
+
+@prova('Arxiu: exportar a PDF i esborrar (amb confirmació escrivint el nom, i es pot desfer)')
+def p_arxiu3(b):
+    if not NPM: raise Omesa('cal PROVES_NPM per al PDF')
+    ctx, pg = pagina_local(b)
+    pg.evaluate("""(()=>{const mk=(n,cat)=>{const s=novaSub(n,'eso','📗');s.archived={cat,data:'2025-06-30'};state.subjects.push(s)};
+      mk('Bio vella','Curs 2024-25');mk('Geo vella','Curs 2024-25');mk('Bio','Curs 2025-26');save();tab='arxiu';render()})()"""); pg.wait_for_timeout(200)
+    n0 = pg.evaluate("state.subjects.length")
+    # exportar una fitxa: va al Drive (simulat)
+    pg.locator('.fitxa', has_text='Bio').filter(has_not_text='vella').locator('[data-axpdf]').click(); pg.wait_for_timeout(2500)
+    comprova(any('Arxiu · Bio' in (n or '') for n in PDFS), f'no s\'ha desat el PDF al Drive: {PDFS}')
+    # esborrar una carpeta: cancel·lar no fa res
+    sec = pg.locator('.seccio', has_text='Curs 2024-25')
+    sec.locator('[data-acdel]').click(); pg.wait_for_timeout(150)
+    comprova('2 llibretes' in pg.inner_text('#qTxt'), 'la pregunta no diu quantes llibretes s\'esborraran: ' + pg.inner_text('#qTit') + ' / ' + pg.inner_text('#qTxt'))
+    pg.click('#qBtns button:has-text("Cancel·la")'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("state.subjects.length") == n0, 'Cancel·la ha esborrat alguna cosa')
+    # nom equivocat: no esborra
+    sec.locator('[data-acdel]').click(); pg.click('#qBtns button:has-text("Només esborra")'); pg.wait_for_timeout(150)
+    pg.fill('#qIn', 'curs 2024'); pg.click('#qBtns button:has-text("Esborra per sempre")'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("state.subjects.length") == n0, 'amb el nom equivocat s\'ha esborrat')
+    # exporta i esborra, amb el nom correcte (sense distingir majúscules)
+    sec.locator('[data-acdel]').click(); pg.click('#qBtns button:has-text("Exporta el PDF i esborra")'); pg.wait_for_timeout(3000)
+    pg.fill('#qIn', 'curs 2024-25'); pg.click('#qBtns button:has-text("Esborra per sempre")'); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("state.subjects.length") == n0 - 2 and pg.locator('.seccio', has_text='Curs 2024-25').count() == 0, 'no s\'ha esborrat la carpeta')
+    comprova(sum('Curs 2024-25' in (n or '') for n in PDFS) == 1, f'«Exporta i esborra» no ha desat el PDF de la carpeta: {PDFS}')
+    # desfer
+    pg.click('#btnUndo'); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("state.subjects.length") == n0, '↶ no recupera la carpeta esborrada')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
