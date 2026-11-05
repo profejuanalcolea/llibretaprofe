@@ -1,44 +1,35 @@
 # Historial de canvis · Llibreta del Profe
 
-## 2.2 · ammonite · en preparació
-**Tanda 4: classes (5/11/2026, en proves)**
-- **La classe ve dels Llistats del curs.** Per als alumnes vinculats als Llistats, canviar-los de grup als Llistats (o des de qualsevol llibreta) ho canvia a totes les llibretes actives. Les llibretes arxivades conserven la classe que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.
-- **Columna Classe amb noms sencers** («2n Batx A»): desapareixen els camps Nivell i Lletres. Migració automàtica; les classes de fantasma (sense cap alumne) desapareixen. Botó «Afegeix els grups dels llistats del curs».
-- **🔁 Recupera les classes dels llistats** (⚙ › Alumnes): mostra què canviarà abans d'aplicar-ho (omplir, vincular, diferents —que no es canvien si no es marquen—), fa una còpia de seguretat al Drive i es pot desfer. Detecta alumnes duplicats i els fusiona conservant notes, classe i Classroom.
-- **Classroom:** en afegir un alumne nou des de l'aparellament, es busca primer als Llistats i agafa la classe d'allà.
-- Columna Classe una mica més ampla. Arreglat un conflicte intern entre dos quadres de diàleg.
+## 2.2 · ammonite · novembre 2026
+Publicada per tandes entre el 4 i el 5 de novembre de 2026.
 
-**Tanda 3c (5/11/2026, en proves)**
-- **Botó 📅** al costat del nom de la columna: posa la data d'avui («dc 05/11») al final del nom o on hi ha el cursor; el nom es continua podent escriure. Si ja hi ha una columna amb aquest nom, hi afegeix «(2)».
-- **⧉ Duplica** al quadre d'edició d'una columna: crea una còpia buida al costat, amb el mateix tipus, categoria i opcions i la data d'avui al nom, i l'obre per retocar-la.
+**A l'aula**
+- **Sortides de l'aula (WC i sortides):** clic dret o doble clic al nom. Botó a la barra amb els minuts (agrupat a partir de 3 alumnes). Avís configurable (7 min) amb el cucut sonant fins a «Esperem» o «Ja ha tornat». Consulta, còpia i PDF a Eines › Sortides. Es buida en començar el curs (amb opció de PDF).
+- **Bloc de notes** amb pestanyes i els **pòsits** al costat, en una pantalla pròpia (icona a la barra amb el número d'avís). Els pòsits surten d'Eines.
+- **Temporitzador:** sons nous 🎧 ritme urbà i 🐦 cucut (originals).
+- **Calculadora** amb càlcul propi (no executa el text com a codi), «2(3+1)» i missatges d'error clars.
 
-**Tanda 3b (5/11/2026, en proves)**
-- **Dues pestanyes:** si s'obre la llibreta en una segona pestanya del mateix navegador, avisa i deixa triar «Treballa aquí» (l'altra pestanya queda aturada i no desa) o «Tanca aquesta».
-- **Dos ordinadors:** en entrar, si la llibreta s'ha desat des d'un altre ordinador o navegador fa menys de 15 minuts, avisa. En desar, si el Drive ha canviat, no trepitja els canvis (com ja feia).
-- **Arxiu:** botons «PDF» i «Esborra» a cada llibreta i «PDF de la carpeta» / «Esborra la carpeta» a cada carpeta. El PDF es desa al Drive. Per esborrar, proposa exportar abans i cal escriure el nom per confirmar; es pot desfer amb ↶ mentre la llibreta és oberta.
-- Plurals corregits («llibretes arxivades», «columnes»).
+**Columnes i notes**
+- **Compta per a la nota** a totes les columnes de nota; si no compta, es queda a la categoria amb ⊘ al títol.
+- **«No ava»** (no avaluat): «nav», «noava» o «no ava»; taronja i no compta a la mitjana.
+- **Columna «Opcions»:** desplegable propi amb 2 a 6 opcions i colors, recompte i conversió opcional a assoliments. Les Icones ja no es proposen per a columnes noves.
+- **Textos llargs** a les columnes Lliure: rètol i punts suspensius.
+- **📅** posa la data d'avui al nom de la columna; **⧉ Duplica** crea una còpia buida amb la data.
 
-**Tanda 3a (5/11/2026, en proves)**
-- **«És el teu ordinador?»:** es pregunta la primera vegada que s'entra amb Google en un navegador. En un ordinador d'una altra persona, la còpia només dura mentre la pestanya és oberta, no es desa el correu, surt l'etiqueta «Ordinador d'una altra persona» i, en sortir, es recorda tancar la sessió de Google. Botó «Esborra la còpia d'aquest ordinador» a ⚙ › Dades.
-- **Arxiu:** carpetes de curs de la més nova a la més antiga; en arxivar es proposa el curs actual (i s'hi posa si es deixa buit); dins de cada carpeta, primer les llibretes i després les llistes, amb una etiqueta «notes» o «llista».
-- **Mida del fitxer** a ⚙ › Dades, amb avís a partir de 5 MB.
-- **Columnes que no compten:** ara només surt el símbol ⊘ en gris davant del nom (sense fons gris ni cursiva).
-- **Arreglat:** el resum dels minuts de l'avís de sortides a ⚙ no s'actualitzava fins a tornar a entrar.
+**Alumnes i classes**
+- **La classe ve dels Llistats del curs** i es propaga a totes les llibretes actives (les arxivades no es toquen). Columna Classe amb noms sencers, sense Nivell ni Lletres; migració automàtica i fora classes de fantasma.
+- **🔁 Recupera les classes dels llistats**, amb previsualització, còpia de seguretat, desfer i fusió de duplicats. Classroom busca els alumnes nous als Llistats.
 
-**Tanda 2 (4/11/2026, en proves)**
-- **Columnes que no compten:** casella «Compta per a la nota» a totes les columnes de nota. Si no compta, la columna es queda dins de la seva categoria però surt amb ⊘ i en cursiva, i a la vista alumne i al PDF hi diu «no compta».
-- **Valor «no ava» (no avaluat):** s'escriu «nav», «noava» o «no ava»; també als desplegables. Es veu en taronja i no compta a la mitjana. També es veu a «D'una altra llibreta» i als PDF.
-- **Columna «Opcions»:** desplegable amb 2 a 6 opcions pròpies, cadascuna amb color opcional. Recompte a la fila de totals. Pot comptar per a la nota (cada opció → un assoliment) o ser només informativa. Funciona a llibretes i llistes. Les Icones es deixen de proposar per a columnes noves (les que ja hi ha continuen funcionant).
-- **Arreglat:** la llista de columnes amagades quedava sempre oberta i tapava la taula (error que venia de la 2.1).
-
-**Tanda 1 (4/11/2026, en proves)**
-- **Sortides de l'aula:** clic dret o doble clic sobre el nom → 🚻 WC / 🚪 Sortida. Botó a la barra mentre l'alumne és fora; es clica quan torna. A partir de tres alumnes fora, un sol botó «🚻 N fora» amb la llista. Avís als 7 minuts (configurable a ⚙ › Sortides de l'aula) amb «Esperem» (3 minuts més) o «Ja ha tornat»; mentrestant sona el cucut sense parar. Consulta, còpia i PDF des de 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou (es pot exportar en PDF).
-- **Bloc de notes:** icona nova a la barra, pantalla pròpia amb pestanyes (＋, doble clic per canviar el nom, arrossegar per ordenar) i els **pòsits** a la dreta, que surten d'Eines. El número d'avís dels pòsits passa a la icona del Bloc. Esc torna a la llibreta.
-- **Temporitzador:** dos sons nous i originals, 🎧 ritme urbà i 🐦 cucut.
-- **Columnes Lliure:** rètol amb el text complet en passar el ratolí i punts suspensius quan no hi cap.
-- **Calculadora** amb càlcul propi (ja no executa el text com a codi), «2(3+1)», «:» per dividir i missatges d'error clars.
+**Dades i seguretat**
+- **«És el teu ordinador?»** i botó per esborrar la còpia d'aquest ordinador.
+- **Avís de dues pestanyes o dos ordinadors.**
 - **Empremta de seguretat (SRI)** a les biblioteques de PDF.
-- Proves automàtiques al repositori (`proves/`) i aquest historial de canvis.
+- **Arxiu per cursos:** de més nou a més antic, curs automàtic, llibretes i llistes distingides, PDF i esborrar (confirmant amb el nom). **Mida del fitxer** a ⚙ › Dades.
+
+**Altres**
+- Ajuda i instruccions posades al dia.
+- Arreglats: la llista de columnes amagades quedava oberta; el resum dels minuts de sortides; plurals («llibretes», «columnes»); un id de diàleg duplicat.
+- Proves automàtiques (`proves/`) i aquest historial de canvis.
 
 ## 2.1 · ammonite · novembre 2026
 - **Google Classroom (només lectura):** connectar una llibreta a un curs, aparellar alumnes, importar tasques i notes, enllaç directe al curs.

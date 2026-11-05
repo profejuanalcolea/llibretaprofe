@@ -697,7 +697,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 4)',COMPILACIO='5/11 20:40';
+const VERSIO='2.2 · ammonite · novembre 2026',COMPILACIO='5/11 20:54';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -2097,13 +2097,34 @@ function rDades(dins){const el=dins?$('#dades'):$('#main');
 
 function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalcolea.github.io/llibretaprofe/':location.href.split('#')[0].split('?')[0];
   const sec=(t,h)=>`<details class="ajs"><summary>${t}</summary><div>${h}</div></details>`;
-  return cfgDet('ajuda','❓ Ajuda i instruccions','dreceres, companys del centre, portar-la a un altre centre',
-  sec('Com es desa',`<ul><li>Cada canvi es desa sol al fitxer <b>${FNAME}</b> del teu Google Drive. El núvol de dalt indica l'estat: <b>☁ 11:48</b> vol dir desat a aquella hora; <b>☁ …</b>, desant; <b>☁✕</b>, sense connexió (les notes es guarden en aquest ordinador i es pugen soles quan torna la connexió).</li>
-    <li>Cada setmana es desa una còpia a la carpeta «${CARPETA}» del teu Drive (se'n guarden ${MAXCOPIES}). Les pots recuperar a <b>💾 Dades</b>.</li>
-    <li><b>↶ ↷</b> desfan i refan qualsevol canvi (fins a 30 passos).</li><li>En un ordinador compartit, clica el núvol › <b>Surt</b> en acabar.</li></ul>`)+
-  sec('Dreceres i trucs',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. En passar-hi el ratolí: ◀ ▶ moure, 👁 amagar, ⇅ ordenar.</li>
-    <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. Pots escriure <b>F</b> (falta) i <b>FJ</b> (falta justificada).</li>
-    <li><b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera.</li>
+  return cfgDet('ajuda','❓ Ajuda i instruccions','què fa cada cosa, dreceres, companys del centre, portar-la a un altre centre',
+  sec('Com es desa',`<ul><li>Cada canvi es desa sol al fitxer <b>${FNAME}</b> del teu Google Drive. L'<b>Ammo</b> petit de dalt a la dreta n'indica l'estat: gira mentre desa i al costat hi surt l'hora de l'últim desat; si surt gris i ratllat, no hi ha connexió (les notes es guarden en aquest ordinador i es pugen soles quan torna la connexió).</li>
+    <li>Cada setmana es desa una còpia a la carpeta «${CARPETA}» del teu Drive (se'n guarden ${MAXCOPIES}). A <b>⚙ › Dades</b> pots fer-ne una ara, veure-les i recuperar-les. També hi veus la <b>mida del fitxer</b>.</li>
+    <li><b>↶ ↷</b> desfan i refan qualsevol canvi (fins a 30 passos).</li>
+    <li><b>És el teu ordinador?</b> Es pregunta el primer cop que entres en un navegador. En un ordinador d'una altra persona la llibreta només dura mentre la pestanya és oberta; en acabar, surt (⚙ › Dades › Surt) i tanca també la sessió de Google. Si t'equivoques, ⚙ › Dades › «Esborra la còpia d'aquest ordinador».</li>
+    <li>Si obres la llibreta en <b>dues pestanyes</b>, te n'avisa i en deixa treballar només una. Si s'ha desat fa poc des d'<b>un altre ordinador</b>, també t'avisa.</li></ul>`)+
+  sec('Columnes i notes',`<ul><li><b>＋ Columna</b>: Numèrica, Escala ordinal, Assoliments, D'una altra llibreta, Nota final, Check, Opcions (un desplegable amb les teves opcions i colors), Dits, Incidències, Classe, URL i Lliure.</li>
+    <li>Al nom de la columna: <b>📅</b> hi posa la data d'avui (el nom el pots continuar escrivint). Al quadre d'una columna que ja existeix, <b>⧉ Duplica</b> en fa una còpia buida amb la data d'avui.</li>
+    <li><b>Compta per a la nota</b>: si la desmarques, la columna es queda a la seva categoria però no entra al càlcul; al títol surt <b>⊘</b>.</li>
+    <li>A les cel·les pots escriure <b>F</b> (falta: compta com un 0), <b>FJ</b> (falta justificada: no compta) i <b>nav</b> o <b>no ava</b> (no avaluat: no compta, surt en taronja).</li>
+    <li><b>Clic dret</b> en una cel·la (o <b>Alt+M</b>): marcar-la en groc o posar-hi un comentari (triangle taronja). Només ho veus tu.</li>
+    <li>La columna <b>Nom</b> es fa més ampla o més estreta arrossegant la vora; doble clic s'ajusta al nom més llarg. Als textos llargs de les columnes Lliure, el text complet surt en passar-hi el ratolí.</li>
+    <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
+  sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
+    <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
+    <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li></ul>`)+
+  sec('Alumnes i classes',`<ul><li>Els <b>Llistats del curs</b> (⚙ › Llistats del curs) són la llista oficial de grups. Les llibretes hi agafen els alumnes amb «📇 Afegeix des dels llistats del curs».</li>
+    <li>La <b>classe</b> ve dels Llistats: si un alumne canvia de grup (als Llistats o des de qualsevol llibreta), es canvia a totes les llibretes actives. Les arxivades conserven la que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.</li>
+    <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
+    <li>Les <b>llistes</b> (sense notes) serveixen per a sortides, autoritzacions… Es creen amb la plantilla «llista».</li></ul>`)+
+  sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil), Llistats i Sortides, i els enllaços de recursos.</li>
+    <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou.</li>
+    <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta.</li></ul>`)+
+  sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
+    <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
+    <li><b>PDF</b>: d'una llibreta, a Avaluació › «Desa en PDF al Drive»; de totes, a ⚙ › Dades; de les sortides, a Eines › Sortides; de l'arxiu, a la pestanya Arxiu.</li></ul>`)+
+  sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. En passar-hi el ratolí: ◀ ▶ moure, 👁 plegar, ⇅ ordenar.</li>
+    <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
     <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura).</li></ul>`)+
@@ -2643,8 +2664,8 @@ function pintaRec(){const {sub,plan,dups}=REC,cl=colsClasse(sub)[0];
     (dups.length?`<h4 class="recsec">Possibles duplicats (${dups.length})</h4><p class="aj" style="margin:0 0 4px">Alumnes amb el mateix nom. Fusionar-los conserva les notes, la classe i l'aparellament amb Classroom. Fins que no es fusionin, no se'ls canvia la classe.</p>`+
       dups.map((g,i)=>`<div class="recdup"><span style="flex:1"><b>${esc(nomComplet(g[0]))}</b> · ${g.length} vegades · ${g.map(st=>esc(classeDe(sub,st)||'sense classe')).join(' / ')}</span><button class="btn sec" style="padding:3px 10px" data-fus="${i}">Fusiona</button></div>`).join(''):'')+
     (fora?`<p class="aj" style="margin-top:10px">${fora} alumne${fora===1?' no és':'s no són'} als Llistats del curs (o hi surten amb un altre nom): la seva classe es queda tal com està.</p>`:'')+
-    `<p class="aj" style="margin-top:10px">Abans d'aplicar es fa una còpia de seguretat al Drive. Les notes, les columnes i Classroom no es toquen. Es pot desfer amb ↶.</p>`;
-  const upd=()=>{const k=$$('[data-rec]:checked').length;$('#recOk').textContent=k?`Aplica (${k})`:'Aplica';$('#recOk').disabled=!k};upd();
+    (plan.length?`<p class="aj" style="margin-top:10px">Abans d'aplicar es fa una còpia de seguretat al Drive. Les notes, les columnes i Classroom no es toquen. Es pot desfer amb ↶.</p>`:'');
+  const upd=()=>{const k=$$('[data-rec]:checked').length;$('#recOk').textContent=k?`Aplica (${k})`:'Aplica';$('#recOk').disabled=!k;$('#recOk').hidden=!plan.length;$('#recX').textContent=plan.length?'Cancel·la':'Tanca'};upd();
   $$('[data-rec]').forEach(c=>c.onchange=upd);
   $$('[data-fus]').forEach(b=>b.onclick=async()=>{const g=REC.dups[+b.dataset.fus];if(!await confirma(`Fusionar les ${g.length} fitxes de «${nomComplet(g[0])}» en una de sola? Es conserven totes les notes; si dues fitxes tenen notes diferents a la mateixa columna, es queda la de la fitxa amb classe.`,'Fusiona'))return;
     fusionaAlumnes(REC.sub,g);save('fusionar alumnes duplicats');REC.plan=planClasses(REC.sub);REC.dups=duplicatsDe(REC.sub);pintaRec();rAlumnes();toast('Fitxes fusionades. Es pot desfer amb ↶.')})}
