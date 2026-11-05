@@ -1,6 +1,10 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.2 · ammonite · en preparació
+**Tanda 3c (5/11/2026, en proves)**
+- **Botó 📅** al costat del nom de la columna: posa la data d'avui («dc 05/11») al final del nom o on hi ha el cursor; el nom es continua podent escriure. Si ja hi ha una columna amb aquest nom, hi afegeix «(2)».
+- **⧉ Duplica** al quadre d'edició d'una columna: crea una còpia buida al costat, amb el mateix tipus, categoria i opcions i la data d'avui al nom, i l'obre per retocar-la.
+
 **Tanda 3b (5/11/2026, en proves)**
 - **Dues pestanyes:** si s'obre la llibreta en una segona pestanya del mateix navegador, avisa i deixa triar «Treballa aquí» (l'altra pestanya queda aturada i no desa) o «Tanca aquesta».
 - **Dos ordinadors:** en entrar, si la llibreta s'ha desat des d'un altre ordinador o navegador fa menys de 15 minuts, avisa. En desar, si el Drive ha canviat, no trepitja els canvis (com ja feia).

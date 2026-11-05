@@ -728,12 +728,43 @@ def p_arxiu3(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columnes: botó 📅 amb la data d\'avui (nom editable) i «Duplica la columna»')
+def p_dataduplica(b):
+    ctx, pg = pagina_local(b)
+    d = pg.evaluate('dataCurta()')
+    comprova(re.fullmatch(r'(dl|dt|dc|dj|dv|ds|dg) \d\d/\d\d', d), f'format de data: {d}')
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100)
+    pg.click('#cAvui'); comprova(pg.input_value('#cNom') == d, 'el 📅 no posa la data en un nom buit')
+    pg.fill('#cNom', 'Actitud'); pg.click('#cAvui'); comprova(pg.input_value('#cNom') == 'Actitud ' + d, 'el 📅 no afegeix la data al final')
+    pg.fill('#cNom', d + ' actitud'); comprova(pg.input_value('#cNom') == d + ' actitud', 'no es pot reescriure el nom')
+    pg.select_option('#cTipus', 'ord'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    # segona columna amb el mateix nom → (2)
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.fill('#cNom', 'actitud'); pg.click('#cNom')
+    pg.evaluate("const e=document.querySelector('#cNom');e.setSelectionRange(0,0)"); pg.click('#cAvui')
+    comprova(pg.input_value('#cNom') == d + ' actitud (2)', f'nom repetit: {pg.input_value("#cNom")}')
+    pg.click('#cCanc')
+    # duplicar
+    cid = pg.evaluate(f"cur().columns.find(c=>c.name==='{d} actitud').id")
+    pg.evaluate(f"(()=>{{const s=cur();setG(s,'{cid}',s.students[0].id,3)}})()")
+    n0 = pg.evaluate('cur().columns.length')
+    pg.locator(f'th.colh[data-col="{cid}"]').dblclick(); pg.wait_for_timeout(150)
+    comprova(pg.locator('#cDup').is_visible(), 'no surt el botó Duplica')
+    pg.click('#cDup'); pg.wait_for_timeout(250)
+    r = pg.evaluate(f"""(()=>{{const s=cur(),i=s.columns.findIndex(c=>c.id==='{cid}'),o=s.columns[i],c=s.columns[i+1];
+        return {{n:s.columns.length,nom:c.name,tipus:c.type,cat:c.cat===o.cat,buida:!Object.keys(s.grades[c.id]||{{}}).length,dlg:document.querySelector('#dlgCol').open,editant:colEd&&colEd.id===c.id}}}})()""")
+    comprova(r['n'] == n0 + 1 and r['tipus'] == 'ord' and r['cat'] and r['buida'], f'còpia: {r}')
+    comprova(r['nom'] == d + ' actitud (2)', f'nom de la còpia: {r["nom"]}')
+    comprova(r['dlg'] and r['editant'], 'després de duplicar no s\'obre la còpia per editar-la')
+    pg.click('#cCanc')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

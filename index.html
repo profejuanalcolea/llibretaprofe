@@ -526,7 +526,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <!-- Diàleg de columna -->
 <dialog id="dlgCol">
   <h3 id="dlgColTit">Nova columna</h3>
-  <div class="fl"><label class="lb">Nom</label><input type="text" id="cNom" placeholder="p. ex. Examen tema 1" style="flex:1"></div>
+  <div class="fl"><label class="lb">Nom</label><input type="text" id="cNom" placeholder="p. ex. Examen tema 1" style="flex:1"><button type="button" class="btn sec" id="cAvui" title="Posa la data d'avui al nom" style="padding:4px 9px">📅</button></div>
   <div class="fl"><label class="lb">Tipus</label><select id="cTipus">
     <optgroup label="Avaluables">
       <option value="num">Numèrica</option><option value="ord">Escala ordinal</option><option value="ass">Assoliments</option>
@@ -579,7 +579,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
     <div class="fl"><button class="btn sec" id="cOmpleBuides">Omple només les buides</button><button class="btn sec" id="cOmpleTot">Sobreescriu totes</button></div>
   </div>
   <div class="fl" style="margin-top:14px;justify-content:space-between">
-    <button class="btn perill" id="cDel">Elimina</button>
+    <span><button class="btn perill" id="cDel">Elimina</button> <button class="btn sec" id="cDup" title="Crea una còpia buida d'aquesta columna, amb la data d'avui al nom">⧉ Duplica</button></span>
     <span><button class="btn sec" id="cCanc">Cancel·la</button> <button class="btn" id="cOk">Desa</button></span>
   </div>
 </dialog>
@@ -691,7 +691,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · en proves (tanda 3b)',COMPILACIO='5/11 16:26';
+const VERSIO='2.2 · ammonite · en proves (tanda 3c)',COMPILACIO='5/11 20:25';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -2309,7 +2309,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cCat').value=colEd?(sub.categories.some(k=>k.id===colEd.cat)?colEd.cat:''):(sub.categories[0]?.id||'');
   $('#cTipus').disabled=!!colEd&&(Object.keys(sub.grades[colEd.id]||{}).length>0||colEd.type==='ext');
   $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;colColor=colEd?.color||'#D9D9D9';pintaColColor();
-  $('#cDel').style.visibility=colEd?'visible':'hidden';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
+  $('#cDel').style.visibility=colEd?'visible':'hidden';$('#cDup').style.display=colEd&&colEd.type!=='final'&&colEd.type!=='classe'?'':'none';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
 function tipusUI(inici){const t=$('#cTipus').value;
   $('#cMaxF').style.display=t==='num'?'flex':'none';$('#cClasseF').style.display=t==='classe'?'block':'none';
   $('#cIconesF').style.display=t==='icones'?'block':'none';$('#cOpcF').style.display=t==='opc'?'block':'none';$('#cExtF').style.display=t==='ext'?'block':'none';
@@ -2350,6 +2350,23 @@ $('#cCompta').onchange=()=>tipusUI(false);
 $('#cIcones').oninput=()=>{if(['icones'].includes($('#cTipus').value))pintaMapa()};
 $$('.preset').forEach(b=>b.onclick=()=>{$('#cIcones').value=b.dataset.ic;pintaMapa()});
 $('#cCanc').onclick=()=>$('#dlgCol').close();
+/* S. Data d'avui al nom de la columna i «Duplica la columna» */
+const DIES=['dg','dl','dt','dc','dj','dv','ds'];
+const dataCurta=(d=new Date())=>`${DIES[d.getDay()]} ${p2(d.getDate())}/${p2(d.getMonth()+1)}`;
+const RXDATA=/(dl|dt|dc|dj|dv|ds|dg) \d{2}\/\d{2}( \(\d+\))?/;
+function nomLliure(sub,nom,excepte){const usat=n=>sub.columns.some(c=>c!==excepte&&norm(c.name)===norm(n));if(!usat(nom))return nom;let i=2;while(usat(`${nom} (${i})`))i++;return `${nom} (${i})`}
+$('#cAvui').onclick=()=>{const el=$('#cNom'),v=el.value,d=dataCurta();let nou;
+  if(RXDATA.test(v))nou=v.replace(RXDATA,d);
+  else if(document.activeElement===el&&el.selectionStart!==null&&el.selectionStart<v.length){const a=el.selectionStart,b=el.selectionEnd;nou=(v.slice(0,a)+(a&&v[a-1]!==' '?' ':'')+d+(v[b]&&v[b]!==' '?' ':'')+v.slice(b)).trim()}
+  else nou=(v.trim()?v.trim()+' ':'')+d;
+  el.value=nomLliure(cur(),nou,colEd);el.focus()};
+$('#cAvui').onmousedown=e=>e.preventDefault();   // conserva el cursor del camp Nom
+$('#cDup').onclick=()=>{const sub=cur(),o=colEd;if(!o)return;const c=JSON.parse(JSON.stringify(o));c.id=uid();delete c.cls;delete c.ampAnt;
+  const d=dataCurta(),base=RXDATA.test(o.name)?o.name.replace(RXDATA,d):(o.name.trim()+' '+d);c.name=nomLliure(sub,base,null);
+  if(c.opcions)c.opcions=c.opcions.map(x=>({...x}));
+  const i=sub.columns.indexOf(o);sub.columns.splice(i+1,0,c);
+  if(!sub.categories.some(k=>k.id===o.cat)){sincBlocs(sub);const j=sub.blocs.findIndex(x=>x.t==='col'&&x.id===o.id);sub.blocs.splice(j+1,0,{t:'col',id:c.id})}
+  save('duplicar columna');$('#dlgCol').close();rLlibreta();obreCol(c.id);$('#cNom').select();toast('Columna duplicada, buida i amb la data d\'avui. Pots canviar-ne el nom.')};
 $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const name=$('#cNom').value.trim()||(/^p\. ex\./.test($('#cNom').placeholder)?'':$('#cNom').placeholder);
   if(!name)return toast('Posa un nom a la columna.');
   const o={name,type,cat:EVAL.includes(type)||AGRUP.includes(type)||type==='dits'?$('#cCat').value:'',max:Math.max(1,+$('#cMax').value||10)};
