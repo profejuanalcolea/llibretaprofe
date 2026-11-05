@@ -27,6 +27,7 @@ Publicada per tandes entre el 4 i el 5 de novembre de 2026.
 - **Arxiu per cursos:** de més nou a més antic, curs automàtic, llibretes i llistes distingides, PDF i esborrar (confirmant amb el nom). **Mida del fitxer** a ⚙ › Dades.
 
 **Altres**
+- **Favicon** amb l'Ammo (també serveix d'icona en afegir la web a la pantalla d'inici del mòbil). Afegit el 5/11 després de tancar la versió.
 - Ajuda i instruccions posades al dia.
 - Arreglats: la llista de columnes amagades quedava oberta; el resum dels minuts de sortides; plurals («llibretes», «columnes»); un id de diàleg duplicat.
 - Proves automàtiques (`proves/`) i aquest historial de canvis.
