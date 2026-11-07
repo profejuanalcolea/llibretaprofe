@@ -2,7 +2,7 @@
 
 ## 2.2.1 · ammonite · novembre 2026
 - **Capçalera de les columnes:** un sol botó **⋯** en passar el ratolí (propietats, ordena, plega, mou, duplica, data al nom) en lloc dels quatre botons petits; les columnes es mouen arrossegant el títol dins de la categoria; el nom ocupa fins a dues línies amb «…» (també a la vista compacta, en horitzontal); una columna plegada es desplega clicant-la; fora la franja grisa amb fletxes de les columnes sense categoria.
-- **Mòbil:** barra de baix amb **Llibreta** (consulta), **Bloc** (notes i pòsits, editables) i **Enllaços**. La pregunta d'entrada diu «És el teu mòbil?».
+- **Mòbil:** barra de baix (icones de línia, com a la web) amb **Llibreta** (consulta), **Bloc** (notes i pòsits, editables) i **Enllaços**. La pregunta d'entrada diu «És el teu mòbil?».
 - **Instal·lable com a app** (manifest amb l'Ammo): Chrome › ⋮ › «Instal·la l'aplicació».
 
 ## 2.2 · ammonite · novembre 2026

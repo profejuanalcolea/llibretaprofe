@@ -260,8 +260,8 @@ body.mob main{padding:10px 10px 30px}body.mob #banOff{top:auto}
 body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{grid-template-columns:1fr 1fr}
 #btnMob{display:none}@media(max-width:700px),(pointer:coarse) and (max-height:700px){#btnMob{display:inline-block}}body.mob #btnMob{display:none!important}
 #mbBar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:600;display:flex;align-items:stretch;background:#111;padding:6px 6px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 14px rgba(0,0,0,.2)}
-#mbBar button{flex:1;height:auto;border:0;background:none;color:#bbb;font:inherit;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;border-radius:10px}
-#mbBar button span{font-size:12.5px}#mbBar button.on{color:#fff;background:#2a2a2a}#mbBar b{background:#e02424;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
+#mbBar button{flex:1;height:auto;border:0;background:none;color:#9a9a9a;font:inherit;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;border-radius:10px}
+#mbBar button span{font-size:12.5px}#mbBar button.on{color:#fff;background:#2a2a2a}#mbBar button.on svg{color:var(--tar)}#mbBar b{background:#e02424;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
 .mob main{padding-bottom:90px!important}.mob #toast{bottom:92px!important}.mbenl a{text-decoration:none;color:inherit}.mbh{font-size:15px;margin:14px 0 6px}.mbenl{display:flex;flex-direction:column;gap:6px}
 .mob .blocw{grid-template-columns:1fr}.mob #blTxt{height:50vh;font-size:17px}.mob .blpt{flex-wrap:nowrap;overflow-x:auto}.mob .blp{flex:0 0 auto}
 #credAmmo{display:flex;justify-content:center;height:80px}#credAmmo svg{transform-origin:50% 55%}
@@ -715,7 +715,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.1 · ammonite · novembre 2026',COMPILACIO='7/11 14:08';
+const VERSIO='2.2.1 · ammonite · novembre 2026',COMPILACIO='7/11 14:53';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1610,7 +1610,7 @@ const MB={vista:'al',st:null,col:'',cerca:'',mode:'resum'};
 /* Mòbil: barra de baix amb Llibreta (només consulta), Bloc (notes i pòsits, es poden editar) i Enllaços */
 function barraMobil(){let b=$('#mbBar');if(!b){b=document.createElement('div');b.id='mbBar';b.setAttribute('role','navigation');document.body.appendChild(b)}const sec=MB.sec||'ll';
   const nAl=state?state.posits.filter(p=>nivPosit(p)).length:0;
-  b.innerHTML=`<button data-mbsec="ll" class="${sec==='ll'?'on':''}">📘<span>Llibreta</span></button><button data-mbsec="bloc" class="${sec==='bloc'?'on':''}">📝<span>Bloc${nAl?` <b>${nAl}</b>`:''}</span></button><button data-mbsec="enl" class="${sec==='enl'?'on':''}">🔗<span>Enllaços</span></button>`;
+  b.innerHTML=`<button data-mbsec="ll" class="${sec==='ll'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7.5h8M8 11h6"/></svg><span>Llibreta</span></button><button data-mbsec="bloc" class="${sec==='bloc'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="5" width="15" height="16.5" rx="2"/><path d="M8 3v4M12 3v4M16 3v4"/><path d="M8 11.5h8M8 15h8M8 18.5h5"/></svg><span>Bloc${nAl?` <b>${nAl}</b>`:''}</span></button><button data-mbsec="enl" class="${sec==='enl'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Enllaços</span></button>`;
   b.querySelectorAll('[data-mbsec]').forEach(x=>x.onclick=()=>{MB.sec=x.dataset.mbsec;MB.st=null;rMobil();scrollTo(0,0)})}
 function rMobilEnl(){const sub=cur(),ll=(t,rs)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
   const h=ll(`D'aquesta llibreta${sub?' · '+esc(sub.name):''}`,sub?.recursos||[])+ll('Generals',state.recursos||[]);
