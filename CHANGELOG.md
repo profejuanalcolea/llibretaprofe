@@ -27,7 +27,7 @@ Publicada per tandes entre el 4 i el 5 de novembre de 2026.
 - **Arxiu per cursos:** de més nou a més antic, curs automàtic, llibretes i llistes distingides, PDF i esborrar (confirmant amb el nom). **Mida del fitxer** a ⚙ › Dades.
 
 **Altres**
-- **Favicon** amb l'Ammo, que omple tot l'espai, i icona de pantalla d'inici del mòbil sobre fons negre (Ammo amb el contorn clar perquè es vegi). Afegit el 5 i el 7/11 després de tancar la versió.
+- **Favicon** amb l'Ammo, que omple tot l'espai, i icona de pantalla d'inici del mòbil amb l'Ammo sobre fons granat. Afegit el 5 i el 7/11 després de tancar la versió.
 - Ajuda i instruccions posades al dia.
 - Arreglats: la llista de columnes amagades quedava oberta; el resum dels minuts de sortides; plurals («llibretes», «columnes»); un id de diàleg duplicat.
 - Proves automàtiques (`proves/`) i aquest historial de canvis.
