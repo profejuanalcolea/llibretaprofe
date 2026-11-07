@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.2.2 · ammonite · novembre 2026
+- **Full de càlcul al Drive** (⚙ › Dades): una pestanya per llibreta activa amb totes les columnes, les categories i la **nota final**, i una pestanya per llistat del curs. Sense fórmules; les notes numèriques són números. Es desa a la carpeta «Llibreta del Profe · PDF» convertit a Full de càlcul de Google.
+
 ## 2.2.1 · ammonite · novembre 2026
 - **Capçalera de les columnes:** un sol botó **⋯** en passar el ratolí (propietats, ordena, plega, mou, duplica, data al nom) en lloc dels quatre botons petits; les columnes es mouen arrossegant el títol dins de la categoria; el nom ocupa fins a dues línies amb «…» (també a la vista compacta, en horitzontal); una columna plegada es desplega clicant-la; fora la franja grisa amb fletxes de les columnes sense categoria.
 - **Mòbil:** barra de baix (icones de línia, com a la web) amb **Llibreta** (consulta), **Bloc** (notes i pòsits, editables) i **Enllaços**. La pregunta d'entrada diu «És el teu mòbil?».

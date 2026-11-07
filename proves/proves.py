@@ -39,6 +39,7 @@ URL = f'http://127.0.0.1:{PORT}/{FITXER}'
 # ---------------------------------------------------------------- Google simulat
 ids = itertools.count(1)
 PDFS = []
+FULLS = []  # (metadades, bytes .xlsx) dels fulls de càlcul desats al Drive
 INIT_BASE = """window.__tok=[];window.google={accounts:{oauth2:{initTokenClient:o=>({requestAccessToken:()=>{window.__tok.push(o.scope);
 setTimeout(()=>o.callback({access_token:'T'+window.__tok.length,expires_in:3600,scope:o.scope}),10)}}),revoke:()=>{}}}};"""
 # per defecte, les proves fan com si l'ordinador fos de la persona (la pregunta «És el teu ordinador?» es prova a part)
@@ -72,6 +73,10 @@ def google_amb(FILES):
           if b'application/pdf' in buf:
               meta = json.loads(buf.split(b'\r\n\r\n')[1].split(b'\r\n--')[0]); PDFS.append(meta.get('name'))
               return j({'id': 'P%d' % next(ids)})
+          if b'spreadsheetml' in buf:
+              cap, resta = buf.split(b'\r\n\r\n', 1); meta = json.loads(resta.split(b'\r\n--')[0])
+              cos = resta.split(b'\r\n\r\n', 1)[1]; cos = cos[:cos.rfind(b'\r\n--')]; FULLS.append((meta, cos))
+              return j({'id': 'S%d' % next(ids)})
           parts = buf.decode().split('\r\n\r\n')
           meta = json.loads(parts[1].split('\r\n--')[0]); content = parts[2].split('\r\n--')[0]
           if m == 'POST':
@@ -832,6 +837,40 @@ def p_classes_propaga(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Full de càlcul: una pestanya per llibreta activa (amb la nota final) i per llistat, al Drive com a Full de Google')
+def p_full(b):
+    import io, openpyxl
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CLASSES_JS); pg.wait_for_timeout(200)
+    pg.evaluate("tab='config';render()"); pg.wait_for_timeout(200)
+    pg.evaluate("document.querySelector('[data-cfg=dades]').open=true")
+    n0 = len(FULLS); pg.click('#dFull'); pg.wait_for_timeout(1500)
+    comprova(len(FULLS) == n0 + 1, 'no s\'ha desat cap full de càlcul al Drive')
+    meta, cos = FULLS[-1]
+    comprova(meta.get('mimeType') == 'application/vnd.google-apps.spreadsheet', f'no es converteix a Full de Google: {meta}')
+    comprova(meta.get('parents') and pg.drive.get(meta['parents'][0], {}).get('name') == 'Llibreta del Profe · PDF', f'carpeta: {meta}')
+    wb = openpyxl.load_workbook(io.BytesIO(cos))
+    noms = wb.sheetnames; act = pg.evaluate("actives().map(s=>s.name)")
+    comprova(noms[:len(act)] == [n[:31] for n in act] and 'Vella' not in noms, f'pestanyes de llibretes: {noms} / {act}')
+    comprova(noms[len(act):] == ['Llistat 2n Batx A', 'Llistat 2n Batx B'], f'pestanyes de llistats: {noms}')
+    ws = wb['GICA2']; cap = [c.value for c in ws[1]]
+    comprova(cap[:2] == ['Cognoms', 'Nom'] and 'Nota final' in cap and 'Assoliment final' in cap, f'capçalera: {cap}')
+    rows = list(ws.iter_rows(min_row=2, values_only=True)); files = {(r[0], r[1]): r for r in rows}
+    comprova(len(rows) == 6, f'han de sortir tots els alumnes, també sense filtre de classe: {list(files)}')
+    ada = files[('Prova', 'Ada')]; inf = cap.index('Nota final')
+    comprova(ada[cap.index('Ex')] == 7 and ada[inf] == 7 and isinstance(ada[inf], (int, float)), f'les notes han de ser números: {ada}')
+    comprova(not any(isinstance(c.value, str) and c.value.startswith('=') for r in ws.iter_rows() for c in r), 'hi ha fórmules')
+    # EXEMPLE: la nota final coincideix amb la de l'app
+    ex = pg.evaluate("(()=>{const s=state.subjects.find(x=>x.name==='EXEMPLE');if(!s)return null;return s.students.map(st=>{const f=finalDe(s,st);return [st.cognoms,st.nom,f?Math.round(f.num*100)/100:null]})})()")
+    if ex:
+        w2 = wb['EXEMPLE']; c2 = [c.value for c in w2[1]]; k = c2.index('Nota final')
+        got = {(r[0], r[1]): r[k] for r in w2.iter_rows(min_row=2, values_only=True)}
+        comprova(all(got.get((a, n)) == v for a, n, v in ex), 'notes finals diferents a EXEMPLE')
+    ll = [r for r in wb['Llistat 2n Batx B'].iter_rows(values_only=True)]
+    comprova(ll == [('Cognoms', 'Nom', 'Classe'), ('Prova', 'Cesc', '2n Batx B'), ('Prova', 'Dana', '2n Batx B')], f'llistat: {ll}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -911,7 +950,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
