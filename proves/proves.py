@@ -843,12 +843,75 @@ def p_recursos(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Capçalera: menú ⋯ (propietats, ordena, plega, mou, duplica, data), arrossegar per moure i nom en dues línies')
+def p_capcalera(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    th = pg.locator('th.colh[data-col=c2]'); th.hover(); pg.wait_for_timeout(100)
+    comprova(th.locator('.hdots').is_visible() and pg.locator('.htools:visible').count() == 0, 'no surt el botó ⋯ (o encara surten els botons antics)')
+    th.locator('.hdots').click(); pg.wait_for_timeout(100)
+    comprova(pg.is_visible('#hMenu') and pg.locator('#hMenu [data-ha]').count() >= 6, 'el ⋯ no obre el menú')
+    pg.click('#hMenu [data-ha=esq]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().columns.filter(c=>c.cat==='kA').map(c=>c.id)") == ['c2', 'c1'], 'Mou a l\'esquerra no funciona')
+    comprova(not pg.is_visible('#hMenu'), 'el menú no es tanca')
+    # arrossegar c2 a la dreta de c1 (torna a l'ordre inicial)
+    pg.locator('th.colh[data-col=c2]').drag_to(pg.locator('th.colh[data-col=c1]'), target_position={'x': 90, 'y': 20}); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().columns.filter(c=>c.cat==='kA').map(c=>c.id)") == ['c1', 'c2'], f'arrossegar no mou: {pg.evaluate("cur().columns.filter(c=>c.cat===\'kA\').map(c=>c.id)")}')
+    # no es pot arrossegar a una altra categoria
+    pg.locator('th.colh[data-col=c1]').drag_to(pg.locator('th.colh[data-col=c3]')); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c1').cat") == 'kA', 'arrossegar ha canviat la columna de categoria')
+    # ordena, plega i desplega clicant la franja
+    pg.locator('th.colh[data-col=c1]').hover(); pg.locator('th.colh[data-col=c1] .hdots').click(); pg.click('#hMenu [data-ha=ord]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().ordre") == 'col:c1', 'Ordena no funciona')
+    pg.locator('th.colh[data-col=c1]').hover(); pg.locator('th.colh[data-col=c1] .hdots').click(); pg.click('#hMenu [data-ha=pleg]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c1').amp") == 'plegada', 'Plega no funciona')
+    pg.locator('th.colh.plc[data-col=c1]').click(); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c1').amp") != 'plegada', 'clicar la franja no desplega')
+    # data i duplica
+    pg.locator('th.colh[data-col=c4]').hover(); pg.locator('th.colh[data-col=c4] .hdots').click(); pg.click('#hMenu [data-ha=data]'); pg.wait_for_timeout(150)
+    d = pg.evaluate('dataCurta()')
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='c4').name") == 'Tr2 ' + d, 'Posa la data no funciona')
+    pg.locator('th.colh[data-col=c4]').hover(); pg.locator('th.colh[data-col=c4] .hdots').click(); pg.click('#hMenu [data-ha=dup]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("document.querySelector('#dlgCol').open") and pg.evaluate("cur().columns.length") == 5, 'Duplica no funciona')
+    pg.click('#cCanc')
+    # nom llarg: dues línies com a màxim
+    pg.evaluate("cur().columns.find(c=>c.id==='c3').name='Pràctica de mitosi amb Tradescantia i microscopi';rLlibreta()"); pg.wait_for_timeout(150)
+    h = pg.locator('th.colh[data-col=c3] .hn').evaluate("e=>[e.getBoundingClientRect().height,parseFloat(getComputedStyle(e).lineHeight)]")
+    comprova(h[0] <= h[1] * 2 + 4, f'el nom ocupa més de dues línies: {h}')
+    pg.evaluate("cur().settings.compacta=true;document.querySelector('#bCmp')&&(document.querySelector('#bCmp').checked=true);rLlibreta()")
+    comprova(pg.locator('th.colh .vt').count() == 0, 'a la vista compacta encara hi ha noms en vertical')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Mòbil: barra amb Llibreta, Bloc i Enllaços; el Bloc es pot editar; «És el teu mòbil?»')
+def p_mobil2(b):
+    FILES = {}
+    ctx = b.new_context(**p_mobil.dev); ctx.add_init_script(INIT_BASE); ctx.route('**/*', google_amb(FILES))
+    pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(300)
+    comprova(pg.is_visible('#dlgQ') and 'És el teu mòbil' in pg.inner_text('#qTit'), 'al mòbil no pregunta «És el teu mòbil?»')
+    pg.click('#qBtns button:has-text("Sí, és meu")'); pg.wait_for_timeout(1500)
+    comprova(pg.locator('#mbBar button').count() == 3, 'no surt la barra de baix')
+    pg.click('#mbBar [data-mbsec=bloc]'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#blTxt') and pg.locator('#blTanca').count() == 0, 'el Bloc no s\'obre al mòbil')
+    pg.fill('#blTxt', 'Apunt des del mòbil'); pg.wait_for_timeout(900)
+    comprova(pg.evaluate("state.bloc.pestanyes[0].text") == 'Apunt des del mòbil', 'el Bloc no es desa al mòbil')
+    comprova(pg.locator('.posit').count() >= 1, 'no surten els pòsits al mòbil')
+    pg.evaluate("state.recursos.push({id:'r1',name:'Diccionari',url:'https://exemple.cat'});cur().recursos.push({id:'r2',name:'Moodle',url:'https://exemple.cat/m'})")
+    pg.click('#mbBar [data-mbsec=enl]'); pg.wait_for_timeout(200)
+    t = pg.inner_text('#main')
+    comprova('Diccionari' in t and 'Moodle' in t and pg.locator('#main a[target=_blank]').count() >= 2, 'no surten els enllaços')
+    pg.click('#mbBar [data-mbsec=ll]'); pg.wait_for_timeout(200)
+    comprova(pg.locator('#main .mbal').count() >= 10 and pg.locator('#main input.g').count() == 0, 'la llibreta no surt en mode consulta')
+    comprova(not errs, 'errors JS: %s' % errs)
+    ctx.close()
+
 # ---------------------------------------------------------------- execució
 with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

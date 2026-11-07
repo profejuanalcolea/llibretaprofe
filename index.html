@@ -8,6 +8,8 @@
 <link rel="icon" type="image/png" sizes="48x48" href="icones/ammo-48.png?v=3">
 <link rel="icon" type="image/png" sizes="192x192" href="icones/ammo-192.png?v=3">
 <link rel="apple-touch-icon" href="icones/ammo-192.png?v=3">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111111">
 <style>
 :root{--neg:#111;--tar:#f07c00;--tar2:#fff1e3;--gris:#f3f3f3;--linia:#d9d9d9;--text:#1a1a1a;--suau:#666;
 --na:#ffd6d6;--as:#fff1b8;--an:#d6ecff;--ae:#d4f5d9}
@@ -257,6 +259,11 @@ body.mob main{padding:10px 10px 30px}body.mob #banOff{top:auto}
 .mbnav{display:flex;gap:6px;align-items:center;margin-bottom:10px;flex-wrap:wrap}.mbnav select{font:inherit;padding:6px;margin-left:auto}
 body.mob .vacard{padding:12px}body.mob .vanom{font-size:20px}body.mob .varesum{grid-template-columns:1fr 1fr}
 #btnMob{display:none}@media(max-width:700px),(pointer:coarse) and (max-height:700px){#btnMob{display:inline-block}}body.mob #btnMob{display:none!important}
+#mbBar{position:fixed;left:0;right:0;bottom:0;top:auto;height:auto;z-index:600;display:flex;align-items:stretch;background:#111;padding:6px 6px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -4px 14px rgba(0,0,0,.2)}
+#mbBar button{flex:1;height:auto;border:0;background:none;color:#bbb;font:inherit;font-size:22px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px;border-radius:10px}
+#mbBar button span{font-size:12.5px}#mbBar button.on{color:#fff;background:#2a2a2a}#mbBar b{background:#e02424;color:#fff;border-radius:9px;padding:0 6px;font-size:11px}
+.mob main{padding-bottom:90px!important}.mob #toast{bottom:92px!important}.mbenl a{text-decoration:none;color:inherit}.mbh{font-size:15px;margin:14px 0 6px}.mbenl{display:flex;flex-direction:column;gap:6px}
+.mob .blocw{grid-template-columns:1fr}.mob #blTxt{height:50vh;font-size:17px}.mob .blpt{flex-wrap:nowrap;overflow-x:auto}.mob .blp{flex:0 0 auto}
 #credAmmo{display:flex;justify-content:center;height:80px}#credAmmo svg{transform-origin:50% 55%}
 #credAmmo.anim svg{animation:aGira .8s ease-in-out}#credAmmo.anim .eye{animation:aUll .5s .95s}#credAmmo.anim .lid{animation:aPar .5s .95s}
 @keyframes aGira{from{transform:rotate(0)}to{transform:rotate(360deg)}}@keyframes aUll{0%,100%{opacity:1}15%,85%{opacity:0}}@keyframes aPar{0%,100%{opacity:0}15%,85%{opacity:1}}
@@ -366,14 +373,21 @@ td input.lliure{text-align:left;text-align-last:left}
 .vNAV,td.vNAV input.g,td.vNAV select.g{color:#d9480f!important;font-weight:800!important}
 td.vNAV input.g,td.vNAV select.g{font-size:.9em}body .compacte td.vNAV input.g,body .compacte td.vNAV select.g{font-size:.78em;letter-spacing:-.02em}
 th.colh{cursor:default}
-th.colh .hn{display:block;overflow:hidden;text-overflow:ellipsis;padding-bottom:2px}
+th.colh .hn{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;hyphens:auto;-webkit-hyphens:auto;line-height:1.2;padding-bottom:2px;padding-right:4px}
+table.compact th.colh .hn{font-size:11px;padding-right:0;letter-spacing:-.01em}
+.hdots{position:absolute;top:2px;right:2px;width:24px;height:22px;border:0;border-radius:6px;background:rgba(0,0,0,.06);color:#444;font-weight:900;font-size:13px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;padding:0}
+th.colh:hover .hdots,.hdots.on{display:flex}.hdots:hover,.hdots.on{background:var(--tar);color:#fff}
+@media (hover:none){.hdots{display:flex;opacity:.7}}
+th.colh.arr{opacity:.4}th.colh.dropl{box-shadow:inset 3px 0 0 var(--tar)}th.colh.dropr{box-shadow:inset -3px 0 0 var(--tar)}
+th.grup.solt{background:transparent;border-top:0;border-left:0;border-right:0}
+#hMenu button:disabled{opacity:.35;cursor:default}
 .srt{color:var(--tar);font-size:11px;margin-left:3px}
 th.colh .vt+.srt{position:absolute;right:2px;top:2px}
-.htools{position:absolute;left:0;right:0;bottom:0;display:none;justify-content:space-between;background:rgba(255,255,255,.96);padding:1px 2px;border-top:1px solid var(--linia)}
+.htools{display:none!important;position:absolute;left:0;right:0;bottom:0;display:none;justify-content:space-between;background:rgba(255,255,255,.96);padding:1px 2px;border-top:1px solid var(--linia)}
 th.colh:hover .htools{display:flex}
 .htools button{border:0;background:none;cursor:pointer;color:#666;font-size:12px;padding:1px 4px;border-radius:4px}
 .htools button:hover{background:var(--tar);color:#fff}.htools button:disabled{visibility:hidden}
-th.colh.plc{padding:0;text-align:center;vertical-align:top;background:#e9e9e9}
+th.colh.plc{padding:0;text-align:center;vertical-align:top;background:#e9e9e9;cursor:pointer}th.colh.plc:hover{background:var(--tar2)}
 .ull{border:0;background:none;cursor:pointer;font-size:11px;padding:4px 0;opacity:.7}.ull:hover{opacity:1}
 td.plcc{background:repeating-linear-gradient(0deg,#e4e4e4 0 6px,#ededed 6px 12px)!important;padding:0}
 th.grup.solt{padding:2px 2px;text-align:center}
@@ -594,7 +608,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 
 <!-- Nova llibreta -->
 <div id="anMenu" class="anmenu" role="menu"></div>
-<div id="soMenu" class="anmenu" role="menu"></div><div id="soAvis"></div>
+<div id="soMenu" class="anmenu" role="menu"></div><div id="hMenu" class="anmenu" role="menu"></div><div id="soAvis"></div>
 <dialog id="dlgSo" style="width:min(760px,95vw)"><h3 style="margin:0 0 8px">🚻 Sortides de l'aula</h3><div id="soW"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="soX">Tanca</button><button class="btn sec" id="soCopia">📋 Copia</button><button class="btn" id="soPdf">PDF</button></div></dialog>
 <dialog id="dlgCls" style="width:min(720px,94vw)"><h3>🎓 Classroom</h3><div id="clsW"></div><div class="fl" id="clsBtns" style="margin-top:12px"></div></dialog>
@@ -701,7 +715,7 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2 · ammonite · novembre 2026',COMPILACIO='7/11 13:36';
+const VERSIO='2.2.1 · ammonite · novembre 2026',COMPILACIO='7/11 14:08';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1058,7 +1072,8 @@ const ordContestat=()=>{try{return esAlie()||localStorage.getItem(LSORD)==='meu'
 const magCache=()=>esAlie()?sessionStorage:localStorage;
 function posaAlie(){try{sessionStorage.setItem(SSALIE,'1');localStorage.removeItem(LSCACHE);localStorage.removeItem('llibreta-email');localStorage.removeItem(LSORD)}catch{}}
 async function preguntaOrdinador(){if(ordContestat())return;
-  const r=await pregunta('És el teu ordinador?','Si és d\'una altra persona, la llibreta no es guardarà en aquest navegador: quan tanquis la pestanya, no hi quedarà res. Només ho preguntem la primera vegada.',[{t:'No, és d\'una altra persona',v:'alie',cls:'sec'},{t:'Sí, és meu',v:'meu'}]);
+  const disp=esMobil()?'mòbil':'ordinador';
+  const r=await pregunta(`És el teu ${disp}?`,'Si és d\'una altra persona, la llibreta no es guardarà en aquest navegador: quan tanquis la pestanya, no hi quedarà res. Només ho preguntem la primera vegada.',[{t:'No, és d\'una altra persona',v:'alie',cls:'sec'},{t:'Sí, és meu',v:'meu'}]);
   if(r==='meu'){try{localStorage.setItem(LSORD,'meu')}catch{}}else posaAlie();pintaAlie()}
 function pintaAlie(){const t=$('#alieTag');if(t)t.hidden=!(esAlie()&&mode==='drive'&&state)}
 function guardaCache(){try{magCache().setItem(LSCACHE,JSON.stringify({state,rev:G.rev,fileId:G.fileId,pendent:G.brut,email:G.email}))}catch{}}
@@ -1238,7 +1253,7 @@ function render(){if(!state)return;aplicaColors();{const s0=cur();if(s0?.cls&&!s
   const esLl=cur()?.tipus==='llista';$('#tabs [data-t=resum]').hidden=esLl;if(esLl&&tab==='resum')tab=tabPrincipal='llibreta';
   renderSel();document.body.classList.toggle('mob',esMobil());if(esMobil()){tancaPanell();VA.on=false;rMobil();estat();return}$$('#tabs button,.tabic').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));if(tab!=='resum'){tancaPanell();VA.on=false}
   if(tab==='alumnes'){tab='config';alObert=true}
-  ({llibreta:rLlibreta,resum:rResum,config:rConfig,eines:rEines,arxiu:rArxiu,bloc:rBloc})[tab]();estat();btnHist();pintaSortides()}
+  $('#mbBar')?.remove();({llibreta:rLlibreta,resum:rResum,config:rConfig,eines:rEines,arxiu:rArxiu,bloc:rBloc})[tab]();estat();btnHist();pintaSortides()}
 const capPlegada=()=>{try{return localStorage.getItem('llibreta-cap-plegada')==='1'}catch{return false}};
 function plegaCap(){try{localStorage.setItem('llibreta-cap-plegada',capPlegada()?'0':'1')}catch{}render()}
 function capcalera(sub,barra='',llg=''){if(!sub)return '';const n=sub.students.length;
@@ -1396,7 +1411,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   const nB=gs.length;
   h+=gs.map((g,bi)=>{
     const mvL=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="-1" ${bi===0?'disabled':''} title="Mou a l'esquerra">◀</button>`,mvR=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="1" ${bi===nB-1?'disabled':''} title="Mou a la dreta">▶</button>`;
-    if(!g.cat){const col=g.solt.color||'#D9D9D9';return `<th class="grup solt" style="background:${col};color:${textSobre(col)}">${g.solt.amp==='plegada'?'':mvL+mvR}</th>`}
+    if(!g.cat){return `<th class="grup solt"></th>`}
     const nC=g.folded?1:g.cols.length;
     return `<th class="grup ${g.folded?'plg':''}" colspan="${nC}" style="background:${g.cat.color};color:${textSobre(g.cat.color)}">${mvL}<span class="gtog" data-pleg="${g.cat.id}" title="${g.folded?'Desplega':'Plega'} la categoria">${g.folded?'▸':'▾'} ${esc(g.cat.sigla)}${g.folded?'':` · ${esc(g.cat.name)}`}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}</span>${mvR}</th>`}).join('');
   h+=`</tr><tr>`;let zc=1000;
@@ -1404,12 +1419,12 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     if(g.folded){const m=g.cat.method==='mean'&&!mitjanaPermesa(sub,g.cat)?'mediana':METODE[g.cat.method];
       return `<th class="colh plegh" data-pleg="${g.cat.id}" style="border-top-color:${g.cat.color}" title="Clica per desplegar">${esc(g.cat.name)}<span class="t">Σ ${m} · ${g.cols.length} col.</span></th>`}
     return g.cols.map((c,i)=>{zc--;const top=`border-top-color:${g.cat?g.cat.color:(c.color||'#D9D9D9')}`;
-      if(c.amp==='plegada')return `<th class="colh plc" data-col="${c.id}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} (plegada) · clica l'ull per desplegar-la"><button class="ull" data-desplc="${c.id}">👁</button></th>`;
-      const np=g.cat&&sub.tipus!=='llista'&&!compta(c),vert=cp&&(c.amp||'normal')!=='ampla';
+      if(c.amp==='plegada')return `<th class="colh plc" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} (plegada) · clica per desplegar-la"><button class="ull" data-desplc="${c.id}">👁</button></th>`;
+      const np=g.cat&&sub.tipus!=='llista'&&!compta(c),vert=false;
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
-      const tools=ro?'':`<span class="htools"><button data-mv="-1" ${g.solt?'':first?'disabled':''} title="Mou a l'esquerra">◀</button><button data-plc="${c.id}" title="Plega la columna">👁</button><button data-srt="${c.id}" title="Ordena els alumnes per aquesta columna" ${['num','ord','ass','final','ext','opc'].includes(c.type)?'':'disabled'}>⇅</button><button data-mv="1" ${g.solt?'':last?'disabled':''} title="Mou a la dreta">▶</button></span>`;
-      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''} ${vert?'vert':''}" data-col="${c.id}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} · ${esc(subtitolCol(sub,c))}${np?' · No compta per a la nota':''}${ro?'':' · doble clic per editar'}">${vert?`<span class="vt">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
+      const tools=ro?'':`<button class="hdots" data-hm="${c.id}" data-first="${g.solt?0:first?1:0}" data-last="${g.solt?0:last?1:0}" title="Opcions de la columna">⋯</button>`;
+      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} · ${esc(subtitolCol(sub,c))}${np?' · No compta per a la nota':''}${ro?'':' · doble clic per editar · ⋯ per a més opcions'}">${vert?`<span class="vt">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
@@ -1592,7 +1607,16 @@ function esMobil(){try{if(sessionStorage.getItem('llibreta-mobil-off')==='1')ret
 function aplicaMob(){document.body.classList.toggle('mob',esMobil())}
 MOBQ.addEventListener?.('change',()=>{aplicaMob();if(state)render()});aplicaMob();
 const MB={vista:'al',st:null,col:'',cerca:'',mode:'resum'};
-function rMobil(){const sub=cur(),m=$('#main');if(!sub){m.innerHTML='<div class="buit">No hi ha cap llibreta activa.</div>';return}
+/* Mòbil: barra de baix amb Llibreta (només consulta), Bloc (notes i pòsits, es poden editar) i Enllaços */
+function barraMobil(){let b=$('#mbBar');if(!b){b=document.createElement('div');b.id='mbBar';b.setAttribute('role','navigation');document.body.appendChild(b)}const sec=MB.sec||'ll';
+  const nAl=state?state.posits.filter(p=>nivPosit(p)).length:0;
+  b.innerHTML=`<button data-mbsec="ll" class="${sec==='ll'?'on':''}">📘<span>Llibreta</span></button><button data-mbsec="bloc" class="${sec==='bloc'?'on':''}">📝<span>Bloc${nAl?` <b>${nAl}</b>`:''}</span></button><button data-mbsec="enl" class="${sec==='enl'?'on':''}">🔗<span>Enllaços</span></button>`;
+  b.querySelectorAll('[data-mbsec]').forEach(x=>x.onclick=()=>{MB.sec=x.dataset.mbsec;MB.st=null;rMobil();scrollTo(0,0)})}
+function rMobilEnl(){const sub=cur(),ll=(t,rs)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
+  const h=ll(`D'aquesta llibreta${sub?' · '+esc(sub.name):''}`,sub?.recursos||[])+ll('Generals',state.recursos||[]);
+  $('#main').innerHTML=h||'<p class="aj" style="text-align:center;margin-top:30px">Encara no hi ha enllaços. S\'afegeixen des de l\'ordinador, a 🧰 Eines.</p>'}
+function rMobil(){barraMobil();if(MB.sec==='bloc'){rBloc();return}if(MB.sec==='enl'){rMobilEnl();return}
+  const sub=cur(),m=$('#main');if(!sub){m.innerHTML='<div class="buit">No hi ha cap llibreta activa.</div>';return}
   const sts=alumnesAval(sub);let h=`<div class="mbcap" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><div><b>${esc(sub.name)}</b><div class="capsub">${sts.length} alumnes · mode consulta (només lectura)</div></div></div>`;
   if(MB.st&&sts.some(x=>x.id===MB.st)){const i=sts.findIndex(x=>x.id===MB.st),st=sts[i];
     h+=`<div class="mbnav"><button class="btn sec" id="mbTorna">← Llista</button><button class="btn sec" data-mbm="-1" ${i===0?'disabled':''}>▲</button><b>${i+1}/${sts.length}</b><button class="btn sec" data-mbm="1" ${i===sts.length-1?'disabled':''}>▼</button>
@@ -2108,6 +2132,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>És el teu ordinador?</b> Es pregunta el primer cop que entres en un navegador. En un ordinador d'una altra persona la llibreta només dura mentre la pestanya és oberta; en acabar, surt (⚙ › Dades › Surt) i tanca també la sessió de Google. Si t'equivoques, ⚙ › Dades › «Esborra la còpia d'aquest ordinador».</li>
     <li>Si obres la llibreta en <b>dues pestanyes</b>, te n'avisa i en deixa treballar només una. Si s'ha desat fa poc des d'<b>un altre ordinador</b>, també t'avisa.</li></ul>`)+
   sec('Columnes i notes',`<ul><li><b>＋ Columna</b>: Numèrica, Escala ordinal, Assoliments, D'una altra llibreta, Nota final, Check, Opcions (un desplegable amb les teves opcions i colors), Dits, Incidències, Classe, URL i Lliure.</li>
+    <li>En passar el ratolí pel títol d'una columna surt el botó <b>⋯</b>: propietats, ordenar, plegar, moure, duplicar i posar la data d'avui al nom. Les columnes també es mouen <b>arrossegant el títol</b> dins de la seva categoria. Una columna plegada es desplega clicant-la.</li>
     <li>Al nom de la columna: <b>📅</b> hi posa la data d'avui (el nom el pots continuar escrivint). Al quadre d'una columna que ja existeix, <b>⧉ Duplica</b> en fa una còpia buida amb la data d'avui.</li>
     <li><b>Compta per a la nota</b>: si la desmarques, la columna es queda a la seva categoria però no entra al càlcul; al títol surt <b>⊘</b>.</li>
     <li>A les cel·les pots escriure <b>F</b> (falta: compta com un 0), <b>FJ</b> (falta justificada: no compta) i <b>nav</b> o <b>no ava</b> (no avaluat: no compta, surt en taronja).</li>
@@ -2127,11 +2152,11 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
   sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
     <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
     <li><b>PDF</b>: d'una llibreta, a Avaluació › «Desa en PDF al Drive»; de totes, a ⚙ › Dades; de les sortides, a Eines › Sortides; de l'arxiu, a la pestanya Arxiu.</li></ul>`)+
-  sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. En passar-hi el ratolí: ◀ ▶ moure, 👁 plegar, ⇅ ordenar.</li>
+  sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. Arrossega el títol per moure-la.</li>
     <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
-    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura).</li></ul>`)+
+    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b>. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+
   sec('Per a companys de l\'institut',`<ol><li>Obre <b>${esc(url)}</b> amb Chrome o Edge.</li><li>Clica <b>Entra amb Google</b> amb el compte del centre.</li>
     <li>El primer cop es crea sola una llibreta <b>EXEMPLE</b> per provar-ho tot. Després en crees de noves amb el <b>＋</b> taronja.</li></ol>
     <p class="aj">Les dades de cadascú són al seu propi Drive: ningú més les veu. A GitHub només hi ha el programa, mai dades d'alumnes.</p>`)+
@@ -2318,6 +2343,7 @@ $('#main').addEventListener('click',e=>{if(!state)return;const sub=cur();
   const dpl=e.target.closest('[data-desplc]');if(dpl){const c=sub.columns.find(x=>x.id===dpl.dataset.desplc);c.amp=c.ampAnt||'normal';save('desplegar columna');rLlibreta();return}
   const srt=e.target.closest('[data-srt]');if(srt){const k='col:'+srt.dataset.srt;
     if(sub.ordre!==k){sub.ordre=k;sub.ordreDir='desc'}else if(sub.ordreDir==='desc')sub.ordreDir='asc';else{sub.ordre='cognoms';sub.ordreDir='desc'}save(null,true);rLlibreta();return}
+  if(th?.classList.contains('plc')){const c=sub.columns.find(x=>x.id===th.dataset.col);if(c){c.amp=c.ampAnt||'normal';save('desplegar columna');rLlibreta()}return}
   if(th)return;
   const ed=e.target.closest('button[data-url]');if(ed){const td=ed.closest('td');editaUrl(sub,td);return}
   const clk=e.target.closest('td.clk');if(clk){const c=sub.columns.find(x=>x.id===clk.dataset.c),v=getG(sub,c.id,clk.dataset.s);
@@ -2408,12 +2434,13 @@ $('#cAvui').onclick=()=>{const el=$('#cNom'),v=el.value,d=dataCurta();let nou;
   else nou=(v.trim()?v.trim()+' ':'')+d;
   el.value=nomLliure(cur(),nou,colEd);el.focus()};
 $('#cAvui').onmousedown=e=>e.preventDefault();   // conserva el cursor del camp Nom
-$('#cDup').onclick=()=>{const sub=cur(),o=colEd;if(!o)return;const c=JSON.parse(JSON.stringify(o));c.id=uid();delete c.cls;delete c.ampAnt;
+function dupCol(sub,o){const c=JSON.parse(JSON.stringify(o));c.id=uid();delete c.cls;delete c.ampAnt;if(c.amp==='plegada')c.amp='normal';
   const d=dataCurta(),base=RXDATA.test(o.name)?o.name.replace(RXDATA,d):(o.name.trim()+' '+d);c.name=nomLliure(sub,base,null);
-  if(c.opcions)c.opcions=c.opcions.map(x=>({...x}));
   const i=sub.columns.indexOf(o);sub.columns.splice(i+1,0,c);
   if(!sub.categories.some(k=>k.id===o.cat)){sincBlocs(sub);const j=sub.blocs.findIndex(x=>x.t==='col'&&x.id===o.id);sub.blocs.splice(j+1,0,{t:'col',id:c.id})}
-  save('duplicar columna');$('#dlgCol').close();rLlibreta();obreCol(c.id);$('#cNom').select();toast('Columna duplicada, buida i amb la data d\'avui. Pots canviar-ne el nom.')};
+  save('duplicar columna');return c}
+$('#cDup').onclick=()=>{const sub=cur(),o=colEd;if(!o)return;const c=dupCol(sub,o);
+  $('#dlgCol').close();rLlibreta();obreCol(c.id);$('#cNom').select();toast('Columna duplicada, buida i amb la data d\'avui. Pots canviar-ne el nom.')};
 $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const name=$('#cNom').value.trim()||(/^p\. ex\./.test($('#cNom').placeholder)?'':$('#cNom').placeholder);
   if(!name)return toast('Posa un nom a la columna.');
   const o={name,type,cat:EVAL.includes(type)||AGRUP.includes(type)||type==='dits'?$('#cCat').value:'',max:Math.max(1,+$('#cMax').value||10)};
@@ -2688,6 +2715,37 @@ $('#recOk').onclick=async()=>{const {sub,plan}=REC,ks=new Set($$('[data-rec]:che
     if(!await confirma('No s\'ha pogut fer la còpia de seguretat al Drive ('+e.message+'). Vols aplicar els canvis igualment? Es poden desfer amb ↶.','Aplica igualment'))return}}
   const cl=colClasse(sub);sel.forEach(x=>{x.st.aid=x.a.id;afegeixClasse(cl,x.ll);setG(sub,cl.id,x.st.id,x.ll,1)});
   save('recuperar les classes dels llistats');$('#dlgRecCl').close();rAlumnes();toast(`${sel.length} alumne${sel.length===1?'':'s'} amb la classe dels Llistats. Es pot desfer amb ↶.`,6000)};
+/* Menú ⋯ de la capçalera de cada columna, i moure columnes arrossegant el títol (dins de la mateixa categoria) */
+function obreHMenu(btn){const sub=cur(),c=sub.columns.find(x=>x.id===btn.dataset.hm);if(!c)return;const m=$('#hMenu');
+  const ord=['num','ord','ass','final','ext','opc'].includes(c.type),dup=c.type!=='final'&&c.type!=='classe';
+  m.innerHTML=`<div style="padding:6px 10px;font-weight:700;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
+    <button data-ha="prop">✎ Propietats…</button>${ord?`<button data-ha="ord">⇅ Ordena per aquesta columna</button>`:''}<button data-ha="pleg">👁 Plega</button>
+    <button data-ha="esq" ${btn.dataset.first==='1'?'disabled':''}>← Mou a l'esquerra</button><button data-ha="dre" ${btn.dataset.last==='1'?'disabled':''}>→ Mou a la dreta</button>
+    ${dup?`<button data-ha="dup">⧉ Duplica</button>`:''}<button data-ha="data">📅 Posa la data d'avui al nom</button>`;
+  m.dataset.col=c.id;$$('.hdots.on').forEach(x=>x.classList.remove('on'));btn.classList.add('on');
+  const r=btn.getBoundingClientRect();m.style.display='block';m.style.left=Math.min(r.left,innerWidth-250)+'px';m.style.top=Math.min(r.bottom+4,innerHeight-m.offsetHeight-8)+'px';m.querySelector('[data-ha]').focus()}
+function tancaHMenu(){$('#hMenu').style.display='none';$$('.hdots.on').forEach(x=>x.classList.remove('on'))}
+$('#hMenu').addEventListener('click',e=>{const b=e.target.closest('[data-ha]');if(!b||b.disabled)return;const sub=cur(),id=$('#hMenu').dataset.col,c=sub.columns.find(x=>x.id===id);tancaHMenu();if(!c)return;
+  const a=b.dataset.ha;
+  if(a==='prop')return obreCol(id);
+  if(a==='ord'){const k='col:'+id;if(sub.ordre!==k){sub.ordre=k;sub.ordreDir='desc'}else if(sub.ordreDir==='desc')sub.ordreDir='asc';else{sub.ordre='cognoms';sub.ordreDir='desc'}save(null,true);return rLlibreta()}
+  if(a==='pleg'){c.ampAnt=c.amp&&c.amp!=='plegada'?c.amp:'normal';c.amp='plegada';save('plegar columna');return rLlibreta()}
+  if(a==='esq'||a==='dre'){mouCol(sub,id,a==='esq'?-1:1);return rLlibreta()}
+  if(a==='dup'){const n=dupCol(sub,c);rLlibreta();obreCol(n.id);$('#cNom').select();return toast('Columna duplicada, buida i amb la data d\'avui. Pots canviar-ne el nom.')}
+  if(a==='data'){const d=dataCurta(),nou=RXDATA.test(c.name)?c.name.replace(RXDATA,d):(c.name.trim()+' '+d);c.name=nomLliure(sub,nou,c);save('data al nom de la columna');rLlibreta()}});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('#hMenu,.hdots'))tancaHMenu()});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#hMenu').style.display==='block')tancaHMenu()});
+$('#main').addEventListener('click',e=>{const b=e.target.closest('.hdots');if(!b)return;e.stopPropagation();e.preventDefault();
+  if(b.classList.contains('on'))tancaHMenu();else obreHMenu(b)},true);
+let arrCol=null;
+$('#main').addEventListener('dragstart',e=>{const th=e.target.closest&&e.target.closest('th.colh[draggable=true]');if(!th)return;arrCol=th.dataset.col;th.classList.add('arr');e.dataTransfer.effectAllowed='move';try{e.dataTransfer.setData('text/plain',arrCol)}catch{}});
+$('#main').addEventListener('dragend',()=>{arrCol=null;$$('th.colh.arr,th.colh.dropl,th.colh.dropr').forEach(x=>x.classList.remove('arr','dropl','dropr'))});
+const thDesti=e=>{if(!arrCol)return null;const th=e.target.closest&&e.target.closest('th.colh[data-col]');const src=$(`th.colh[data-col="${arrCol}"]`);if(!th||!src||th===src||th.dataset.g!==src.dataset.g||!th.dataset.g)return null;return th};
+$('#main').addEventListener('dragover',e=>{const th=thDesti(e);$$('th.colh.dropl,th.colh.dropr').forEach(x=>x.classList.remove('dropl','dropr'));if(!th)return;e.preventDefault();
+  const r=th.getBoundingClientRect();th.classList.add(e.clientX<r.left+r.width/2?'dropl':'dropr')});
+$('#main').addEventListener('drop',e=>{const th=thDesti(e);if(!th)return;e.preventDefault();const sub=cur(),ids=$$(`th.colh[data-g="${th.dataset.g}"]`).map(x=>x.dataset.col);
+  const i=ids.indexOf(arrCol);let j=ids.indexOf(th.dataset.col);const r=th.getBoundingClientRect();if(e.clientX>=r.left+r.width/2)j++;if(j>i)j--;
+  const pasos=j-i;for(let k=0;k<Math.abs(pasos);k++)mouCol(sub,arrCol,Math.sign(pasos));if(pasos){save('moure columna');rLlibreta()}});
 /* ======================= Bloc de notes i pòsits (pantalla pròpia) ======================= */
 const blocTots=()=>{try{return localStorage.getItem('llibreta-bloc-tots')==='1'}catch{return false}};
 function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
@@ -2696,7 +2754,7 @@ function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
   $('#main').innerHTML=`<div class="blocw">
     <section class="blocn"><div class="blpt">${B.pestanyes.map(p=>`<button class="blp ${p.id===B.actiu?'on':''}" data-blp="${p.id}" draggable="true" title="Doble clic per canviar el nom · arrossega per moure">${esc(p.nom)}</button>`).join('')}
       <button class="blp nou" id="blNou" title="Pestanya nova">＋</button><span style="flex:1"></span>
-      ${B.pestanyes.length>1?`<button class="blx" id="blDel" title="Elimina aquesta pestanya">Elimina</button>`:''}<button class="blx" id="blTanca" title="Torna (Esc)">✕</button></div>
+      ${B.pestanyes.length>1?`<button class="blx" id="blDel" title="Elimina aquesta pestanya">Elimina</button>`:''}${esMobil()?'':'<button class="blx" id="blTanca" title="Torna (Esc)">✕</button>'}</div>
       <textarea id="blTxt" spellcheck="true" placeholder="Materials, dades, recordatoris…">${esc(act.text)}</textarea></section>
     <section class="blocp"><h2>Pòsits <span class="ebn">${pos.length}${nAl?` · <b class="${pos.some(p=>['avui','vermell','vencut'].includes(nivPosit(p)))?'r':'t'}">${nAl} en alerta</b>`:''}</span>
       <span style="flex:1"></span><select id="blFil" title="Quins pòsits es veuen"><option value="0">Aquesta llibreta</option><option value="1" ${tots?'selected':''}>Tots</option></select>
@@ -2714,9 +2772,9 @@ function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
     B.pestanyes.push(p);B.actiu=p.id;save('pestanya nova');rBloc();$('#blTxt').focus()};
   $('#blDel')&&($('#blDel').onclick=async()=>{if(!await confirma(`Eliminar la pestanya «${act.nom}»${act.text.trim()?' i tot el que hi ha escrit':''}?`,'Elimina'))return;
     B.pestanyes=B.pestanyes.filter(p=>p.id!==act.id);B.actiu=B.pestanyes[0].id;save('eliminar pestanya');rBloc()});
-  $('#blTanca').onclick=()=>{tab=tabPrincipal;render()};
+  $('#blTanca')&&($('#blTanca').onclick=()=>{tab=tabPrincipal;render()});
   $('#blFil').onchange=e=>{try{localStorage.setItem('llibreta-bloc-tots',e.target.value)}catch{}rBloc()};
-  lligaPosits(pos,sub,vistAra,rBloc)}
+  lligaPosits(pos,sub,vistAra,()=>esMobil()?rMobil():rBloc())}
 addEventListener('keydown',e=>{if(e.key!=='Escape'||tab!=='bloc'||document.querySelector('dialog[open]'))return;e.preventDefault();tab=tabPrincipal;render()});
 let recEd=null,recOn='ll';
 function obreRec(id,on){recOn=on;const a=on==='ll'?cur().recursos:state.recursos;recEd=id?a.find(r=>r.id===id):null;
