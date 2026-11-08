@@ -379,7 +379,7 @@ table.compact th.colh .hn{font-size:11px;padding-right:0;letter-spacing:-.01em}
 th.colh:hover .hdots,.hdots.on{display:flex}.hdots:hover,.hdots.on{background:var(--tar);color:#fff}
 @media (hover:none){.hdots{display:flex;opacity:.7}}
 th.colh.arr{opacity:.4}th.colh.dropl{box-shadow:inset 3px 0 0 var(--tar)}th.colh.dropr{box-shadow:inset -3px 0 0 var(--tar)}
-th.grup.solt{background:transparent;border-top:0;border-left:0;border-right:0}
+th.grup.solt{overflow:hidden;text-overflow:ellipsis;max-width:0;cursor:default}
 #hMenu button:disabled{opacity:.35;cursor:default}
 .srt{color:var(--tar);font-size:11px;margin-left:3px}
 th.colh .vt+.srt{position:absolute;right:2px;top:2px}
@@ -390,7 +390,7 @@ th.colh:hover .htools{display:flex}
 th.colh.plc{padding:0;text-align:center;vertical-align:top;background:#e9e9e9;cursor:pointer}th.colh.plc:hover{background:var(--tar2)}
 .ull{border:0;background:none;cursor:pointer;font-size:11px;padding:4px 0;opacity:.7}.ull:hover{opacity:1}
 td.plcc{background:repeating-linear-gradient(0deg,#e4e4e4 0 6px,#ededed 6px 12px)!important;padding:0}
-th.grup.solt{padding:2px 2px;text-align:center}
+th.grup.solt{padding:5px 8px;text-align:left}
 tfoot td{position:sticky;bottom:0;z-index:3;background:#fff3e0!important;font-weight:700;font-size:13px;text-align:center;border-top:2px solid var(--tar);padding:6px 4px;white-space:nowrap}
 tfoot td.fx{z-index:6;text-align:left;padding:6px 10px}
 td[tabindex]:focus{outline:2px solid var(--tar);outline-offset:-2px}
@@ -616,6 +616,7 @@ body.mob #btnPleg,body.mob #bplTab{display:none!important}
   </div>
   <div class="fl" id="cCatF"><label class="lb">Categoria</label><select id="cCat"></select></div>
   <div class="fl" id="cColorF"><label class="lb">Color</label><span class="pal" id="cColor"></span><span style="font-size:12.5px;color:var(--suau)">(franja de sobre, per a columnes sense categoria)</span></div>
+  <div class="fl" id="cFrF"><label class="lb">Text de la franja</label><input type="text" id="cFr" maxlength="40" placeholder="(buida)" style="min-width:220px"><span style="font-size:12.5px;color:var(--suau)">opcional: només és una etiqueta</span></div>
   <div class="fl" id="cCatAj" style="margin-top:-2px"><label class="lb"></label><span style="font-size:12.5px;color:var(--suau)">⊘ Aquesta columna només s'agrupa amb la categoria: no compta per a la nota.</span></div>
   <div id="cFinalF" style="background:var(--gris);border-radius:8px;padding:8px 10px;margin-top:8px">
     <div style="font-size:13.5px;margin-bottom:6px">Omple aquesta columna amb el càlcul ponderat:</div>
@@ -737,7 +738,7 @@ body.mob #btnPleg,body.mob #bplTab{display:none!important}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.3 · ammonite · novembre 2026',COMPILACIO='8/11 18:57';
+const VERSIO='2.2.3 · ammonite · novembre 2026',COMPILACIO='8/11 19:05';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1433,7 +1434,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   const nB=gs.length;
   h+=gs.map((g,bi)=>{
     const mvL=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="-1" ${bi===0?'disabled':''} title="Mou a l'esquerra">◀</button>`,mvR=ro?'':`<button class="gmv" data-bk="${g.key}" data-d="1" ${bi===nB-1?'disabled':''} title="Mou a la dreta">▶</button>`;
-    if(!g.cat){return `<th class="grup solt"></th>`}
+    if(!g.cat){const cc=g.solt.color||'#D9D9D9',fr=g.solt.franja||'';return `<th class="grup solt" data-frc="${g.solt.id}" style="background:${cc};color:${textSobre(cc)}" title="${fr?esc(fr)+' · ':''}doble clic: propietats de «${esc(g.solt.name)}»">${esc(fr)}</th>`}
     const nC=g.folded?1:g.cols.length;
     return `<th class="grup ${g.folded?'plg':''}" colspan="${nC}" style="background:${g.cat.color};color:${textSobre(g.cat.color)}">${mvL}<span class="gtog" data-pleg="${g.cat.id}" title="${g.folded?'Desplega':'Plega'} la categoria">${g.folded?'▸':'▾'} ${esc(g.cat.sigla)}${g.folded?'':` · ${esc(g.cat.name)}`}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}</span>${mvR}</th>`}).join('');
   h+=`</tr><tr>`;let zc=1000;
@@ -2250,6 +2251,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>Full de càlcul</b>: a ⚙ › Dades, «Desa un full de càlcul al Drive». Una pestanya per llibreta activa (columnes, categories i nota final) i una per llistat del curs, sense fórmules. Es desa a la carpeta «Llibreta del Profe · PDF» com a Full de càlcul de Google. És una còpia per consultar: els canvis que hi facis no tornen a la llibreta.</li></ul>`)+
   sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. Arrossega el títol per moure-la.</li>
     <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera. <b>Alt + ↑ / ↓</b>: llibreta anterior o següent.</li>
+    <li><b>Columnes sense categoria</b>: la franja de dalt agafa el color de la columna (gris clar per defecte). A ✎ Propietats pots escriure-hi un text lliure («Text de la franja»), que és només una etiqueta; doble clic a la franja obre les propietats.</li>
     <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina amb «⌄ Llibreta del Profe» a l'esquerra (per tornar-la a obrir) i, a la dreta, només els avisos: sortides de l'aula, temporitzador, pòsits urgents i estat del Drive. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
@@ -2455,8 +2457,8 @@ $('#pop').addEventListener('click',e=>{e.stopPropagation();const b=e.target.clos
   const sub=cur(),v={y:0,r:0,...(getG(sub,popT.dataset.c,popT.dataset.s)||{})};v[b.dataset.k]=Math.max(0,v[b.dataset.k]+ +b.dataset.d);
   setG(sub,popT.dataset.c,popT.dataset.s,v.y||v.r?v:undefined);$('#popY').textContent=v.y;$('#popR').textContent=v.r;popT.innerHTML=incHtml(v)});
 document.addEventListener('click',e=>{$('#pop').style.display='none';popT=null;if(!e.target.closest('.ocw')){const l=$('#ocList');if(l)l.hidden=true}});
-$('#main').addEventListener('dblclick',e=>{if(tab!=='llibreta'||!state)return;const th=e.target.closest('th.colh[data-col]');if(!th||e.target.closest('button'))return;
-  if(RO())return toast('Llibreta arxivada: només lectura.');obreCol(th.dataset.col)});
+$('#main').addEventListener('dblclick',e=>{if(tab!=='llibreta'||!state)return;const fc=e.target.closest('th[data-frc]');const th=e.target.closest('th.colh[data-col]');if((!th&&!fc)||e.target.closest('button'))return;
+  if(RO())return toast('Llibreta arxivada: només lectura.');obreCol(fc?fc.dataset.frc:th.dataset.col)});
 
 /* ======================= Diàleg de columna ======================= */
 let colEd=null;
@@ -2479,7 +2481,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cCat').innerHTML='<option value="">— Sense categoria</option>'+sub.categories.map(c=>`<option value="${c.id}">${esc(c.sigla)} · ${esc(c.name)}${sub.tipus==='llista'?'':' ('+c.weight+'%)'}</option>`).join('');
   $('#cCat').value=colEd?(sub.categories.some(k=>k.id===colEd.cat)?colEd.cat:''):(sub.categories[0]?.id||'');
   $('#cTipus').disabled=!!colEd&&(Object.keys(sub.grades[colEd.id]||{}).length>0||colEd.type==='ext');
-  $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;colColor=colEd?.color||'#D9D9D9';pintaColColor();
+  $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;colColor=colEd?.color||'#D9D9D9';pintaColColor();$('#cFr').value=colEd?.franja||'';
   $('#cDel').style.visibility=colEd?'visible':'hidden';$('#cDup').style.display=colEd&&colEd.type!=='final'&&colEd.type!=='classe'?'':'none';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
 function tipusUI(inici){const t=$('#cTipus').value;
   $('#cMaxF').style.display=t==='num'?'flex':'none';$('#cClasseF').style.display=t==='classe'?'block':'none';
@@ -2493,7 +2495,7 @@ function tipusUI(inici){const t=$('#cTipus').value;
   $('#cMapaW').style.display=pond&&$('#cCompta').checked?'block':'none';
   $('#cCatAj').style.display=agr&&!(pond&&$('#cCompta').checked)?'flex':'none';if(pond)pintaMapa();
   $('#cFinalF').style.display=t==='final'&&colEd?'block':'none';
-  $('#cColorF').style.display=t!=='classe'&&($('#cCatF').style.display==='none'||!$('#cCat').value)?'flex':'none';
+  $('#cColorF').style.display=$('#cFrF').style.display=t!=='classe'&&($('#cCatF').style.display==='none'||!$('#cCat').value)?'flex':'none';
   if(t==='ext'&&!colEd&&!inici)$('#cCat').value='';
   const sug={final:'Nota final',classe:'Classe',dits:'Participació',check:'Lliurat',opc:'Lliurament',url:'Enllaç',inc:'Incidències',ext:'Nota trimestre anterior'}[t];
   $('#cNom').placeholder=sug||'p. ex. Examen tema 1'}
@@ -2555,7 +2557,7 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   if(type==='icones'){const ic=splitIcones($('#cIcones').value);if(ic.length<2)return toast('Posa com a mínim dues icones (fins a 5).');o.icons=ic}
   if(type==='classe'){o.classes=[...new Set($('#cClasses').value.split('\n').map(x=>x.trim()).filter(Boolean))]}
   if(type==='ext'){if(!$('#cSrc').value)return toast('No hi ha cap llibreta enllaçada. Primer duplica una llibreta.');o.src=$('#cSrc').value;o.item=$('#cItem').value}
-  o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;o.color=colColor;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
+  o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;o.color=colColor;const fr=$('#cFr').value.trim();if(fr)o.franja=fr;else delete o.franja;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
   /* si una columna surt d'una categoria, es queda al costat d'on era */
   if(colEd&&colEd.cat&&!o.cat&&sub.categories.some(k=>k.id===colEd.cat)){sincBlocs(sub);const i=sub.blocs.findIndex(x=>x.t==='cat'&&x.id===colEd.cat);sub.blocs.splice(i+1,0,{t:'col',id:colEd.id})}
   if(colEd)Object.assign(colEd,o);else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};

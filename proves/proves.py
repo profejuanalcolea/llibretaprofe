@@ -911,6 +911,19 @@ def p_barra(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columna sense categoria: franja del color de la columna, text lliure des de Propietats i doble clic')
+def p_franja(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("(()=>{const s=cur();s.columns.push({id:'z1',name:'ola',type:'text',cat:'',color:'#56B4E9'});save();render()})()"); pg.wait_for_timeout(200)
+    bg = pg.evaluate("getComputedStyle(document.querySelector('th[data-frc=z1]')).backgroundColor")
+    comprova(bg == 'rgb(86, 180, 233)', f'la franja no agafa el color de la columna: {bg}')
+    pg.dblclick('th[data-frc=z1]'); pg.wait_for_timeout(300)
+    comprova(pg.is_visible('#cFr'), 'el doble clic a la franja no obre les propietats amb el camp de text')
+    pg.fill('#cFr', 'Extra'); pg.click('#dlgCol button:has-text("Desa")'); pg.wait_for_timeout(300)
+    comprova(pg.evaluate("cur().columns.find(c=>c.id==='z1').franja") == 'Extra' and pg.inner_text('th[data-frc=z1]').strip() == 'Extra', 'el text de la franja no es desa o no es veu')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -990,7 +1003,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
