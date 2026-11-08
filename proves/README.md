@@ -60,6 +60,7 @@ python3 proves/proves.py
 | Capçalera | Menú ⋯, arrossegar dins la categoria, desplegar clicant la franja, nom en dues línies |
 | Mòbil (2) | Barra Llibreta/Bloc/Enllaços, Bloc editable, «És el teu mòbil?» |
 | Full de càlcul | Pestanya per llibreta activa i per llistat, nota final com a número, sense fórmules, convertit a Full de Google a la carpeta del Drive |
+| Barra plegable | Franja amb el nom a l'esquerra i avisos, es recorda, canvi de llibreta pel nom i Alt+↑/↓, Llibreta/Avaluació |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

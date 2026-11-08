@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.2.3 · ammonite · novembre 2026
+- **Barra negra plegable** (botó ⌃): queda una franja fina amb «⌄ Llibreta del Profe» a l'esquerra i, a la dreta, només els avisos (sortides, temporitzador, pòsits urgents, estat del Drive). Es recorda per ordinador.
+- **Canvi de llibreta clicant el nom** (▾) a la capçalera, i **Alt + ↑ / ↓** per anar a l'anterior o la següent. Amb la barra plegada, botons **Llibreta | Avaluació** al costat del nom.
+
 ## 2.2.2 · ammonite · novembre 2026
 - **Full de càlcul al Drive** (⚙ › Dades): una pestanya per llibreta activa amb totes les columnes, les categories i la **nota final**, i una pestanya per llistat del curs. Sense fórmules; les notes numèriques són números. Es desa a la carpeta «Llibreta del Profe · PDF» convertit a Full de càlcul de Google.
 

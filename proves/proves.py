@@ -871,6 +871,46 @@ def p_full(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Barra plegable: franja amb el nom a l\'esquerra i avisos, canvi de llibreta des del nom, Alt+↑/↓ i Llibreta/Avaluació')
+def p_barra(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("(()=>{const s=novaSub('Geologia','batx','🌋');state.subjects.push(s);save();render()})()"); pg.wait_for_timeout(200)
+    pg.click('#btnPleg'); pg.wait_for_timeout(200)
+    h = pg.evaluate("document.querySelector('header').getBoundingClientRect().height")
+    comprova(h <= 21 and pg.evaluate("document.body.classList.contains('bpleg')"), f'la barra no es plega: {h}px')
+    comprova(pg.is_visible('#bplTab') and pg.is_visible('#estat') and not pg.is_visible('#selSub') and not pg.is_visible('#btnUndo'), 'a la franja hi ha d\'haver el nom i l\'estat, i res més')
+    tb = pg.evaluate("document.querySelector('#bplTab').getBoundingClientRect().left")
+    comprova(tb < 40 and 'Llibreta del Profe' in pg.inner_text('#bplTab'), f'el nom ha d\'anar a l\'esquerra: {tb}')
+    # pòsit urgent: el botó del Bloc surt a la franja
+    pg.evaluate("state.posits=[{id:'p1',text:'Ara',data:new Date().toISOString().slice(0,10)}];render()"); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('.blocav'), 'el pòsit urgent no es veu a la franja')
+    # es recorda en tornar a carregar
+    pg.reload(); pg.wait_for_timeout(600)
+    if pg.is_visible('#lgEntra'): pg.click('#lgEntra')
+    pg.wait_for_timeout(1500)
+    comprova(pg.evaluate("document.body.classList.contains('bpleg')"), 'no recorda la barra plegada: ' + str(pg.evaluate("[localStorage.getItem('llibreta-barra-plegada'),!!state,document.body.className]")))
+    # canviar de llibreta clicant el nom
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(150)
+    nom0 = pg.evaluate("cur().name"); pg.click('h1[data-llsel]'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#llMenu [data-llv]').count() == pg.evaluate("actives().length"), 'el menú no té totes les llibretes')
+    pg.locator('#llMenu [data-llv]').filter(has_not_text=nom0).first.click(); pg.wait_for_timeout(200)
+    nom1 = pg.evaluate("cur().name"); comprova(nom1 != nom0 and pg.locator('#llMenu').count() == 0, 'no canvia de llibreta')
+    # Alt+↑/↓
+    pg.keyboard.press('Alt+ArrowUp'); pg.wait_for_timeout(150); a = pg.evaluate("cur().name")
+    pg.keyboard.press('Alt+ArrowDown'); pg.wait_for_timeout(150); b2 = pg.evaluate("cur().name")
+    comprova(a != b2 and b2 == pg.evaluate("actives()[actives().findIndex(s=>s.name===%r)+1]?.name||%r" % (a, a)), f'Alt+fletxes: {a} {b2}')
+    # Llibreta / Avaluació des de la capçalera
+    pg.evaluate("state.cur=state.subjects.find(s=>s.name==='EXEMPLE').id;tab='llibreta';render()"); pg.wait_for_timeout(150)
+    pg.click('.segt [data-segt=resum]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("tab") == 'resum', 'el botó Avaluació no hi va')
+    pg.click('.segt [data-segt=llibreta]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("tab") == 'llibreta', 'el botó Llibreta no hi torna')
+    # desplegar
+    pg.click('#bplTab'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#selSub') and not pg.is_visible('.segt'), 'no es desplega')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -950,7 +990,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
