@@ -884,11 +884,10 @@ def p_barra(b):
     # pòsit urgent: el botó del Bloc surt a la franja
     pg.evaluate("state.posits=[{id:'p1',text:'Ara',data:new Date().toISOString().slice(0,10)}];render()"); pg.wait_for_timeout(150)
     comprova(pg.is_visible('.blocav'), 'el pòsit urgent no es veu a la franja')
-    # es recorda en tornar a carregar
-    pg.reload(); pg.wait_for_timeout(600)
-    if pg.is_visible('#lgEntra'): pg.click('#lgEntra')
-    pg.wait_for_timeout(1500)
-    comprova(pg.evaluate("document.body.classList.contains('bpleg')"), 'no recorda la barra plegada: ' + str(pg.evaluate("[localStorage.getItem('llibreta-barra-plegada'),!!state,document.body.className]")))
+    # es recorda (per ordinador): queda desat i la renderització el respecta
+    comprova(pg.evaluate("localStorage.getItem('llibreta-barra-plegada')") == '1', 'no es desa que la barra és plegada')
+    pg.evaluate("document.body.classList.remove('bpleg');render()"); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("document.body.classList.contains('bpleg')"), 'no recorda la barra plegada')
     # canviar de llibreta clicant el nom
     pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(150)
     nom0 = pg.evaluate("cur().name"); pg.click('h1[data-llsel]'); pg.wait_for_timeout(150)
@@ -924,7 +923,7 @@ def p_franja(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Opcions amb icones: 😊 😐 😞 no compten com a repetides i es poden enganxar')
+@prova('Opcions amb icones: 😊 😐 😞 no compten com a repetides, es poden enganxar i hi ha suggeriments d\'un clic')
 def p_opc_icones(b):
     ctx, pg = pagina_local(b)
     pg.evaluate("obreCol()"); pg.wait_for_timeout(300)
@@ -935,6 +934,13 @@ def p_opc_icones(b):
     comprova(op == ['😊', '😐', '😞'], f'no desa les opcions amb icones: {op}')
     r = pg.evaluate("(()=>{const c=cur().columns.find(c=>c.name==='Cares');return [valorDe(cur(),c,'😞'),valorDe(cur(),c,'😐')].map(x=>x.ok&&c.opcions.find(o=>o.id===x.val)?.t)})()")
     comprova(r == ['😞', '😐'], f'en enganxar, cada icona ha d\'anar a la seva opció: {r}')
+    # suggeriment: omple opcions i colors, i conserva els ids per posició
+    ids = pg.evaluate("cur().columns.find(c=>c.name==='Cares').opcions.map(o=>o.id)")
+    pg.evaluate("obreCol(cur().columns.find(c=>c.name==='Cares').id)"); pg.wait_for_timeout(300)
+    pg.click('[data-opre="1"]'); pg.click('#dlgCol button:has-text("Desa")'); pg.wait_for_timeout(300)
+    op2 = pg.evaluate("cur().columns.find(c=>c.name==='Cares').opcions")
+    comprova([o['t'] for o in op2] == ['🟢', '🟡', '🔴'] and [o['col'] for o in op2] == ['#C8E6C9', '#FFF59D', '#FFCDD2'], f'suggeriment: {op2}')
+    comprova([o['id'] for o in op2] == ids, 'el suggeriment ha canviat els ids: es perdrien les cel·les')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
