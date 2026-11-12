@@ -780,6 +780,8 @@ const stamp=()=>{const d=new Date();return `${d.getFullYear()}-${p2(d.getMonth()
 const diesDes=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const avui=()=>{const d=new Date();return `${d.getFullYear()}-${p2(d.getMonth()+1)}-${p2(d.getDate())}`};
 const nomComplet=s=>(s.nom+' '+(s.cognoms||'')).trim();
+/* Clau per comparar opcions: com norm, però conserva icones i símbols (😊 ≠ 😞) */
+const normOpc=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
 const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
 function pregunta(titol,text,botons,input){return new Promise(res=>{const d=$('#dlgQ');$('#qTit').textContent=titol;$('#qTxt').textContent=text;
   const qi=$('#qIn');qi.hidden=input===undefined;qi.value=input??'';
@@ -2361,7 +2363,7 @@ function valorDe(sub,c,raw){const v=String(raw??'').trim();if(v==='')return{ok:t
   case 'final':{if(/^(na|as|an|ae)$/i.test(v))return{ok:true,val:v.toUpperCase()};const n=+v.replace(',','.');return isNaN(n)||n<0||n>10?{ok:false}:{ok:true,val:n}}
   case 'check':{const k=norm(v);if(['fet','x','si','1','ok','✔','✓'].includes(k)||v==='✔'||v==='✓')return{ok:true,val:'fet'};if(['no','0','no fet','✘'].includes(k)||v==='✘')return{ok:true,val:'no'};return{ok:false}}
   case 'icones':return iconesDe(c).includes(v)?{ok:true,val:v}:{ok:false};
-  case 'opc':{const o=(c.opcions||[]).find(x=>x.id===v||norm(x.t)===norm(v));return o?{ok:true,val:o.id}:{ok:false}}
+  case 'opc':{const o=(c.opcions||[]).find(x=>x.id===v||normOpc(x.t)===normOpc(v));return o?{ok:true,val:o.id}:{ok:false}}
   case 'url':return{ok:true,val:/^https?:\/\//i.test(v)?v:'https://'+v};
   case 'classe':case 'lliure':return{ok:true,val:v};
   default:return{ok:false}}}
@@ -2547,7 +2549,7 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   const o={name,type,cat:EVAL.includes(type)||AGRUP.includes(type)||type==='dits'?$('#cCat').value:'',max:Math.max(1,+$('#cMax').value||10)};
   if(EVAL.includes(type))o.noCompta=!!o.cat&&!$('#cCompta').checked&&cur().tipus!=='llista';
   if(type==='opc'){const ops=opcEd.map(x=>({...x,t:x.t.trim()})).filter(x=>x.t);if(ops.length<2||ops.length>6)return toast('Posa entre 2 i 6 opcions.');
-    if(new Set(ops.map(x=>norm(x.t))).size<ops.length)return toast('Hi ha dues opcions amb el mateix nom.');
+    if(new Set(ops.map(x=>normOpc(x.t))).size<ops.length)return toast('Hi ha dues opcions amb el mateix nom.');
     if(colEd){const ids=new Set(ops.map(x=>x.id)),g=sub.grades[colEd.id]||{},perd=Object.values(g).filter(v=>!ids.has(v)).length;
       if(perd&&!await confirma(`${perd} cel·la${perd===1?'':'es'} tenen una opció que has tret i quedaran buides.`,'Continua'))return;
       Object.keys(g).forEach(k=>{if(!ids.has(g[k]))delete g[k]})}

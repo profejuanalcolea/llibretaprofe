@@ -924,6 +924,20 @@ def p_franja(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Opcions amb icones: 😊 😐 😞 no compten com a repetides i es poden enganxar')
+def p_opc_icones(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("obreCol()"); pg.wait_for_timeout(300)
+    pg.select_option('#cTipus', 'opc'); pg.fill('#cNom', 'Cares')
+    for i, e in enumerate(['😊', '😐', '😞']): pg.fill(f'#cOpcL input[data-opt="{i}"]', e)
+    pg.click('#dlgCol button:has-text("Desa")'); pg.wait_for_timeout(300)
+    op = pg.evaluate("cur().columns.find(c=>c.name==='Cares')?.opcions?.map(o=>o.t)")
+    comprova(op == ['😊', '😐', '😞'], f'no desa les opcions amb icones: {op}')
+    r = pg.evaluate("(()=>{const c=cur().columns.find(c=>c.name==='Cares');return [valorDe(cur(),c,'😞'),valorDe(cur(),c,'😐')].map(x=>x.ok&&c.opcions.find(o=>o.id===x.val)?.t)})()")
+    comprova(r == ['😞', '😐'], f'en enganxar, cada icona ha d\'anar a la seva opció: {r}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1003,7 +1017,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
