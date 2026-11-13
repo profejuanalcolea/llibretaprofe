@@ -63,6 +63,7 @@ python3 proves/proves.py
 | Barra plegable | Franja amb el nom a l'esquerra i avisos, es recorda, canvi de llibreta pel nom i Alt+↑/↓, Llibreta/Avaluació |
 | Franja de columna solta | Color de la columna a la franja de dalt, text lliure des de Propietats i doble clic |
 | Opcions amb icones | Opcions només amb icones es desen i s'enganxen bé; els suggeriments omplen opcions i colors sense perdre les cel·les |
+| Columna estreta | Desplegables sense fletxeta a les columnes estretes; surt en passar-hi el ratolí; les normals no canvien |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

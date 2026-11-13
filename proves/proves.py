@@ -944,6 +944,21 @@ def p_opc_icones(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columna estreta: el desplegable no mostra la fletxeta (només en passar-hi el ratolí)')
+def p_estreta(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("(()=>{const s=cur();s.columns.push({id:'e1',name:'Cares',type:'opc',cat:'',amp:'estreta',opcions:[{id:'a',t:'😊',col:'#C8E6C9'},{id:'b',t:'😞',col:'#FFCDD2'}]});save();render()})()"); pg.wait_for_timeout(200)
+    sel = pg.locator('td.estr[data-c=e1] select.g').first
+    comprova(sel.count() == 1, 'la cel·la estreta no porta la classe estr')
+    ap = sel.evaluate("e=>getComputedStyle(e).appearance")
+    comprova(ap == 'none', f'la fletxeta encara es veu: {ap}')
+    sel.hover(); pg.wait_for_timeout(100)
+    comprova(sel.evaluate("e=>getComputedStyle(e).appearance") != 'none', 'en passar-hi el ratolí hauria de sortir la fletxeta')
+    nor = pg.evaluate("[...document.querySelectorAll('td:not(.estr) select.g')].filter(e=>!e.disabled).map(e=>getComputedStyle(e).appearance)")
+    comprova(not pg.evaluate("cur().compacte") and all(a != 'none' for a in nor[:3]), f'les columnes normals han de mantenir la fletxeta: {nor[:3]}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1023,7 +1038,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

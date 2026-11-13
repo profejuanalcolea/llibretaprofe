@@ -130,6 +130,9 @@ table.compact{font-size:13px}
 table.compact th.colh{padding:4px 3px}
 table.compact th.colh.vert{height:92px;padding:0;overflow:visible;vertical-align:bottom}
 th.colh .vt{position:absolute;left:14px;bottom:8px;transform-origin:left bottom;transform:rotate(-45deg);white-space:nowrap;max-width:112px;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:600;pointer-events:none}
+/* 2.2.5 · columnes estretes: sense fletxeta (surt en passar-hi el ratolí o amb la cel·la seleccionada) */
+td.estr select.g{-webkit-appearance:none;appearance:none;padding:5px 2px;text-align:center;text-align-last:center}
+td.estr:hover select.g:not(:disabled),td.estr select.g:focus{-webkit-appearance:menulist;appearance:auto}
 table.compact td input.g,table.compact td select.g{min-width:0;padding:5px 3px;height:30px;text-align:center;text-align-last:center;-webkit-appearance:none;appearance:none}
 table.compact td input.lliure{text-align:left}
 input.lliure{text-overflow:ellipsis}input.lliure:focus{text-overflow:clip}
@@ -740,7 +743,7 @@ body.mob #btnPleg,body.mob #bplTab{display:none!important}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.4 · ammonite · novembre 2026',COMPILACIO='12/11 10:24';
+const VERSIO='2.2.5 · ammonite · novembre 2026',COMPILACIO='13/11 09:12';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1317,7 +1320,7 @@ const faltaCls=v=>v==='F'?'vF':v==='FJ'?'vFJ':v==='NAV'?'vNAV':'';
 function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="${c.id}" data-s="${st.id}"`,dis=RO()?'disabled':'';
   if(c.amp==='plegada')return `<td class="plcc" ${a}></td>`;
   const cv=c.cls?.vals?.[st.id],clsMan=cv&&cv.v!==undefined&&v!==cv.v,clsC=c.cls&&cv?(clsMan?' clsman':cv.draft?' clsdraft':''):'';
-  const an=sub.anot?.[c.id+'|'+st.id],anC=(an?(an.h?' anh':'')+(an.t?' ant':''):'')+clsC,anI=an?.t?`<i class="antri"></i>`:'',anT=(an?.t||cv)?` title="${esc([an?.t?'💬 '+an.t:'',cv?`🎓 Classroom: ${cv.p===undefined||cv.p===null?'sense nota':fmt(cv.p)+(c.cls.max?'/'+c.cls.max:'')}${cv.draft?' (esborrany, encara no retornada)':''}${clsMan?' · canviada a mà a la llibreta':''}`:''].filter(Boolean).join('\n'))}"`:'';
+  const an=sub.anot?.[c.id+'|'+st.id],anC=(an?(an.h?' anh':'')+(an.t?' ant':''):'')+clsC+(c.amp==='estreta'?' estr':''),anI=an?.t?`<i class="antri"></i>`:'',anT=(an?.t||cv)?` title="${esc([an?.t?'💬 '+an.t:'',cv?`🎓 Classroom: ${cv.p===undefined||cv.p===null?'sense nota':fmt(cv.p)+(c.cls.max?'/'+c.cls.max:'')}${cv.draft?' (esborrany, encara no retornada)':''}${clsMan?' · canviada a mà a la llibreta':''}`:''].filter(Boolean).join('\n'))}"`:'';
   const td=(k,inner,foc)=>`<td ${a} class="${cls} ${k}${anC}" style="${sty}"${anT}${foc?' tabindex="0"':''}>${inner}${anI}</td>`;
   const fa=faltaCls(v);
   switch(c.type){
@@ -2238,6 +2241,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>A les cel·les pots escriure <b>F</b> (falta: compta com un 0), <b>FJ</b> (falta justificada: no compta) i <b>nav</b> o <b>no ava</b> (no avaluat: no compta, surt en taronja).</li>
     <li><b>Clic dret</b> en una cel·la (o <b>Alt+M</b>): marcar-la en groc o posar-hi un comentari (triangle taronja). Només ho veus tu.</li>
     <li>La columna <b>Nom</b> es fa més ampla o més estreta arrossegant la vora; doble clic s'ajusta al nom més llarg. Als textos llargs de les columnes Lliure, el text complet surt en passar-hi el ratolí.</li>
+    <li>A les columnes <b>estretes</b>, els desplegables no mostren la fletxeta (no tapa la icona ni el valor): surt en passar-hi el ratolí. Es despleguen igual clicant la cel·la.</li>
     <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
   sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>

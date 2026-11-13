@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.2.5 · ammonite · novembre 2026
+- **Columnes estretes:** els desplegables no mostren la fletxeta, que tapava la icona o el valor; surt en passar-hi el ratolí o amb la cel·la seleccionada.
+
 ## 2.2.4 · ammonite · novembre 2026
 - **Corregit:** a les columnes d'Opcions, les opcions fetes només amb icones (😊 😐 😞) es prenien per repetides i no es podien desar; ni s'enganxaven bé des de l'Excel.
 - **Suggeriments a Opcions:** 😊 😐 😞, 🟢 🟡 🔴, 👍 👎, ⭐ ⭐⭐ ⭐⭐⭐, ✔ ✘ i Lliurat · Tard · No lliurat omplen les opcions i els colors d'un clic.
