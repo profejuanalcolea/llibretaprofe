@@ -487,7 +487,7 @@ def p_nocompta(b):
     # sense Ex2: Ada EX 6 · TR 6 → 6 · Bru EX 8 · TR 10 → 8.8 · Cesc EX 9 → 9
     comprova(pg.evaluate(FINALS_JS) == [6, 8.8, 9], f'finals amb Ex2 exclosa: {pg.evaluate(FINALS_JS)}')
     th = pg.locator('th.colh[data-col=c2]')
-    comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No compta' in th.get_attribute('title'), 'la capçalera no porta el signe ⊘')
+    comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No compta' in th.locator('.npx').get_attribute('title'), 'la capçalera no porta el signe ⊘ (amb el rètol «No compta» al símbol)')
     comprova(th.locator('.hn').evaluate("e=>getComputedStyle(e).fontStyle") == 'normal' and th.evaluate("e=>getComputedStyle(e).backgroundColor") != 'rgb(236, 236, 236)', 'la capçalera encara surt grisa o en cursiva')
     comprova(th.locator('.npx').evaluate("e=>getComputedStyle(e).color") == 'rgb(153, 153, 153)', 'el símbol ⊘ no és gris')
     comprova(pg.evaluate("cur().columns.find(c=>c.id==='c2').cat") == 'kA', 'la columna ha sortit de la categoria')
@@ -973,6 +973,29 @@ def p_calc_copia(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Avaluació: el ⋯ de Càlcul tria Assoliments / Numèric / Mixt; nota final que no encaixa, marcada; rètols només amb el nom')
+def p_calc_mode(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    t = pg.evaluate("[...document.querySelectorAll('th.colh[data-col]')].map(t=>t.title)")
+    comprova(t and all('doble clic' not in x and 'Numèrica' not in x for x in t), f'els rètols han de dur només el nom: {t[:3]}')
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    st = pg.evaluate("cur().students[0].id")
+    calc = lambda: pg.evaluate("(()=>{const tr=document.querySelector('tr[data-s=\"%s\"]');const tds=[...tr.children];return tds[2+cur().categories.length].textContent.trim()})()" % st)
+    m0 = calc(); comprova(' · ' in m0, f'mode mixt per defecte: {m0}')
+    pg.click('[data-cmode]'); pg.click('#cmMenu [data-cm=ass]'); pg.wait_for_timeout(200)
+    a = calc(); comprova(a in ('NA', 'AS', 'AN', 'AE') and a == m0.split(' · ')[1], f'assoliments: {a}')
+    pg.click('[data-cmode]'); pg.click('#cmMenu [data-cm=num]'); pg.wait_for_timeout(200)
+    n = calc(); comprova(n == m0.split(' · ')[0], f'numèric: {n}')
+    comprova(pg.evaluate("cur().aval.calc") == 'num', 'no es desa el mode')
+    # nota final que no encaixa
+    pg.evaluate("(()=>{const s=cur();let f=s.columns.find(c=>c.type==='final');if(!f){f={id:'fz',name:'Final',type:'final',cat:''};s.columns.push(f)}setG(s,f.id,s.students[0].id,'AN',1);render()})()"); pg.wait_for_timeout(200)
+    comprova(pg.locator('td.fmis').count() == 1, 'la nota final AN en mode numèric hauria de sortir marcada')
+    pg.click('[data-cmode]'); pg.click('#cmMenu [data-cm=mixt]'); pg.wait_for_timeout(200)
+    comprova(pg.locator('td.fmis').count() == 0 and calc() == m0, 'el mode mixt ha de quedar com abans')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1052,7 +1075,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

@@ -65,6 +65,7 @@ python3 proves/proves.py
 | Opcions amb icones | Opcions només amb icones es desen i s'enganxen bé; els suggeriments omplen opcions i colors sense perdre les cel·les |
 | Columna estreta | Desplegables sense fletxeta a les columnes estretes; surt en passar-hi el ratolí; les normals no canvien |
 | Copiar de la calculadora | El botó ⧉ i Ctrl+C copien el resultat amb coma |
+| Mode del càlcul | ⋯ de Càlcul: Assoliments, Numèric o Mixt; nota final que no encaixa marcada; rètols de capçalera només amb el nom |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

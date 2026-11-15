@@ -495,6 +495,16 @@ body.mob #btnPleg,body.mob #bplTab{display:none!important}
 #llMenu{position:fixed;z-index:700;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:6px;min-width:240px;max-width:340px;max-height:70vh;overflow:auto}
 #llMenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:7px;font:500 14px Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #llMenu button:hover{background:#f4f1ec}#llMenu button.on{background:#f3ece2;font-weight:700}#llMenu .pe{border-top:1px solid #eee;margin-top:4px;padding:7px 10px 3px;color:#888;font-size:12.5px}
+
+/* 2.2.7 · mode del càlcul a Avaluació */
+th.calch .cmode{display:block;font-size:11px;font-weight:500;color:var(--suau)}
+.cmdots{position:absolute;top:50%;right:4px;transform:translateY(-50%);width:22px;height:22px;border:0;border-radius:6px;background:rgba(0,0,0,.06);color:#444;font-weight:900;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.cmdots:hover{background:var(--tar);color:#fff}
+#cmMenu{position:fixed;z-index:700;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);padding:6px;min-width:250px}
+#cmMenu .tt{padding:6px 10px 4px;font-size:12px;color:#888}
+#cmMenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:7px;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
+#cmMenu button:hover{background:#f4f1ec}#cmMenu button.on{background:#f3ece2;font-weight:700}#cmMenu small{color:#888;font-weight:400;margin-left:6px}
+td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 </style>
 </head>
 <body>
@@ -747,7 +757,7 @@ body.mob #btnPleg,body.mob #bplTab{display:none!important}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.6 · ammonite · novembre 2026',COMPILACIO='15/11 20:59';
+const VERSIO='2.2.7 · ammonite · novembre 2026',COMPILACIO='15/11 21:30';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -933,6 +943,10 @@ function catResult(sub,cat,stu,depth=0){
   const ls=items.map(toL),l=m==='median'?medianLow(ls):moda(ls);
   return{num:s.assVals[LV[l]],lvl:l,label:LV[l],m,warn,isNum:false}
 }
+/* 2.2.7 · Com es mostra el càlcul a cada llibreta: 'mixt' (6,8 · AN, com abans), 'ass' (AN) o 'num' (6,8). El càlcul no canvia. */
+const modeCalc=sub=>sub?.aval?.calc||'mixt';
+const calcTxt=(sub,f)=>!f?'—':modeCalc(sub)==='ass'?LV[f.lvl]:modeCalc(sub)==='num'?fmt(f.num):fmt(f.num)+' · '+LV[f.lvl];
+const catTxt=(sub,r)=>!r?'—':modeCalc(sub)==='ass'?LV[r.lvl]:modeCalc(sub)==='num'?fmt(r.num):r.label;
 function finalDe(sub,stu,depth=0){let tw=0,sum=0;for(const c of sub.categories){if(!(c.weight>0))continue;const r=catResult(sub,c,stu,depth);if(r){sum+=r.num*c.weight;tw+=c.weight}}
   if(!tw)return null;const x=sum/tw;return{num:x,lvl:lvlNum(x,sub.settings)}}
 function incDe(sub,stu){let y=0,r=0;sub.columns.filter(c=>c.type==='inc').forEach(c=>{const v=getG(sub,c.id,stu.id);if(v){y+=v.y||0;r+=v.r||0}});return{y,r}}
@@ -1319,7 +1333,7 @@ const opcDe=(c,v)=>(c.opcions||[]).find(o=>o.id===v);
 function checkHtml(v){return v==='fet'?'<span class="fet">✔</span>':v==='no'?'<span class="nofet">✘</span>':'<span class="buida">·</span>'}
 function urlHtml(v,ro){return v?`<a class="lnk" href="${esc(v)}" target="_blank" rel="noopener noreferrer" title="${esc(v)}">URL ↗</a>${ro?'':'<button class="ed" data-url="1" title="Canvia l\'enllaç">✎</button>'}`:(ro?'':'<button class="ed" data-url="1" title="Afegeix un enllaç">＋</button>')}
 const incHtml=v=>(v?.y||v?.r)?`${v.y?`<span class="tg y"></span>${v.y}`:''}${v.r?`<span class="tg r"></span>${v.r}`:''}`:'<span class="buida">＋</span>';
-function calcHtml(sub,st){const f=finalDe(sub,st);return f?`<span class="calc" title="Càlcul ponderat de referència">${fmt(f.num)}</span>`:''}
+function calcHtml(sub,st){const f=finalDe(sub,st);return f?`<span class="calc" title="Càlcul ponderat de referència">${esc(modeCalc(sub)==='ass'?LV[f.lvl]:fmt(f.num))}</span>`:''}
 const faltaCls=v=>v==='F'?'vF':v==='FJ'?'vFJ':v==='NAV'?'vNAV':'';
 function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="${c.id}" data-s="${st.id}"`,dis=RO()?'disabled':'';
   if(c.amp==='plegada')return `<td class="plcc" ${a}></td>`;
@@ -1334,7 +1348,9 @@ function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="$
   case 'ass':{const o=['','NA','AS','AN','AE','F','FJ','NAV'];
     return td(fa||(v?'l'+LV.indexOf(v):''),`<select class="g" ${a} ${dis}>${o.map(x=>`<option value="${x}" ${(v??'')===x?'selected':''}>${x==='NAV'?NAVT:x}</option>`).join('')}</select>`)}
   case 'ext':{const r=resolveExt(sub,c,st);return td('ext '+(r?.k==='fj'?'vFJ':r?.k==='nav'?'vNAV':r?.label==='F'?'vF':r?.lvl?'l'+r.lvl:''),r?esc(r.label):'<span class="buida">—</span>',1)}
-  case 'final':return td('fin '+(v!==undefined?'l'+lvlFinal(v,sub.settings):''),`<input class="g" ${a} ${dis} value="${v===undefined?'':esc(String(v).replace('.',','))}" placeholder="—">${calcHtml(sub,st)}`);
+  case 'final':{const mc=modeCalc(sub),mis=v!==undefined&&((mc==='ass'&&typeof v==='number')||(mc==='num'&&LV.includes(v)));
+    if(mis)return td('fin fmis '+'l'+lvlFinal(v,sub.settings),`<input class="g" ${a} ${dis} value="${esc(String(v).replace('.',','))}" placeholder="—" title="${mc==='ass'?'Aquesta llibreta mostra assoliments i aquí hi ha un número':'Aquesta llibreta és numèrica i aquí hi ha un assoliment'}">${calcHtml(sub,st)}`);
+    return td('fin '+(v!==undefined?'l'+lvlFinal(v,sub.settings):''),`<input class="g" ${a} ${dis} value="${v===undefined?'':esc(String(v).replace('.',','))}" placeholder="—">${calcHtml(sub,st)}`);}
   case 'classe':{const o=['',...classesDe(sub,true)];if(v&&!o.includes(v))o.push(v);const al=sub.archived?null:alumneLl(st),dif=al&&(al.grup||'')!==(v||'');
     return td(dif?'cldif':'',`<select class="g" ${a} ${dis} title="${al?(dif?`Als Llistats del curs és «${esc(al.grup||'—')}». Fes «Recupera les classes» a ⚙ › Alumnes.`:'Ve dels Llistats del curs: si la canvies, es canvia allà i a totes les llibretes.'):'Classe escrita a mà (l\'alumne no és als Llistats del curs)'}">${o.map(x=>`<option value="${esc(x)}" ${(v??'')===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`)}
   case 'check':return td('clk',checkHtml(v),1);
@@ -1440,7 +1456,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   gs.forEach(g=>g.folded=!!g.cat&&pleg.includes(g.cat.id));
   const ws=c=>{const w=amplada(sub,c);return `width:${w}px;min-width:${w}px;max-width:${w}px`};
   h+=`<div class="tw" id="tw"><table class="${cp?'compact':''}"><thead><tr>`;
-  h+=fix.map(f=>f.k==='cl'?`<th class="fx colh ${f.last?'fxlast':''}" rowspan="2" data-col="${f.c.id}" style="${stf(f)};border-top:5px solid #111" title="${esc(f.t)} · doble clic per editar">${esc(f.t)}</th>`
+  h+=fix.map(f=>f.k==='cl'?`<th class="fx colh ${f.last?'fxlast':''}" rowspan="2" data-col="${f.c.id}" style="${stf(f)};border-top:5px solid #111" title="${esc(f.t)}">${esc(f.t)}</th>`
       :`<th class="fx ${f.k==='nom'?'nomh':''} ${f.last?'fxlast':''}" rowspan="2" style="${stf(f)}">${f.t}${f.k==='nom'?'<span class="nomres" title="Arrossega per fer-la més ampla o més estreta · doble clic: s\'ajusta al nom més llarg"></span>':''}</th>`).join('');
   const nB=gs.length;
   h+=gs.map((g,bi)=>{
@@ -1458,7 +1474,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
       const tools=ro?'':`<button class="hdots" data-hm="${c.id}" data-first="${g.solt?0:first?1:0}" data-last="${g.solt?0:last?1:0}" title="Opcions de la columna">⋯</button>`;
-      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} · ${esc(subtitolCol(sub,c))}${np?' · No compta per a la nota':''}${ro?'':' · doble clic per editar · ⋯ per a més opcions'}">${vert?`<span class="vt">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
+      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
@@ -1474,7 +1490,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   h+=`</table></div>`;
   h+=`<div class="peu"><textarea data-info="${sub.id}" ${sub.archived?'disabled':''} aria-label="Notes de la llibreta">${esc(sub.info||'')}</textarea></div>`;
   m.innerHTML=h;const tw=$('#tw');ajustaTaula();tw.scrollLeft=sx;tw.scrollTop=sy;lligaBarra(sub);const ta=$('.peu textarea');if(ta){const fit=()=>{ta.style.height='auto';ta.style.height=Math.max(70,ta.scrollHeight+2)+'px'};fit();ta.addEventListener('input',fit)}}
-function plegCella(sub,cat,st){const r=catResult(sub,cat,st);return `<td class="plegc ${r?'l'+r.lvl:''}" data-plegc="${cat.id}" data-s="${st.id}">${r?esc(r.label):'—'}</td>`}
+function plegCella(sub,cat,st){const r=catResult(sub,cat,st);return `<td class="plegc ${r?'l'+r.lvl:''}" data-plegc="${cat.id}" data-s="${st.id}">${esc(catTxt(sub,r))}</td>`}
 function amplada(sub,c){const a=c.amp||'normal';if(a==='plegada')return 20;if(a==='ampla')return c.type==='lliure'?240:170;if(a==='estreta')return 50;return sub.compacte?54:(c.type==='lliure'?190:110)}
 function lligaBarra(sub){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#bCol','onclick',()=>obreCol(null));on('#bExp','onclick',exporta);on('#bImp','onclick',obreImp);on('#bUndo','onclick',desfes);
@@ -1505,12 +1521,12 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
   const sts=alumnesAval(sub);if(DIST.on)h+=distHtml(sub);
   h+=`<div class="tw" id="tw"><table class="resum aval"><thead><tr><th class="fx" style="left:0;min-width:170px;text-align:left;padding:6px 10px">Cognoms</th><th class="fx fxlast" style="left:170px;min-width:${sub.nomW||120}px;max-width:${sub.nomW||120}px;width:${sub.nomW||120}px;text-align:left;padding:6px 10px">Nom</th>
     ${sub.categories.map(c=>`<th style="border-top:5px solid ${c.color};padding:6px 10px">${sigHtml(c)} ${esc(c.name)} · ${c.weight}%<span class="metode">${c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana':METODE[c.method]}</span></th>`).join('')}
-    <th style="padding:6px 10px">Càlcul</th><th style="padding:6px 10px;min-width:110px">${fc?esc(fc.name):'Nota final'}</th>
+    <th style="padding:6px 30px 6px 10px;position:relative" class="calch">Càlcul<span class="cmode">${{ass:'assoliments',num:'numèric',mixt:''}[modeCalc(sub)]}</span><button class="cmdots" data-cmode title="Com es mostra el càlcul">⋯</button></th><th style="padding:6px 10px;min-width:110px">${fc?esc(fc.name):'Nota final'}</th>
     <th class="comh ${pleg?'pl':''}" id="aComH" title="Clica per ${pleg?'desplegar':'plegar'} la columna">${pleg?'💬 ▸':'💬 Comentari ▾'}</th><th style="padding:6px 8px" title="Copia el comentari per enganxar-lo a l'Esfera">Esfera</th></tr></thead><tbody>`;
   for(const st of sts){const f=finalDe(sub,st),com=sub.comentaris[st.id]||'',marc=sub.aval.marques[st.id];
     h+=`<tr data-s="${st.id}"><td class="fx nomc" style="left:0;text-align:left;font-weight:400">${esc(st.cognoms||'')}</td><td class="fx fxlast nomc" style="left:170px;text-align:left;max-width:${sub.nomW||120}px" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>
-      ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}">${r?r.label:'—'}</td>`}).join('')}
-      <td class="${f?'l'+f.lvl:''}" style="font-weight:700">${f?fmt(f.num)+' · '+LV[f.lvl]:'—'}</td>
+      ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}">${esc(catTxt(sub,r))}</td>`}).join('')}
+      <td class="${f?'l'+f.lvl:''}" style="font-weight:700">${esc(calcTxt(sub,f))}</td>
       ${fc?cella(sub,fc,st):'<td><span class="buida">—</span></td>'}
       <td class="com ${pleg?'pl':''}" data-com="${st.id}" title="${pleg?esc(com)||'Sense comentari':'Clica per escriure o triar comentaris del banc'}">${pleg?(com?'💬':'<span class="buida">·</span>'):(com?`<div class="comt">${esc(com)}</div>`:'<span class="buida">＋ comentari</span>')}</td>
       <td class="esf"><button class="cpb" data-cp="${st.id}" title="Copia el comentari" ${com?'':'disabled'}>📋</button>${marc?'<span class="mrc" title="Ja copiat">✔</span>':''}</td></tr>`}
@@ -1520,7 +1536,7 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
 const DIST={on:false,font:'',mode:'auto'};
 function dadesDist(sub){const fc=colFinal(sub);let font=DIST.font==='calc'||!fc?'calc':'final';
   const sts=alumnesAval(sub),vals=sts.map(st=>{if(font==='final'){const v=getG(sub,fc.id,st.id);return v===undefined||v===''?null:v}const f=finalDe(sub,st);return f?f.num:null});
-  let mode=DIST.mode;if(mode==='auto'){if(font==='final'){const n=vals.filter(v=>typeof v==='number').length,a=vals.filter(v=>['NA','AS','AN','AE'].includes(v)).length;mode=a>n?'ass':'num'}
+  let mode=DIST.mode;if(mode==='auto'&&modeCalc(sub)!=='mixt')mode=modeCalc(sub);if(mode==='auto'){if(font==='final'){const n=vals.filter(v=>typeof v==='number').length,a=vals.filter(v=>['NA','AS','AN','AE'].includes(v)).length;mode=a>n?'ass':'num'}
     else{const cols=sub.columns.filter(c=>EVAL.includes(c.type));mode=cols.length&&cols.every(c=>c.type==='num'||c.type==='ext')?'num':'ass'}}
   const files=mode==='num'?['< 5','5–6','7–8','9–10']:['NA','AS','AN','AE'];
   const fila=v=>{if(v===null||v==='FJ')return -1;if(v==='F')return 0;if(typeof v==='number'){if(mode==='num')return v<5?0:v<7?1:v<9?2:3;return Math.max(0,lvlNum(v,sub.settings)-1)}
@@ -1567,7 +1583,7 @@ function pintaPanell(){const sub=cur(),st=sub?.students.find(x=>x.id===PN.st);if
   $$('td.com.sel').forEach(t=>t.classList.remove('sel'));document.querySelector(`td[data-com="${st.id}"]`)?.classList.add('sel');
   const sts=alumnesAval(sub),i=sts.findIndex(x=>x.id===st.id),f=finalDe(sub,st),fc=colFinal(sub),vf=fc?getG(sub,fc.id,st.id):undefined,lv=nivellAlumne(sub,st);
   $('#pnNom').textContent=(st.cognoms?st.cognoms+', ':'')+st.nom;$('#pnPos').textContent=`${i+1}/${sts.length}`;
-  $('#pnInfo').innerHTML=`<span class="chip">Càlcul: <b>${f?fmt(f.num)+' · '+LV[f.lvl]:'—'}</b></span>${fc?`<span class="chip ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${esc(fc.name)}: <b>${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</b></span>`:''}`;
+  $('#pnInfo').innerHTML=`<span class="chip">Càlcul: <b>${esc(calcTxt(sub,f))}</b></span>${fc?`<span class="chip ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${esc(fc.name)}: <b>${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</b></span>`:''}`;
   const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=sub.comentaris[st.id]||'';
   $('#pnCerca').value=PN.cerca;pintaBancPanell(sub,lv)}
 function pintaBancPanell(sub,lv){const b=state.banc,q=norm(PN.cerca),w=$('#pnBanc');
@@ -1601,12 +1617,12 @@ function valorVista(sub,c,st){const v=getG(sub,c.id,st.id);
 function fitxaHtml(sub,st,mode,obs,priv){const f=finalDe(sub,st),fc=colFinal(sub),vf=fc?getG(sub,fc.id,st.id):undefined,cl=classeDe(sub,st);
   let h=`<div class="vacard"><h2 class="vanom">${esc(st.cognoms?st.cognoms+', ':'')}${esc(st.nom)}</h2><div class="capsub">${esc(sub.name)}${cl?' · '+esc(cl):''}</div>`;
   if(mode==='resum'){
-    h+=`<div class="varesum">${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<div class="vacat" style="border-top:5px solid ${c.color}"><div class="vct">${sigHtml(c)} ${esc(c.name)} · ${c.weight}%</div><div class="vcv ${r?'l'+r.lvl:''}">${r?esc(r.label):'—'}</div></div>`}).join('')}
-      <div class="vacat"><div class="vct">Càlcul ponderat</div><div class="vcv ${f?'l'+f.lvl:''}">${f?fmt(f.num)+' · '+LV[f.lvl]:'—'}</div></div>
+    h+=`<div class="varesum">${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<div class="vacat" style="border-top:5px solid ${c.color}"><div class="vct">${sigHtml(c)} ${esc(c.name)} · ${c.weight}%</div><div class="vcv ${r?'l'+r.lvl:''}">${esc(catTxt(sub,r))}</div></div>`}).join('')}
+      <div class="vacat"><div class="vct">Càlcul ponderat</div><div class="vcv ${f?'l'+f.lvl:''}">${esc(calcTxt(sub,f))}</div></div>
       ${fc?`<div class="vacat fin"><div class="vct">${esc(fc.name)}</div><div class="vcv ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</div></div>`:''}</div>`}
   else{h+=grups(sub,true).map(g=>{const cols=g.cols.filter(c=>c.type!=='classe'&&(obs||!['lliure','url'].includes(c.type)));if(!cols.length)return '';
       const col=g.cat?g.cat.color:(g.solt.color||'#D9D9D9');
-      return `<div class="vabloc" style="border-left:5px solid ${col}">${g.cat?`<div class="vbt">${sigHtml(g.cat)} ${esc(g.cat.name)}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}${(()=>{if(sub.tipus==='llista')return '';const r=catResult(sub,g.cat,st);return r?` <span class="vchip l${r.lvl}">${esc(r.label)}</span>`:''})()}</div>`:''}
+      return `<div class="vabloc" style="border-left:5px solid ${col}">${g.cat?`<div class="vbt">${sigHtml(g.cat)} ${esc(g.cat.name)}${sub.tipus==='llista'?'':' · '+g.cat.weight+'%'}${(()=>{if(sub.tipus==='llista')return '';const r=catResult(sub,g.cat,st);return r?` <span class="vchip l${r.lvl}">${esc(catTxt(sub,r))}</span>`:''})()}</div>`:''}
         ${cols.map(c=>{const an=priv&&sub.anot?.[c.id+'|'+st.id];return `<div class="vrow ${an?.h?'anh':''}"><span class="vrn">${esc(c.name)}${g.cat&&sub.tipus!=='llista'&&(EVAL.includes(c.type)||['icones','check','opc'].includes(c.type))&&!compta(c)?' <span class="vnc" title="No compta per a la nota">⊘ no compta</span>':''}</span><span>${valorVista(sub,c,st)}</span></div>${an?.t?`<div class="vran">💬 ${esc(an.t)}</div>`:''}`}).join('')}</div>`}).join('')}
   if(obs&&sub.comentaris[st.id])h+=`<div class="vabloc" style="border-left:5px solid #999"><div class="vbt">💬 Comentari</div><div style="white-space:pre-wrap">${esc(sub.comentaris[st.id])}</div></div>`;
   return h+'</div>'}
@@ -1660,13 +1676,13 @@ function rMobil(){barraMobil();if(MB.sec==='bloc'){rBloc();return}if(MB.sec==='e
   h+=`<div class="mbtabs"><button data-mbv="al" class="${MB.vista==='al'?'on':''}">👤 Alumnes</button><button data-mbv="col" class="${MB.vista==='col'?'on':''}">▦ Per columna</button></div>`;
   if(MB.vista==='al'){const q=norm(MB.cerca),ll=sts.filter(x=>!q||norm(nomComplet(x)).includes(q));
     h+=`<input type="search" id="mbCerca" placeholder="🔍 Cerca un alumne…" value="${esc(MB.cerca)}" autocomplete="off"><div class="mbllista">${ll.map(st=>{const f=finalDe(sub,st);
-      return `<button class="mbal" data-mbst="${st.id}"><span>${esc(st.cognoms?st.cognoms+', ':'')}<b>${esc(st.nom)}</b></span>${f?`<span class="vchip l${f.lvl}">${fmt(f.num)}</span>`:''}</button>`}).join('')||'<p class="aj">Cap alumne coincideix.</p>'}</div>`}
+      return `<button class="mbal" data-mbst="${st.id}"><span>${esc(st.cognoms?st.cognoms+', ':'')}<b>${esc(st.nom)}</b></span>${f?`<span class="vchip l${f.lvl}">${esc(modeCalc(sub)==='ass'?LV[f.lvl]:fmt(f.num))}</span>`:''}</button>`}).join('')||'<p class="aj">Cap alumne coincideix.</p>'}</div>`}
   else{const cols=[...sub.categories.map(c=>({id:'cat:'+c.id,name:'⚖️ '+c.name})),{id:'calc',name:'Càlcul ponderat'},...grups(sub).flatMap(g=>g.cols).filter(c=>c.type!=='classe').map(c=>({id:'col:'+c.id,name:c.name}))];
     if(!cols.some(c=>c.id===MB.col))MB.col=cols.find(c=>c.id.startsWith('col:'))?.id||'calc';
     h+=`<select id="mbCol" class="mbsel">${cols.map(c=>`<option value="${c.id}" ${c.id===MB.col?'selected':''}>${esc(c.name)}</option>`).join('')}</select><div class="mbllista">`;
     const [tipus,id]=MB.col.split(':');
-    h+=sts.map(st=>{let v;if(tipus==='calc'){const f=finalDe(sub,st);v=f?`<span class="vchip l${f.lvl}">${fmt(f.num)} · ${LV[f.lvl]}</span>`:'<span class="buida">—</span>'}
-      else if(tipus==='cat'){const r=catResult(sub,sub.categories.find(c=>c.id===id),st);v=r?`<span class="vchip l${r.lvl}">${esc(r.label)}</span>`:'<span class="buida">—</span>'}
+    h+=sts.map(st=>{let v;if(tipus==='calc'){const f=finalDe(sub,st);v=f?`<span class="vchip l${f.lvl}">${esc(calcTxt(sub,f))}</span>`:'<span class="buida">—</span>'}
+      else if(tipus==='cat'){const r=catResult(sub,sub.categories.find(c=>c.id===id),st);v=r?`<span class="vchip l${r.lvl}">${esc(catTxt(sub,r))}</span>`:'<span class="buida">—</span>'}
       else v=valorVista(sub,sub.columns.find(c=>c.id===id),st);
       const an=tipus==='col'&&sub.anot?.[id+'|'+st.id];
       return `<div class="mbal mbro ${an?.h?'anh':''}" data-mbst="${st.id}"><span>${esc(st.cognoms?st.cognoms+', ':'')}<b>${esc(st.nom)}</b>${an?.t?`<span class="mban">💬 ${esc(an.t)}</span>`:''}</span><span class="mbv">${v}</span></div>`}).join('')+'</div>'}
@@ -1852,8 +1868,8 @@ function pdfLlibreta(doc,sub,primera){const M=10,W=doc.internal.pageSize.getWidt
   /* 1. Resum d'avaluació */
   if(!esLl){capP('Resum d\'avaluació');const fc=colFinal(sub);const head=[...nomCols.map(c=>c.h),...sub.categories.map(c=>pt(`${c.sigla||c.name} ${c.weight}%`)),'Càlcul',...(fc?[pt(fc.name)]:[]),'Comentari'];
     const nivs=[],body=sts.map(st=>{const f=finalDe(sub,st),row=nomVals(st),nv=row.map(()=>0);
-      sub.categories.forEach(c=>{const r=catResult(sub,c,st);row.push(r?pt(r.label):'');nv.push(r?.lvl||0)});
-      row.push(f?fmt(f.num)+' · '+LV[f.lvl]:'');nv.push(f?.lvl||0);
+      sub.categories.forEach(c=>{const r=catResult(sub,c,st);row.push(r?pt(catTxt(sub,r)):'');nv.push(r?.lvl||0)});
+      row.push(f?calcTxt(sub,f):'');nv.push(f?.lvl||0);
       if(fc){const v=getG(sub,fc.id,st.id);row.push(v===undefined?'':typeof v==='number'?fmt(v):v);nv.push(v===undefined?0:lvlFinal(v,sub.settings))}
       row.push(pt(sub.comentaris[st.id]||''));nv.push(0);nivs.push(nv);return row});
     const cs={};nomCols.forEach((c,i)=>cs[i]={cellWidth:c.w});cs[head.length-1]={cellWidth:'auto',halign:'left'};
@@ -1985,6 +2001,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#llMenu')){tanca
   if(!e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||(e.key!=='ArrowUp'&&e.key!=='ArrowDown')||!state||esMobil()||document.querySelector('dialog[open]'))return;
   if(!['llibreta','resum'].includes(tab))return;const act=actives(),i=act.findIndex(s=>s.id===state.cur),j=i+(e.key==='ArrowDown'?1:-1);
   e.preventDefault();e.stopPropagation();if(i<0||j<0||j>=act.length)return;vesALlibreta(act[j].id);toast(`${act[j].icon||'📘'} ${act[j].name}`,1200)},true);
+
+function obreCmMenu(btn){if($('#cmMenu')){$('#cmMenu').remove();return}const sub=cur(),mc=modeCalc(sub),r=btn.getBoundingClientRect(),m=document.createElement('div');m.id='cmMenu';
+  m.innerHTML='<div class="tt">Com es mostra el càlcul</div>'+[['ass','Assoliments','AN'],['num','Numèric','6,8'],['mixt','Mixt','6,8 · AN']].map(([k,t,e])=>`<button data-cm="${k}" class="${k===mc?'on':''}">${t}<small>${e}</small></button>`).join('');
+  document.body.appendChild(m);m.style.left=Math.max(8,Math.min(r.right-m.offsetWidth,innerWidth-m.offsetWidth-8))+'px';m.style.top=(r.bottom+4)+'px';
+  m.onclick=e=>{const b=e.target.closest('[data-cm]');if(!b)return;m.remove();if(RO())return toast('Llibreta arxivada: només lectura.');sub.aval.calc=b.dataset.cm;save('mode del càlcul');render()}}
+document.addEventListener('pointerdown',e=>{if($('#cmMenu')&&!e.target.closest('#cmMenu,[data-cmode]'))$('#cmMenu').remove()},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-cmode]');if(b){e.stopPropagation();obreCmMenu(b)}},true);
 
 /* ======================= Alumnat del curs (llistats oficials, comuns a totes les llibretes) ======================= */
 const grupOrd=(a,b)=>a.localeCompare(b,'ca',{numeric:true});
@@ -2249,7 +2272,8 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
   sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
-    <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li></ul>`)+
+    <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
+    <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Alumnes i classes',`<ul><li>Els <b>Llistats del curs</b> (⚙ › Llistats del curs) són la llista oficial de grups. Les llibretes hi agafen els alumnes amb «📇 Afegeix des dels llistats del curs».</li>
     <li>La <b>classe</b> ve dels Llistats: si un alumne canvia de grup (als Llistats o des de qualsevol llibreta), es canvia a totes les llibretes actives. Les arxivades conserven la que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.</li>
     <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
@@ -2261,7 +2285,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
     <li><b>PDF</b>: d'una llibreta, a Avaluació › «Desa en PDF al Drive»; de totes, a ⚙ › Dades; de les sortides, a Eines › Sortides; de l'arxiu, a la pestanya Arxiu.</li>
     <li><b>Full de càlcul</b>: a ⚙ › Dades, «Desa un full de càlcul al Drive». Una pestanya per llibreta activa (columnes, categories i nota final) i una per llistat del curs, sense fórmules. Es desa a la carpeta «Llibreta del Profe · PDF» com a Full de càlcul de Google. És una còpia per consultar: els canvis que hi facis no tornen a la llibreta.</li></ul>`)+
-  sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. Arrossega el títol per moure-la.</li>
+  sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. En passar el ratolí pel títol, en surt el nom sencer. Arrossega el títol per moure-la.</li>
     <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera. <b>Alt + ↑ / ↓</b>: llibreta anterior o següent.</li>
     <li><b>Columnes sense categoria</b>: la franja de dalt agafa el color de la columna (gris clar per defecte). A ✎ Propietats pots escriure-hi un text lliure («Text de la franja»), que és només una etiqueta; doble clic a la franja obre les propietats.</li>
     <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina amb «⌄ Llibreta del Profe» a l'esquerra (per tornar-la a obrir) i, a la dreta, només els avisos: sortides de l'aula, temporitzador, pòsits urgents i estat del Drive. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
