@@ -60,7 +60,7 @@ python3 proves/proves.py
 | Capçalera | Menú ⋯, arrossegar dins la categoria, desplegar clicant la franja, nom en dues línies |
 | Mòbil (2) | Barra Llibreta/Bloc/Enllaços, Bloc editable, «És el teu mòbil?» |
 | Full de càlcul | Pestanya per llibreta activa i per llistat, nota final com a número, sense fórmules, convertit a Full de Google a la carpeta del Drive |
-| Barra plegable | Franja amb el nom a l'esquerra i avisos, es recorda, canvi de llibreta pel nom i Alt+↑/↓, Llibreta/Avaluació |
+| Barra plegable | Franja sense text amb avisos, Ammo i ⌄ a la dreta, es desplega amb un clic buit, es recorda, canvi de llibreta pel nom i Alt+↑/↓, Llibreta/Avaluació |
 | Franja de columna solta | Color de la columna a la franja de dalt, text lliure des de Propietats i doble clic |
 | Opcions amb icones | Opcions només amb icones es desen i s'enganxen bé; els suggeriments omplen opcions i colors sense perdre les cel·les |
 | Columna estreta | Desplegables sense fletxeta a les columnes estretes; surt en passar-hi el ratolí; les normals no canvien |

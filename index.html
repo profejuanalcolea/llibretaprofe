@@ -479,7 +479,8 @@ body.mob #login h1{font-size:28px}body.mob #login .btn{width:100%;max-width:340p
 #bplTab{display:none}body.bpleg{--hh:20px}
 body.bpleg header{height:20px;padding:0 10px;gap:8px}
 body.bpleg header>*:not(.sub):not(#bplTab){display:none!important}
-body.bpleg #bplTab{display:inline-flex;align-items:center;gap:5px;background:none;border:0;color:#ddd;font:600 12px/1 Inter,system-ui,sans-serif;cursor:pointer;height:20px;padding:0 6px;border-radius:0 0 6px 6px}
+body.bpleg #bplTab{display:inline-flex;align-items:center;justify-content:center;order:99;background:none;border:0;color:#ddd;font:700 16px/1 Inter,system-ui,sans-serif;cursor:pointer;height:20px;width:30px;padding:0 0 3px;border-radius:5px}
+body.bpleg header{justify-content:flex-end;cursor:pointer}body.bpleg header .sub{margin-left:0}
 body.bpleg #bplTab:hover{background:#2a2a2a;color:#fff}
 body.bpleg .sub{gap:8px}
 body.bpleg .sub>*:not(#soBar):not(#tpill):not(#estat):not(.blocav){display:none!important}
@@ -509,7 +510,7 @@ td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 </head>
 <body>
 <header>
-  <button id="bplTab" title="Desplega la barra">⌄ Llibreta del Profe</button>
+  <button id="bplTab" title="Desplega la barra" aria-label="Desplega la barra">⌄</button>
   <div class="logo" id="logo" title="Crèdits" style="cursor:pointer">Llibreta <b>del Profe</b></div><span class="curs" id="cursLbl"></span>
   <nav id="tabs">
     <button data-t="llibreta">Llibreta</button>
@@ -757,7 +758,7 @@ td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.7 · ammonite · novembre 2026',COMPILACIO='15/11 21:30';
+const VERSIO='2.2.8 · ammonite · novembre 2026',COMPILACIO='15/11 21:57';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1990,6 +1991,8 @@ async function fullAlDrive(){if(mode!=='drive')return toast('Per desar el full d
 function barraPlegada(){try{return localStorage.getItem('llibreta-barra-plegada')==='1'}catch{return false}}
 function plegaBarra(v){try{localStorage.setItem('llibreta-barra-plegada',v?'1':'0')}catch{}render()}
 $('#btnPleg').onclick=()=>plegaBarra(true);$('#bplTab').onclick=()=>plegaBarra(false);
+/* franja plegada: un clic en un lloc buit també la desplega */
+document.querySelector('header').addEventListener('click',e=>{if(document.body.classList.contains('bpleg')&&!e.target.closest('button,a,input,select,#soBar,#tpill,#estat,.sub>*'))plegaBarra(false)});
 function tancaLlMenu(){$('#llMenu')?.remove()}
 function vesALlibreta(id){tancaLlMenu();if(!id||id===state.cur)return;state.cur=id;save();render()}
 function obreLlMenu(el){if($('#llMenu')){tancaLlMenu();return}const act=actives(),r=el.getBoundingClientRect(),m=document.createElement('div');m.id='llMenu';
@@ -2288,7 +2291,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
   sec('Dreceres',`<ul><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. En passar el ratolí pel títol, en surt el nom sencer. Arrossega el títol per moure-la.</li>
     <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera. <b>Alt + ↑ / ↓</b>: llibreta anterior o següent.</li>
     <li><b>Columnes sense categoria</b>: la franja de dalt agafa el color de la columna (gris clar per defecte). A ✎ Propietats pots escriure-hi un text lliure («Text de la franja»), que és només una etiqueta; doble clic a la franja obre les propietats.</li>
-    <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina amb «⌄ Llibreta del Profe» a l'esquerra (per tornar-la a obrir) i, a la dreta, només els avisos: sortides de l'aula, temporitzador, pòsits urgents i estat del Drive. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
+    <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina sense text. A la dreta hi queden només els avisos (sortides de l'aula, temporitzador, pòsits urgents), l'Ammo de l'estat del Drive i el botó ⌄ per tornar-la a obrir; també s'obre clicant en qualsevol lloc buit de la franja. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
     <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b>. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+

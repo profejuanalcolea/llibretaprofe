@@ -871,7 +871,7 @@ def p_full(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Barra plegable: franja amb el nom a l\'esquerra i avisos, canvi de llibreta des del nom, Alt+↑/↓ i Llibreta/Avaluació')
+@prova('Barra plegable: franja sense text amb avisos, Ammo i ⌄ a la dreta, canvi de llibreta des del nom, Alt+↑/↓ i Llibreta/Avaluació')
 def p_barra(b):
     ctx, pg = pagina_local(b)
     pg.evaluate("(()=>{const s=novaSub('Geologia','batx','🌋');state.subjects.push(s);save();render()})()"); pg.wait_for_timeout(200)
@@ -879,8 +879,8 @@ def p_barra(b):
     h = pg.evaluate("document.querySelector('header').getBoundingClientRect().height")
     comprova(h <= 21 and pg.evaluate("document.body.classList.contains('bpleg')"), f'la barra no es plega: {h}px')
     comprova(pg.is_visible('#bplTab') and pg.is_visible('#estat') and not pg.is_visible('#selSub') and not pg.is_visible('#btnUndo'), 'a la franja hi ha d\'haver el nom i l\'estat, i res més')
-    tb = pg.evaluate("document.querySelector('#bplTab').getBoundingClientRect().left")
-    comprova(tb < 40 and 'Llibreta del Profe' in pg.inner_text('#bplTab'), f'el nom ha d\'anar a l\'esquerra: {tb}')
+    tb = pg.evaluate("[document.querySelector('#bplTab').getBoundingClientRect().right, innerWidth, document.querySelector('#estat').getBoundingClientRect().left]")
+    comprova(tb[0] > tb[1] - 60 and tb[2] < tb[0] and 'Llibreta' not in pg.inner_text('header'), f'la franja ha de quedar sense text, amb l\'Ammo i el ⌄ a la dreta: {tb}')
     # pòsit urgent: el botó del Bloc surt a la franja
     pg.evaluate("state.posits=[{id:'p1',text:'Ara',data:new Date().toISOString().slice(0,10)}];render()"); pg.wait_for_timeout(150)
     comprova(pg.is_visible('.blocav'), 'el pòsit urgent no es veu a la franja')
@@ -904,7 +904,10 @@ def p_barra(b):
     comprova(pg.evaluate("tab") == 'resum', 'el botó Avaluació no hi va')
     pg.click('.segt [data-segt=llibreta]'); pg.wait_for_timeout(200)
     comprova(pg.evaluate("tab") == 'llibreta', 'el botó Llibreta no hi torna')
-    # desplegar
+    # desplegar clicant un lloc buit de la franja
+    pg.mouse.click(200, 10); pg.wait_for_timeout(200)
+    comprova(not pg.evaluate("document.body.classList.contains('bpleg')"), 'un clic en un lloc buit no desplega la franja')
+    pg.click('#btnPleg'); pg.wait_for_timeout(150)
     pg.click('#bplTab'); pg.wait_for_timeout(200)
     comprova(pg.is_visible('#selSub') and not pg.is_visible('.segt'), 'no es desplega')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)

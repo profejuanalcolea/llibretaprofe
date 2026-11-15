@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.2.8 · ammonite · novembre 2026
+- **Barra plegada sense text:** a l'app instal·lada el nom es repetia amb la barra de la finestra. Ara la franja només té, a la dreta, els avisos, l'Ammo i el botó ⌄; un clic en un lloc buit també la desplega.
+
 ## 2.2.7 · ammonite · novembre 2026
 - **Avaluació:** ⋯ a la columna Càlcul per triar com es mostra el resultat de cada llibreta: Assoliments (AN), Numèric (6,8) o Mixt (com abans). Afecta categories, càlcul, Vista alumne, mòbil, PDF i Distribució; el càlcul no canvia. La nota final que no encaixa amb el mode surt marcada.
 - **Capçaleres de columna:** el rètol només mostra el nom (i l'origen a les columnes «D'una altra llibreta»); «No compta per a la nota» surt en passar pel ⊘.
