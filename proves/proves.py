@@ -959,6 +959,20 @@ def p_estreta(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Calculadora: el botó ⧉ i Ctrl+C copien el resultat amb coma')
+def p_calc_copia(b):
+    ctx, pg = pagina_local(b)
+    ctx.grant_permissions(['clipboard-read', 'clipboard-write'])
+    pg.click('#btnCalc'); pg.fill('#calcIn', '1,5+0,8+0,15+1'); pg.keyboard.press('Enter'); pg.wait_for_timeout(100)
+    comprova(pg.input_value('#calcIn') == '3,45', 'càlcul: ' + pg.input_value('#calcIn'))
+    pg.click('#calcCp'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("navigator.clipboard.readText()") == '3,45', 'el botó no copia el resultat')
+    comprova(pg.inner_text('#calcCp') == '✓', 'el botó no confirma la còpia')
+    pg.fill('#calcIn', '10÷4'); pg.keyboard.press('Enter'); pg.focus('#calcIn'); pg.keyboard.press('Control+c'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("navigator.clipboard.readText()") == '2,5', 'Ctrl+C no copia el resultat')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1038,7 +1052,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

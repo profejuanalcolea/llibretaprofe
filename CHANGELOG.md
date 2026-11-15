@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.2.6 · ammonite · novembre 2026
+- **Calculadora:** botó ⧉ dins de la pantalla per copiar el resultat (amb coma, a punt per enganxar a la llibreta, l'Excel o l'Esfera); també amb Ctrl+C si no hi ha res seleccionat.
+
 ## 2.2.5 · ammonite · novembre 2026
 - **Columnes estretes:** els desplegables no mostren la fletxeta, que tapava la icona o el valor; surt en passar-hi el ratolí o amb la cel·la seleccionada.
 
