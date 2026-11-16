@@ -506,6 +506,23 @@ th.calch .cmode{display:block;font-size:11px;font-weight:500;color:var(--suau)}
 #cmMenu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:7px;font:500 14px Inter,system-ui,sans-serif;cursor:pointer}
 #cmMenu button:hover{background:#f4f1ec}#cmMenu button.on{background:#f3ece2;font-weight:700}#cmMenu small{color:#888;font-weight:400;margin-left:6px}
 td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
+
+/* 2.3 · atenció a la diversitat */
+.dvl{position:absolute;left:0;top:0;bottom:0;width:6px;cursor:help;z-index:1}
+.dvl.p{background:linear-gradient(90deg,#E0A800 0 2.5px,rgba(255,255,255,.9) 2.5px 3.5px,#E0A800 3.5px 6px)}
+.dvl.ma{background:linear-gradient(90deg,#1F5FD1 0 2.5px,rgba(255,255,255,.9) 2.5px 3.5px,#1F5FD1 3.5px 6px)}
+.dvl.ma.pi{background:#1F5FD1}
+th.dvh,th.dvph{padding:6px 10px;white-space:nowrap}th.dvph{cursor:pointer;background:#f1f1f6}th.dvph.pl{width:40px;text-align:center}
+td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:center;width:40px}td.dvc.sel{outline:2px solid var(--tar);outline-offset:-2px}
+.aval td.dvp:not(.pl){text-align:left!important}
+.dvt{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.dvchip{display:inline-block;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:600;margin-right:4px;border:1.5px solid}
+.dvchip.p{border-color:#E0A800;color:#7a5c00;background:#fff8dc}.dvchip.ma{border-color:#1F5FD1;color:#1F5FD1;background:#eaf1ff}.dvchip.pi{border-color:#1F5FD1;background:#1F5FD1;color:#fff}
+.dvop{display:flex;gap:6px;flex-wrap:wrap}.dvop button{border:1.5px solid #ccc;background:#fff;border-radius:999px;padding:5px 12px;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}
+.dvop button.p.on{background:#E0A800;border-color:#E0A800;color:#111}.dvop button.ma.on,.dvop button.pi.on{background:#1F5FD1;border-color:#1F5FD1;color:#fff}.dvop button.pi{margin-left:8px}
+.pntit{font-weight:700;font-size:13px;color:#555;margin:2px 0 4px}.pnsec{font-weight:700;font-size:13px;margin:10px 0 4px}
+.dvll{display:flex;align-items:center;gap:6px;padding:2px 0}.dvll a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dvamg{display:inline-flex;align-items:center;gap:5px;font-size:13px;margin-left:6px}
 </style>
 </head>
 <body>
@@ -545,9 +562,11 @@ td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 
 <aside id="pnl" hidden>
   <div class="ph"><button class="icb" data-pn="-1" title="Alumne anterior">◀</button><div style="flex:1;min-width:0"><b id="pnNom"></b> <span class="aj" id="pnPos"></span></div><button class="icb" data-pn="1" title="Alumne següent">▶</button><button class="icb" id="pnX" title="Tanca (Esc)">✕</button></div>
+  <div id="pnTit" class="pntit" hidden></div>
   <div id="pnInfo" class="fl" style="margin:6px 0"></div>
   <textarea id="pnTxt" placeholder="Escriu el comentari o tria'n del banc de sota…"></textarea>
   <div class="fl"><button class="btn" id="pnCp">📋 Copia per a l'Esfera</button><button class="btn sec" id="pnBuida">Esborra</button></div>
+  <div id="pnLl" hidden></div>
   <input type="text" id="pnCerca" placeholder="🔍 Cerca al banc…" style="width:100%;margin-top:6px">
   <div id="pnBanc"></div>
 </aside>
@@ -758,7 +777,7 @@ td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.2.8 · ammonite · novembre 2026',COMPILACIO='15/11 21:56';
+const VERSIO='2.3 · ammonite · novembre 2026',COMPILACIO='16/11 11:10';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -841,13 +860,13 @@ function demo(){
   put(ob,['Acaba les tasques abans d\'hora','',null,'Molt bon treball al laboratori',null,null,'Ha de recuperar la pràctica',null,'Parlar amb la família',null]); put(inc,[{y:1,r:0},null,null,null,{y:2,r:1},null,null,null,{y:1,r:0},null]);
   put(fi,[9,8,null,null,null,null,null,null,null,null]);
   s.recursos=[{id:uid(),name:'Rúbrica pràctiques',url:'https://example.org',grup:'Avaluació',icon:'📋'}];
-  return {versio:5,savedAt:Date.now(),cur:s.id,subjects:[s],banc:{cats:[],items:[]},recursos:[{id:uid(),name:'Calendari d\'avaluacions',url:'https://example.org',grup:'Centre',icon:'📅'}],
+  return {versio:5,savedAt:Date.now(),cur:s.id,subjects:[s],banc:{cats:[],items:[]},bancDiv:{cats:[],items:[]},recursos:[{id:uid(),name:'Calendari d\'avaluacions',url:'https://example.org',grup:'Centre',icon:'📅'}],
     posits:[{id:uid(),text:'Recuperació de l\'examen d\'en Clint',color:PCOL[0],data:avui(),llib:s.id},{id:uid(),text:'Lliurar les notes a tutoria',color:PCOL[1],data:diesDes(5),llib:''}],
     colors:{joc:'pal'},alumnat:[],eines:{ordre:['aula','recll','recgen'],pleg:{},aula:['temp','atz','par','calc','llist','sort']}};
 }
 
 function migra(d){
-  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','recll','recgen'];d.eines.ordre=d.eines.ordre.filter(k=>k!=='posits');d.bloc??={pestanyes:[],actiu:null};if(!d.bloc.pestanyes.length)d.bloc.pestanyes.push({id:uid(),nom:'Notes',text:''});d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.sortidesMin??=7;if(!d.eines.aula.includes('sort'))d.eines.aula.push('sort');d.banc??={cats:[],items:[]};d.banc.cats??=[];d.banc.items??=[];
+  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','recll','recgen'];d.eines.ordre=d.eines.ordre.filter(k=>k!=='posits');d.bloc??={pestanyes:[],actiu:null};if(!d.bloc.pestanyes.length)d.bloc.pestanyes.push({id:uid(),nom:'Notes',text:''});d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.sortidesMin??=7;if(!d.eines.aula.includes('sort'))d.eines.aula.push('sort');d.banc??={cats:[],items:[]};d.bancDiv??={cats:[],items:[]};d.bancDiv.cats??=[];d.bancDiv.items??=[];d.banc.cats??=[];d.banc.items??=[];
   for(const s of d.subjects){
     s.students=(s.students||[]).map(st=>st.nom!==undefined?st:{id:st.id,nom:st.name||'',cognoms:''});
     s.columns=(s.columns||[]).map(c=>{if(c.type==='text')c.type='lliure';delete c.tema;return c});
@@ -856,7 +875,7 @@ function migra(d){
     s.settings={...DEF(),...(s.settings||{})};
     s.icon??='📘';s.color??=LPAL[0][0];s.info??='';s.ocult??={cognoms:false,classe:false};s.archived??=null;s.recursos??=[];s.mostra??='tots';
     if(!s.ordre||s.ordre==='classe'){if(s.ordre==='classe')s.mostra='perclasse';s.ordre='cognoms'}
-    s.anot??={};s.ordreDir??='desc';s.comentaris??={};s.aval??={};s.aval.marques??={};
+    s.anot??={};s.ordreDir??='desc';s.comentaris??={};s.div??={};s.aval??={};s.aval.marques??={};
     if(s.settings.npMode==='skip'&&!s.settings._fjMig)s.settings.fjMode=s.settings.fjMode||'skip';
     delete s.settings.npMode;
     /* el NP antic passa a ser F (falta) */
@@ -1272,13 +1291,13 @@ $('#lgOff').onclick=entraOffline;
 $('#lgLocal').onclick=()=>{mode='local';localStorage.setItem(LSMODE,'local');location.reload()};
 
 /* ======================= Exportació ======================= */
-function exporta(){const sub=cur(),cols=[...colsClasse(sub),...grups(sub).flatMap(g=>g.cols)],SEP=';';
+async function exporta(){const sub=cur(),dv=await preguntaDiv([sub]);if(dv===null)return;const cols=[...colsClasse(sub),...grups(sub).flatMap(g=>g.cols)],SEP=';';
   const q=v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  const cap=['Cognoms','Nom',...cols.map(c=>c.name),...sub.categories.map(c=>`${c.name} (${c.weight}%)`),'Nota calculada','Assoliment calculat','Targetes grogues','Targetes vermelles'];
+  const cap=['Cognoms','Nom',...cols.map(c=>c.name),...sub.categories.map(c=>`${c.name} (${c.weight}%)`),'Nota calculada','Assoliment calculat','Targetes grogues','Targetes vermelles',...(dv?['Mesures','Proposta educativa','Enllaços']:[])];
   const files=[cap.map(q).join(SEP)];
   for(const st of alumnesVisibles(sub)){const f=finalDe(sub,st),i=incDe(sub,st);
     files.push([st.cognoms,st.nom,...cols.map(c=>c.type==='ext'?(resolveExt(sub,c,st)?.label??''):valorText(c,getG(sub,c.id,st.id))),
-      ...sub.categories.map(c=>{const r=catResult(sub,c,st);return r?r.label:''}),f?fmt(f.num):'',f?LV[f.lvl]:'',i.y,i.r].map(q).join(SEP))}
+      ...sub.categories.map(c=>{const r=catResult(sub,c,st);return r?r.label:''}),f?fmt(f.num):'',f?LV[f.lvl]:'',i.y,i.r,...(dv?(d=>[dvEtiq(d),d.t||'',dvLlTxt(d)])(dvDe(sub,st.id)):[])].map(q).join(SEP))}
   descarrega(`notes_${sub.name.replace(/[^\wÀ-ÿ·-]+/g,'_')}_${stamp()}.csv`,'﻿'+files.join('\r\n'));
   toast('CSV descarregat. A Google Sheets: Fitxer › Importa › Puja.')}
 
@@ -1444,7 +1463,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     ${ordH}</div><div class="cbr2">
     <label><input type="checkbox" id="bHCg" ${sub.ocult.cognoms?'checked':''}> Amaga cognoms</label>
     ${cls.length?`<label><input type="checkbox" id="bHCl" ${sub.ocult.classe?'checked':''}> Amaga classe</label>`:''}
-    <label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label></div>
+    <label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label>${teDiv(sub)||amagaDiv()?`<label title="Per quan projectes: amaga les ratlles de diversitat"><input type="checkbox" id="bDvAm" ${amagaDiv()?'checked':''}> Amaga marques de diversitat</label>`:''}</div>
   `;let h=capcalera(sub,barra,capPlegada()?'':llegenda(sub));
   if(!sub.students.length){m.innerHTML=h+`<div class="buit">Encara no hi ha alumnes en aquesta llibreta.<div style="margin-top:12px"><button class="btn" id="bAfAl">👥 Afegeix alumnes</button></div></div>`;lligaBarra(sub);$('#bAfAl').onclick=()=>{tab='config';alObert=true;render();$('#detAl')?.scrollIntoView({block:'start'})};return}
   /* columnes fixes a l'esquerra */
@@ -1479,8 +1498,8 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
-    return `<tr data-s="${st.id}">`+fix.map(f=>f.k==='cognoms'?`<td class="fx ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${esc(st.cognoms||'')}</td>`
-      :f.k==='nom'?`<td class="fx nomc ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>`
+    return `<tr data-s="${st.id}">`+fix.map((f,fi)=>f.k==='cognoms'?`<td class="fx ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.cognoms||'')}</td>`
+      :f.k==='nom'?`<td class="fx nomc ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.nom)}</td>`
       :cella(sub,f.c,st,'fx cl '+(f.last?'fxlast':''),stf(f))).join('')+
       gs.map(g=>g.folded?plegCella(sub,g.cat,st):g.cols.map(c=>cella(sub,c,st,'',ws(c))).join('')).join('')+`</tr>`}).join('');
   if(!files.length)h+=`<tr><td colspan="${ncol}" class="buit">Cap alumne en aquesta classe.</td></tr>`;
@@ -1498,7 +1517,7 @@ function lligaBarra(sub){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#bOrd','onchange',e=>{sub.ordre=e.target.value;if(ordrePerNota(sub))sub.ordreDir='desc';save(null,true);rLlibreta()});
   on('#bDir','onclick',()=>{sub.ordreDir=sub.ordreDir==='asc'?'desc':'asc';save(null,true);rLlibreta()});
   on('#bMos','onchange',e=>{sub.mostra=e.target.value;save();rLlibreta()});
-  on('#bHCg','onchange',e=>{sub.ocult.cognoms=e.target.checked;save();rLlibreta()});
+  on('#bHCg','onchange',e=>{sub.ocult.cognoms=e.target.checked;save();rLlibreta()});on('#bDvAm','onchange',e=>setAmagaDiv(e.target.checked));
   on('#bHCl','onchange',e=>{sub.ocult.classe=e.target.checked;save();rLlibreta()});
   on('#bCmp','onchange',e=>{sub.compacte=e.target.checked;save();rLlibreta()});
   on('#chipOc','onclick',e=>{e.stopPropagation();const l=$('#ocList');l.hidden=!l.hidden});
@@ -1516,19 +1535,21 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
   const ro=RO(),finals=sub.columns.filter(c=>c.type==='final'),fc=colFinal(sub),pleg=!!sub.aval.comPleg;
   const barra=`<div class="cbr1"><button class="btn" id="aVA">👤 Vista alumne</button>
     ${finals.length>1?`<label>Nota final <select id="aFin">${finals.map(c=>`<option value="${c.id}" ${c===fc?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
-    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button><button class="btn sec" id="bExp">Exporta</button></div>`;
+    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button>${teDiv(sub)||amagaDiv()?`<label class="dvamg" title="Per quan projectes: amaga les ratlles i les columnes de diversitat"><input type="checkbox" id="aDvAm" ${amagaDiv()?'checked':''}> Amaga marques de diversitat</label>`:''}<button class="btn sec" id="bExp">Exporta</button></div>`;
   let h=capcalera(sub,barra,llegenda(sub));
   if(!sub.students.length){$('#main').innerHTML=h+'<div class="buit">Sense alumnes.</div>';lligaAval(sub);return}
-  const sts=alumnesAval(sub);if(DIST.on)h+=distHtml(sub);
+  const sts=alumnesAval(sub),dvOn=!amagaDiv();if(DIST.on)h+=distHtml(sub);
   h+=`<div class="tw" id="tw"><table class="resum aval"><thead><tr><th class="fx" style="left:0;min-width:170px;text-align:left;padding:6px 10px">Cognoms</th><th class="fx fxlast" style="left:170px;min-width:${sub.nomW||120}px;max-width:${sub.nomW||120}px;width:${sub.nomW||120}px;text-align:left;padding:6px 10px">Nom</th>
     ${sub.categories.map(c=>`<th style="border-top:5px solid ${c.color};padding:6px 10px">${sigHtml(c)} ${esc(c.name)} · ${c.weight}%<span class="metode">${c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana':METODE[c.method]}</span></th>`).join('')}
     <th style="padding:6px 30px 6px 10px;position:relative" class="calch">Càlcul<span class="cmode">${{ass:'assoliments',num:'numèric',mixt:''}[modeCalc(sub)]}</span><button class="cmdots" data-cmode title="Com es mostra el càlcul">⋯</button></th><th style="padding:6px 10px;min-width:110px">${fc?esc(fc.name):'Nota final'}</th>
+    ${dvOn?`<th class="dvh" title="Atenció a la diversitat (clica una cel·la per editar-la)">🧩 Mesures</th><th class="dvph ${DV.prop?'':'pl'}" id="aDvH" title="Clica per ${DV.prop?'plegar':'desplegar'} la columna">${DV.prop?'Proposta educativa ▾':'📝 ▸'}</th>`:''}
     <th class="comh ${pleg?'pl':''}" id="aComH" title="Clica per ${pleg?'desplegar':'plegar'} la columna">${pleg?'💬 ▸':'💬 Comentari ▾'}</th><th style="padding:6px 8px" title="Copia el comentari per enganxar-lo a l'Esfera">Esfera</th></tr></thead><tbody>`;
   for(const st of sts){const f=finalDe(sub,st),com=sub.comentaris[st.id]||'',marc=sub.aval.marques[st.id];
-    h+=`<tr data-s="${st.id}"><td class="fx nomc" style="left:0;text-align:left;font-weight:400">${esc(st.cognoms||'')}</td><td class="fx fxlast nomc" style="left:170px;text-align:left;max-width:${sub.nomW||120}px" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>
+    h+=`<tr data-s="${st.id}"><td class="fx nomc" style="left:0;text-align:left;font-weight:400">${dvSpan(sub,st)}${esc(st.cognoms||'')}</td><td class="fx fxlast nomc" style="left:170px;text-align:left;max-width:${sub.nomW||120}px" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>
       ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}">${esc(catTxt(sub,r))}</td>`}).join('')}
       <td class="${f?'l'+f.lvl:''}" style="font-weight:700">${esc(calcTxt(sub,f))}</td>
       ${fc?cella(sub,fc,st):'<td><span class="buida">—</span></td>'}
+      ${dvOn?(()=>{const d=dvDe(sub,st.id),t=(d.t||'').trim();return `<td class="dvc dvm" data-dvm="${st.id}" title="${d.n?esc(dvEtiq(d)):'Clica per marcar mesures'}">${dvChips(d)}</td><td class="dvc dvp ${DV.prop?'':'pl'}" data-dvp="${st.id}" title="${DV.prop?'Clica per veure-ho tot o escriure':esc(t)||'Sense proposta educativa'}">${DV.prop?(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>'):(t?'📝':'<span class="buida">·</span>')}</td>`})():''}
       <td class="com ${pleg?'pl':''}" data-com="${st.id}" title="${pleg?esc(com)||'Sense comentari':'Clica per escriure o triar comentaris del banc'}">${pleg?(com?'💬':'<span class="buida">·</span>'):(com?`<div class="comt">${esc(com)}</div>`:'<span class="buida">＋ comentari</span>')}</td>
       <td class="esf"><button class="cpb" data-cp="${st.id}" title="Copia el comentari" ${com?'':'disabled'}>📋</button>${marc?'<span class="mrc" title="Ja copiat">✔</span>':''}</td></tr>`}
   h+=`</tbody></table></div>${fc?'':'<p class="aj" style="margin-top:8px">ⓘ Aquesta llibreta encara no té cap columna de <b>nota final</b>. Crea-la a la pestanya Llibreta (＋ Columna › Nota final) i aquí podràs posar la nota de cada alumne.</p>'}`;
@@ -1565,7 +1586,8 @@ function lligaAval(sub){const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#bExp','onclick',exporta);on('#aVA','onclick',()=>{VA.on=true;VA.idx=0;VA.cortina=false;tancaPanell();rResum()});
   on('#aFin','onchange',e=>{sub.aval.final=e.target.value;save(null,true);rResum()});
   on('#aMarq','onclick',()=>{sub.aval.marques={};save(null,true);rResum()});
-  on('#aComH','onclick',()=>{sub.aval.comPleg=!sub.aval.comPleg;save(null,true);rResum()})}
+  on('#aComH','onclick',()=>{sub.aval.comPleg=!sub.aval.comPleg;save(null,true);rResum()});
+  on('#aDvH','onclick',()=>{DV.prop=!DV.prop;rResum()});on('#aDvAm','onchange',e=>setAmagaDiv(e.target.checked))}
 async function copiaText(t){try{await navigator.clipboard.writeText(t);return true}catch{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch{}ta.remove();return ok}}
 async function copiaComentari(sub,stId){const t=(sub.comentaris[stId]||'').trim();if(!t)return toast('Aquest alumne no té comentari.');
   if(!await copiaText(t))return toast('No s\'ha pogut copiar. Selecciona el text i fes Ctrl+C.');
@@ -1574,21 +1596,47 @@ async function copiaComentari(sub,stId){const t=(sub.comentaris[stId]||'').trim(
 function clicAval(e,sub){
   const cp=e.target.closest('[data-cp]');if(cp){copiaComentari(sub,cp.dataset.cp);return}
   const com=e.target.closest('td[data-com]');if(com){if(RO())return toast('Llibreta arxivada: només lectura.');obrePanell(com.dataset.com);return}
+  const dv=e.target.closest('td[data-dvm],td[data-dvp]');if(dv){if(RO())return toast('Llibreta arxivada: només lectura.');obrePanell(dv.dataset.dvm||dv.dataset.dvp,'div');return}
   const va=e.target.closest('[data-va]');if(va){mouVA(+va.dataset.va);return}}
 
+/* ======================= 2.3 · Atenció a la diversitat (per llibreta; dades sensibles) ======================= */
+const DVN={p:'Personalització',ma:'Mesures addicionals'};
+const dvDe=(sub,id)=>sub.div?.[id]||{};
+const dvEtiq=d=>!d.n?'':DVN[d.n]+(d.pi?' · PI':'');
+function amagaDiv(){try{return localStorage.getItem('llibreta-amaga-div')==='1'}catch{return false}}
+function setAmagaDiv(v){try{localStorage.setItem('llibreta-amaga-div',v?'1':'0')}catch{}render()}
+const teDiv=sub=>Object.values(sub.div||{}).some(d=>d.n||d.pi||(d.t||'').trim()||d.ll?.length);
+const nDiv=sub=>Object.entries(sub.div||{}).filter(([id,d])=>(d.n||d.pi||(d.t||'').trim()||d.ll?.length)&&sub.students.some(s=>s.id===id)).length;
+/* ratlla a l'esquerra del nom: groc = personalització, blau = mesures addicionals; partida sense PI, plena amb PI */
+function dvSpan(sub,st){if(amagaDiv()||VA.on)return '';const d=dvDe(sub,st.id);if(!d.n)return '';return `<span class="dvl ${d.n}${d.pi?' pi':''}" title="${esc(dvEtiq(d))}"></span>`}
+function dvChips(d){return d.n?`<span class="dvchip ${d.n}">${DVN[d.n]}</span>${d.pi?'<span class="dvchip pi">PI</span>':''}`:'<span class="buida">＋</span>'}
+function dvSet(sub,id,camp,v){sub.div??={};const d=sub.div[id]??={};if(v===undefined||v===''||v===false||(Array.isArray(v)&&!v.length))delete d[camp];else d[camp]=v;if(!Object.keys(d).length)delete sub.div[id]}
+const DV={prop:false};
+/* Pregunta abans d'exportar si hi ha dades de diversitat: null = cancel·la */
+async function preguntaDiv(subs){const n=subs.reduce((a,s)=>a+nDiv(s),0);if(!n)return false;
+  return pregunta('Atenció a la diversitat',`${n===1?'Hi ha 1 alumne':'Hi ha '+n+' alumnes'} amb mesures d'atenció a la diversitat. Vols incloure-hi les mesures, la proposta educativa i els enllaços? Són dades sensibles: inclou-les només si el document és per a l'equip docent.`,
+    [{t:'Cancel·la',v:null,cls:'sec'},{t:'Inclou-les',v:true,cls:'sec'},{t:'No les incloguis',v:false}])}
+const dvLlTxt=d=>(d.ll||[]).map(l=>(l.n?l.n+': ':'')+l.u).join(' · ');
+
 /* ----- Panell del banc de comentaris ----- */
-const PN={st:null,cerca:''};
-function obrePanell(stId){PN.st=stId;PN.cerca='';$('#pnl').hidden=false;document.body.classList.add('pnl-on');pintaPanell();setTimeout(()=>$('#pnTxt')?.focus(),0)}
-function tancaPanell(){PN.st=null;const p=$('#pnl');if(p)p.hidden=true;document.body.classList.remove('pnl-on');$$('td.com.sel').forEach(t=>t.classList.remove('sel'))}
+const PN={st:null,cerca:'',mode:'com'};
+const bancPN=()=>PN.mode==='div'?state.bancDiv:state.banc;
+function obrePanell(stId,md='com'){PN.st=stId;PN.cerca='';PN.mode=md;$('#pnl').hidden=false;document.body.classList.add('pnl-on');pintaPanell();setTimeout(()=>$('#pnTxt')?.focus(),0)}
+function tancaPanell(){PN.st=null;const p=$('#pnl');if(p)p.hidden=true;document.body.classList.remove('pnl-on');$$('td.com.sel,td.dvc.sel').forEach(t=>t.classList.remove('sel'))}
 function pintaPanell(){const sub=cur(),st=sub?.students.find(x=>x.id===PN.st);if(!st){tancaPanell();return}
-  $$('td.com.sel').forEach(t=>t.classList.remove('sel'));document.querySelector(`td[data-com="${st.id}"]`)?.classList.add('sel');
+  $$('td.com.sel,td.dvc.sel').forEach(t=>t.classList.remove('sel'));const dvm=PN.mode==='div';
+  if(dvm)$$(`td[data-dvm="${st.id}"],td[data-dvp="${st.id}"]`).forEach(t=>t.classList.add('sel'));else document.querySelector(`td[data-com="${st.id}"]`)?.classList.add('sel');
+  $('#pnTit').hidden=!dvm;$('#pnLl').hidden=!dvm;$('#pnCp').textContent=dvm?'📋 Copia':'📋 Copia per a l\'Esfera';$('#pnTxt').placeholder=dvm?'Proposta educativa: escriu-la o tria frases del banc de sota…':'Escriu el comentari o tria\'n del banc de sota…';
   const sts=alumnesAval(sub),i=sts.findIndex(x=>x.id===st.id),f=finalDe(sub,st),fc=colFinal(sub),vf=fc?getG(sub,fc.id,st.id):undefined,lv=nivellAlumne(sub,st);
   $('#pnNom').textContent=(st.cognoms?st.cognoms+', ':'')+st.nom;$('#pnPos').textContent=`${i+1}/${sts.length}`;
+  if(dvm){const d=dvDe(sub,st.id);$('#pnTit').innerHTML='🧩 Atenció a la diversitat';
+    $('#pnInfo').innerHTML=`<div class="dvop"><button data-dvn="p" class="p ${d.n==='p'?'on':''}" title="Mesures universals">Personalització</button><button data-dvn="ma" class="ma ${d.n==='ma'?'on':''}">Mesures addicionals</button><button data-dvpi class="pi ${d.pi?'on':''}" title="Pla de suport individualitzat (inclou mesures addicionals)">PI</button></div>`;
+    const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=d.t||'';pintaLlPanell(sub,st);$('#pnCerca').value=PN.cerca;pintaBancPanell(sub,0);return}
   $('#pnInfo').innerHTML=`<span class="chip">Càlcul: <b>${esc(calcTxt(sub,f))}</b></span>${fc?`<span class="chip ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${esc(fc.name)}: <b>${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</b></span>`:''}`;
   const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=sub.comentaris[st.id]||'';
   $('#pnCerca').value=PN.cerca;pintaBancPanell(sub,lv)}
-function pintaBancPanell(sub,lv){const b=state.banc,q=norm(PN.cerca),w=$('#pnBanc');
-  if(!b.items.length){w.innerHTML='<p class="aj">El banc és buit. Afegeix-hi comentaris a <b>⚙ Configuració › Banc de comentaris</b>.</p>';return}
+function pintaBancPanell(sub,lv){const b=bancPN(),q=norm(PN.cerca),w=$('#pnBanc');
+  if(!b.items.length){w.innerHTML=PN.mode==='div'?'<p class="aj">El banc és buit. Afegeix-hi frases a <b>⚙ Configuració › Banc d\'atenció a la diversitat</b>.</p>':'<p class="aj">El banc és buit. Afegeix-hi comentaris a <b>⚙ Configuració › Banc de comentaris</b>.</p>';return}
   const item=it=>`<button class="bitem" data-bi="${it.id}" title="Clica per afegir-lo al comentari">${it.niv?`<span class="niv l${LV.indexOf(it.niv)}">${it.niv}</span>`:''}${esc(it.text)}</button>`;
   if(q){const r=b.items.filter(it=>norm(it.text).includes(q));w.innerHTML=r.length?r.map(item).join(''):'<p class="aj">Cap comentari conté aquest text.</p>';return}
   const sug=lv?b.items.filter(it=>it.niv===LV[lv]):[];
@@ -1596,7 +1644,21 @@ function pintaBancPanell(sub,lv){const b=state.banc,q=norm(PN.cerca),w=$('#pnBan
   w.innerHTML=(sug.length?`<div class="bsug"><div class="bt">⭐ Suggerits per a ${LV[lv]}</div>${sug.map(item).join('')}</div>`:'')+
     cats.map(c=>{const its=b.items.filter(it=>(it.cat||'')===c.id&&(c.id||!b.cats.some(k=>k.id===it.cat)));if(!its.length)return '';
       return `<details class="bcat" ${PN.obertes?.has(c.id)?'open':''} data-bc="${c.id}"><summary>${esc(c.nom)} <span class="aj">(${its.length})</span></summary>${its.map(item).join('')}</details>`}).join('')}
-function afegeixComentari(text){const sub=cur(),st=PN.st;if(!sub||!st)return;const ta=$('#pnTxt');let v=ta.value.trim();v=v?(v+(/[.!?…]$/.test(v)?' ':'. ')+text):text;ta.value=v;desaComentari(v)}
+function afegeixComentari(text){const sub=cur(),st=PN.st;if(!sub||!st)return;const ta=$('#pnTxt');let v=ta.value.trim();v=v?(v+(/[.!?…]$/.test(v)?' ':'. ')+text):text;ta.value=v;PN.mode==='div'?desaProposta(v):desaComentari(v)}
+function desaProposta(v){const sub=cur(),st=PN.st;if(!sub||!st)return;dvSet(sub,st,'t',v.trim()?v:'');clearTimeout(desaProposta.h);desaProposta.h=setTimeout(()=>save('proposta educativa'),500);
+  const td=document.querySelector(`td[data-dvp="${st}"]`);if(td){const t=v.trim();td.innerHTML=td.classList.contains('pl')?(t?'📝':'<span class="buida">·</span>'):(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>');td.title=td.classList.contains('pl')?t||'Sense proposta educativa':'Clica per veure-ho tot o escriure'}}
+function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
+  $('#pnLl').innerHTML=`<div class="pnsec">🔗 Enllaços</div>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
+    <div class="fl dvlla"><input type="text" id="pnLlN" placeholder="Nom (opcional)" style="width:34%"><input type="text" id="pnLlU" placeholder="Enganxa l'adreça (https://…)" style="flex:1;min-width:0"><button class="btn sec" id="pnLlAf">Afegeix</button></div>`;
+  $('#pnLlAf').onclick=()=>{let u=$('#pnLlU').value.trim();if(!u)return toast('Enganxa l\'adreça de l\'enllaç.');if(!/^https?:\/\//i.test(u)){if(/^[a-z]+:/i.test(u))return toast('Només es poden desar enllaços web (http o https).');u='https://'+u}
+    dvSet(sub,st.id,'ll',[...ll,{n:$('#pnLlN').value.trim(),u}]);save('enllaç de diversitat');pintaLlPanell(sub,st)};
+  $('#pnLlU').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#pnLlAf').click()}};
+  $$('#pnLl [data-llx]').forEach(b=>b.onclick=()=>{const n=ll.filter((_,i)=>i!==+b.dataset.llx);dvSet(sub,st.id,'ll',n);save('treure enllaç de diversitat');pintaLlPanell(sub,st)})}
+function triaDiv(sub,st,k){if(RO())return toast('Llibreta arxivada: només lectura.');const d=dvDe(sub,st);
+  if(k==='pi'){if(d.pi)dvSet(sub,st,'pi',false);else{dvSet(sub,st,'pi',true);dvSet(sub,st,'n','ma')}}
+  else if(d.n===k){if(d.pi&&k==='ma')return toast('Amb PI hi ha d\'haver mesures addicionals. Treu primer el PI.');dvSet(sub,st,'n','')}
+  else{if(d.pi&&k==='p')return toast('Amb PI hi ha d\'haver mesures addicionals. Treu primer el PI.');dvSet(sub,st,'n',k)}
+  save('mesures de diversitat');rResum()}
 function desaComentari(v){const sub=cur(),st=PN.st;if(!sub||!st)return;if(v.trim())sub.comentaris[st]=v;else delete sub.comentaris[st];
   delete sub.aval.marques[st];clearTimeout(desaComentari.h);desaComentari.h=setTimeout(()=>save('comentari'),500);
   const td=document.querySelector(`td[data-com="${st}"]`);if(td&&!td.classList.contains('pl'))td.innerHTML=v.trim()?`<div class="comt">${esc(v)}</div>`:'<span class="buida">＋ comentari</span>';
@@ -1857,7 +1919,7 @@ function textCella(sub,c,st){const v=getG(sub,c.id,st.id);
     case 'icones':return pt(v)||'•';case 'opc':return pt(opcDe(c,v)?.t||'');default:return pt(valorText(c,v))}}
 function nomFitxer(t){return t.replace(/[\\/:*?"<>|]/g,'-').slice(0,120)}
 const PDFCOL={1:[255,214,214],2:[255,241,184],3:[214,236,255],4:[212,245,217]};
-function pdfLlibreta(doc,sub,primera){const M=10,W=doc.internal.pageSize.getWidth(),ara=new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'});
+function pdfLlibreta(doc,sub,primera,ambDiv){const M=10,W=doc.internal.pageSize.getWidth(),ara=new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'});
   const sts=alumnesAval(sub),esLl=sub.tipus==='llista',cls=colsClasse(sub).length?colsClasse(sub)[0]:null;
   const capP=(t)=>{doc.setFont('helvetica','bold');doc.setFontSize(13);doc.text(pt(sub.name),M,M+5);doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(110);
     doc.text(pt(`${t} · Curs ${cursCurt(cursKey())} · ${sts.length} alumnes · generat el ${ara}`),M,M+10);doc.setTextColor(0)};
@@ -1893,6 +1955,12 @@ function pdfLlibreta(doc,sub,primera){const M=10,W=doc.internal.pageSize.getWidt
   if(hiHaNp){let y=doc.lastAutoTable.finalY+5;if(y>doc.internal.pageSize.getHeight()-14){doc.addPage();capP('Detall de la llibreta');y=M+16}
     doc.setFontSize(8);doc.setTextColor(90);doc.text(pt('(no compta): columna dins d\'una categoria que no compta per a la nota.'),M,y);doc.setTextColor(0);doc.lastAutoTable.finalY=y}
   if(anots.length){doc.autoTable({...base,startY:doc.lastAutoTable.finalY+6,head:[['Alumne','Columna','Comentari de la cel·la']],body:anots,columnStyles:{0:{cellWidth:50},1:{cellWidth:50}},headStyles:{...base.headStyles,fillColor:[230,81,0]}})}
+  /* 2b. Atenció a la diversitat (només si s'ha triat incloure-la) */
+  if(ambDiv&&nDiv(sub)){const fl=sts.map(st=>[st,dvDe(sub,st.id)]).filter(([,d])=>d.n||d.pi||(d.t||'').trim()||d.ll?.length);
+    let y=doc.lastAutoTable.finalY+8;if(y>doc.internal.pageSize.getHeight()-40){doc.addPage();capP('Atenció a la diversitat');y=M+14}
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(pt('Atenció a la diversitat (dades confidencials)'),M,y);
+    doc.autoTable({...base,startY:y+2,head:[[...nomCols.map(c=>c.h),'Mesures','Proposta educativa','Enllaços']],body:fl.map(([st,d])=>[...nomVals(st),pt(dvEtiq(d)),pt(d.t||''),pt(dvLlTxt(d))]),
+      columnStyles:{...Object.fromEntries(nomCols.map((c,i)=>[i,{cellWidth:c.w}])),[nomCols.length]:{cellWidth:36},[nomCols.length+2]:{cellWidth:60}},headStyles:{...base.headStyles,fillColor:[31,95,209]},didDrawPage:()=>capP('Atenció a la diversitat')})}
   /* 3. Distribució per grups */
   if(!esLl&&sub.categories.length){const d=dadesDist(sub),pc=(n,t)=>t?Math.round(n/t*100)+' %':'—';
     let y=doc.lastAutoTable.finalY+8;if(y>doc.internal.pageSize.getHeight()-60){doc.addPage();capP('Distribució');y=M+14}
@@ -1902,10 +1970,10 @@ function pdfLlibreta(doc,sub,primera){const M=10,W=doc.internal.pageSize.getWidt
   return inici}
 function peus(doc){const n=doc.getNumberOfPages(),W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();doc.setFontSize(7.5);doc.setTextColor(120);
   for(let i=1;i<=n;i++){doc.setPage(i);doc.text(pt(`Llibreta del Profe · J Alcolea · v${VERSIO.split(' ')[0]}`),10,H-5);doc.text(`${i} / ${n}`,W-10,H-5,{align:'right'})}doc.setTextColor(0)}
-async function fesPDF(llibretes,ambIndex){await carregaPDF();const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});const idx=[];
+async function fesPDF(llibretes,ambIndex,ambDiv=false){await carregaPDF();const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});const idx=[];
   if(ambIndex){doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('Llibreta del Profe',10,22);doc.setFont('helvetica','normal');doc.setFontSize(10);
     doc.text(pt(`Curs ${cursCurt(cursKey())} · totes les llibretes actives · ${new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'})}`),10,29)}
-  llibretes.forEach((sub,i)=>idx.push([pt(sub.name),pdfLlibreta(doc,sub,!ambIndex&&i===0)]));
+  llibretes.forEach((sub,i)=>idx.push([pt(sub.name),pdfLlibreta(doc,sub,!ambIndex&&i===0,ambDiv)]));
   if(ambIndex){doc.setPage(1);doc.autoTable({startY:36,margin:{left:10,right:10},theme:'plain',styles:{fontSize:11},head:[['Llibreta','Pàgina']],body:idx.map(([n,p])=>[n,String(p)]),columnStyles:{1:{halign:'right',cellWidth:30}},
     didDrawCell:d=>{if(d.section==='body'){const pg=idx[d.row.index][1];doc.link(d.cell.x,d.cell.y,d.cell.width,d.cell.height,{pageNumber:pg})}}})}
   peus(doc);return doc}
@@ -1916,8 +1984,9 @@ async function pujaPDF(doc,nom){const blob=doc.output('blob');
   const bd='pdf'+uid(),cos=new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:nom,mimeType:'application/pdf',parents:[fid]})}\r\n--${bd}\r\nContent-Type: application/pdf\r\n\r\n`,blob,`\r\n--${bd}--`]);
   await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+bd},body:cos})}
 async function pdfAlDrive(sub){if(mode!=='drive')return toast('Per desar al Drive cal entrar amb Google. Pots descarregar-lo des de ⚙ Configuració.');
+  const dv=await preguntaDiv([sub]);if(dv===null)return;
   const b=$('#aPdf');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
-  try{const doc=await fesPDF([sub],false),blob=doc.output('blob'),nom=nomFitxer(`${avui()} · ${sub.name}.pdf`);
+  try{const doc=await fesPDF([sub],false,dv),blob=doc.output('blob'),nom=nomFitxer(`${avui()} · ${sub.name}.pdf`);
     let fid;const q=encodeURIComponent(`name='${CARPDF}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
     const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id)&spaces=drive`)).json();fid=r.files?.[0]?.id;
     if(!fid)fid=(await (await gf(`${DRIVE}?fields=id`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:CARPDF,mimeType:'application/vnd.google-apps.folder'})})).json()).id;
@@ -1926,8 +1995,8 @@ async function pdfAlDrive(sub){if(mode!=='drive')return toast('Per desar al Driv
     toast(`PDF desat al Drive: «${CARPDF}» › ${nom}`,6000)}
   catch(e){toast(e.message==='reauth'?'La sessió ha caducat: clica el núvol i torna-ho a provar.':e.message==='offline'?'Sense connexió: no es pot desar el PDF ara.':'No s\'ha pogut fer el PDF: '+e.message,6000)}
   if(b){b.disabled=false;b.textContent='📄 Desa en PDF al Drive'}}
-async function pdfTotes(){const ll=actives();if(!ll.length)return toast('No hi ha cap llibreta activa.');const b=$('#dPdf');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
-  try{const doc=await fesPDF(ll,true);doc.save(nomFitxer(`Llibreta del Profe · ${avui()}.pdf`));toast(`PDF amb ${ll.length} llibreta(es) descarregat.`)}catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000)}
+async function pdfTotes(){const ll=actives();if(!ll.length)return toast('No hi ha cap llibreta activa.');const dv=await preguntaDiv(ll);if(dv===null)return;const b=$('#dPdf');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
+  try{const doc=await fesPDF(ll,true,dv);doc.save(nomFitxer(`Llibreta del Profe · ${avui()}.pdf`));toast(`PDF amb ${ll.length} llibreta(es) descarregat.`)}catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000)}
   if(b){b.disabled=false;b.textContent='📄 Descarrega el PDF de totes les llibretes'}}
 
 /* ======================= Full de càlcul (.xlsx sense fórmules) al Drive, convertit a Full de càlcul de Google ======================= */
@@ -1965,13 +2034,13 @@ function fesXLSX(fulls){const ss=[],ssi=new Map(),si=s=>{if(!ssi.has(s)){ssi.set
     ...fx.map((x,i)=>[`xl/worksheets/sheet${i+1}.xml`,x]),
     ['xl/sharedStrings.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="${ss.length}" uniqueCount="${ss.length}">${ss.map(s=>`<si><t xml:space="preserve">${xEsc(s)}</t></si>`).join('')}</sst>`]])}
 /* Les mateixes dades que l'exportació CSV d'una llibreta, amb tots els alumnes (sense filtre de classe) */
-function filesLlibreta(sub){const cols=[...colsClasse(sub),...grups(sub).flatMap(g=>g.cols)];
-  const out=[['Cognoms','Nom',...cols.map(c=>c.name),...sub.categories.map(c=>`${c.name} (${c.weight}%)`),'Nota final','Assoliment final','Targetes grogues','Targetes vermelles']];
+function filesLlibreta(sub,ambDiv){const cols=[...colsClasse(sub),...grups(sub).flatMap(g=>g.cols)];
+  const out=[['Cognoms','Nom',...cols.map(c=>c.name),...sub.categories.map(c=>`${c.name} (${c.weight}%)`),'Nota final','Assoliment final','Targetes grogues','Targetes vermelles',...(ambDiv?['Mesures','Proposta educativa','Enllaços']:[])]];
   for(const {st} of filesVisibles(sub,'tots','cognoms')){const f=finalDe(sub,st),i=incDe(sub,st);
     out.push([st.cognoms,st.nom,...cols.map(c=>c.type==='ext'?(resolveExt(sub,c,st)?.label??''):valorText(c,getG(sub,c.id,st.id))),
-      ...sub.categories.map(c=>{const r=catResult(sub,c,st);return r?r.label:''}),f?Math.round(f.num*100)/100:'',f?LV[f.lvl]:'',i.y||'',i.r||''])}
+      ...sub.categories.map(c=>{const r=catResult(sub,c,st);return r?r.label:''}),f?Math.round(f.num*100)/100:'',f?LV[f.lvl]:'',i.y||'',i.r||'',...(ambDiv?(d=>[dvEtiq(d),d.t||'',dvLlTxt(d)])(dvDe(sub,st.id)):[])])}
   return out}
-function fullsExport(){const usats=new Set(),fulls=actives().map(sub=>({nom:nomFull(sub.name,usats),fixa:2,files:filesLlibreta(sub)}));
+function fullsExport(ambDiv){const usats=new Set(),fulls=actives().map(sub=>({nom:nomFull(sub.name,usats),fixa:2,files:filesLlibreta(sub,ambDiv&&nDiv(sub)>0)}));
   const k=cursKey();grupsDe(k).forEach(g=>{const al=alumnatDe(k).filter(a=>(a.grup||'—')===g).sort((a,b)=>(a.cognoms+' '+a.nom).localeCompare(b.cognoms+' '+b.nom,'ca'));
     fulls.push({nom:nomFull('Llistat '+g,usats),fixa:2,files:[['Cognoms','Nom','Classe'],...al.map(a=>[a.cognoms,a.nom,a.grup||''])]})});
   return fulls}
@@ -1979,8 +2048,8 @@ async function carpetaDrive(){const q=encodeURIComponent(`name='${CARPDF}' and m
   const r=await (await gf(`${DRIVE}?q=${q}&fields=files(id)&spaces=drive`)).json();
   return r.files?.[0]?.id||(await (await gf(`${DRIVE}?fields=id`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:CARPDF,mimeType:'application/vnd.google-apps.folder'})})).json()).id}
 async function fullAlDrive(){if(mode!=='drive')return toast('Per desar el full de càlcul cal entrar amb Google.');
-  if(!actives().length)return toast('No hi ha cap llibreta activa.');const b=$('#dFull');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
-  try{const fulls=fullsExport(),blob=fesXLSX(fulls),fid=await carpetaDrive(),nom=nomFitxer(`Llibreta del Profe · ${avui()}`),bd='xl'+uid();
+  if(!actives().length)return toast('No hi ha cap llibreta activa.');const dv=await preguntaDiv(actives());if(dv===null)return;const b=$('#dFull');if(b){b.disabled=true;b.textContent='⏳ Generant…'}
+  try{const fulls=fullsExport(dv),blob=fesXLSX(fulls),fid=await carpetaDrive(),nom=nomFitxer(`Llibreta del Profe · ${avui()}`),bd='xl'+uid();
     const cos=new Blob([`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify({name:nom,mimeType:'application/vnd.google-apps.spreadsheet',parents:[fid]})}\r\n--${bd}\r\nContent-Type: ${blob.type}\r\n\r\n`,blob,`\r\n--${bd}--`]);
     await gf(`${UPL}?uploadType=multipart&fields=id`,{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+bd},body:cos});
     toast(`Full de càlcul desat al Drive (${fulls.length} pestanyes): «${CARPDF}» › ${nom}`,7000)}
@@ -2161,8 +2230,8 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     <div class="fl"><label><b class="vFJ">FJ</b> (falta justificada):</label><select id="kFJ"><option value="skip" ${s.fjMode!=='zero'?'selected':''}>no compta (recomanat)</option><option value="zero" ${s.fjMode==='zero'?'selected':''}>compta com un 0</option></select></div>`)}
   ${cfgDet('taula','▦ Taula',s.filaTotals?'amb fila de totals':'sense fila de totals',`<label><input type="checkbox" id="kTot" ${s.filaTotals?'checked':''}> Mostra una fila de totals al final de la taula (mitjanes, valor més repetit, fets, targetes…)</label>`)}
   ${cfgDet('sortides','🚻 Sortides de l\'aula','avís als '+state.sortidesMin+' min',`<label>Avisa quan un alumne porta fora <input type="number" id="kSoMin" min="1" max="60" value="${state.sortidesMin}" style="width:64px"> minuts</label>`)}
-  </fieldset>${cfgDet('alumnat','📇 Llistats del curs '+cursCurt(cursKey()),`${alumnatDe().length} alumnes · ${grupsDe().length} grups`,'<div id="alumW"></div>')}${colorsHtml()}${cfgDet('banc','💬 Banc de comentaris',state.banc.items.length+' comentari'+(state.banc.items.length===1?'':'s')+' · '+state.banc.cats.length+' categori'+(state.banc.cats.length===1?'a':'es'),'<div id="bancW"></div>','detBanc')}<div id="dades"></div>`;
-  rDades(true);rAlumnes();rAlumnat();rBanc();lligaCfg();lligaColors();$('#cfgPl').onclick=()=>plegaCfg(false);$('#cfgDp').onclick=()=>plegaCfg(true);
+  </fieldset>${cfgDet('alumnat','📇 Llistats del curs '+cursCurt(cursKey()),`${alumnatDe().length} alumnes · ${grupsDe().length} grups`,'<div id="alumW"></div>')}${colorsHtml()}${cfgDet('banc','💬 Banc de comentaris',state.banc.items.length+' comentari'+(state.banc.items.length===1?'':'s')+' · '+state.banc.cats.length+' categori'+(state.banc.cats.length===1?'a':'es'),'<div id="bancW"></div>','detBanc')}${cfgDet('bancdiv','🧩 Banc d\'atenció a la diversitat',state.bancDiv.items.length+' frase'+(state.bancDiv.items.length===1?'':'s')+' · '+state.bancDiv.cats.length+' categori'+(state.bancDiv.cats.length===1?'a':'es'),'<p class="aj" style="margin:0 0 8px">Frases per a la proposta educativa (panell de 🧩 a Avaluació). Escriu-hi mesures, no diagnòstics.</p><div id="bancDivW"></div>')}<div id="dades"></div>`;
+  rDades(true);rAlumnes();rAlumnat();rBanc();rBanc('#bancDivW',state.bancDiv,{niv:false,ob:bancDivObertes,ph:'Més temps als exàmens.\nEnunciats curts i per passos.'});lligaCfg();lligaColors();$('#cfgPl').onclick=()=>plegaCfg(false);$('#cfgDp').onclick=()=>plegaCfg(true);
   if(ro)return;
   const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
   on('#kNom','onchange',e=>{sub.name=e.target.value.trim()||sub.name;save();render()});
@@ -2195,29 +2264,29 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
   on('#kTot','onchange',e=>{s.filaTotals=e.target.checked;save('fila de totals')});
   on('#kSoMin','onchange',e=>{const v=Math.round(+e.target.value);if(v>=1&&v<=60){state.sortidesMin=v;save('temps d\'avís de sortides');const r=document.querySelector('details[data-cfg=sortides] .cres');if(r)r.textContent='avís als '+v+' min';pintaSortides()}else e.target.value=state.sortidesMin})}
 /* ----- Banc de comentaris (comú a totes les llibretes) ----- */
-let bancObert=false;const bancCatObertes=new Set();
-function rBanc(){const W=$('#bancW');if(!W)return;const b=state.banc,nivSel=(v,attr)=>`<select ${attr} title="Nivell (opcional): el comentari se suggerirà als alumnes amb aquest nivell">${['','NA','AS','AN','AE'].map(n=>`<option value="${n}" ${v===n?'selected':''}>${n||'—'}</option>`).join('')}</select>`;
+let bancObert=false;const bancCatObertes=new Set(),bancDivObertes=new Set();
+function rBanc(sel='#bancW',b=state.banc,opt={}){const W=$(sel);if(!W)return;const OB=opt.ob||bancCatObertes,ambNiv=opt.niv!==false,nivSel=(v,attr)=>`<select ${attr} title="Nivell (opcional): el comentari se suggerirà als alumnes amb aquest nivell">${['','NA','AS','AN','AE'].map(n=>`<option value="${n}" ${v===n?'selected':''}>${n||'—'}</option>`).join('')}</select>`;
   const cats=[...b.cats,{id:'',nom:'Sense categoria'}];
   W.innerHTML=`
     <div class="card" style="background:var(--gris);border:0"><b>Afegeix comentaris</b> <span class="aj">(un per línia)</span>
-      <textarea id="bNous" placeholder="Bona feina. Cal que continuï treballant com fins ara.&#10;Ha de lliurar totes les tasques de forma puntual." style="min-height:70px"></textarea>
-      <div class="fl"><label>Categoria</label><select id="bNCat">${cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select><label>Nivell</label>${nivSel('','id="bNNiv"')}<button class="btn" id="bAf">Afegeix</button></div>
+      <textarea id="bNous" placeholder="${esc(opt.ph||'Bona feina. Cal que continuï treballant com fins ara.\nHa de lliurar totes les tasques de forma puntual.')}" style="min-height:70px"></textarea>
+      <div class="fl"><label>Categoria</label><select id="bNCat">${cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>${ambNiv?`<label>Nivell</label>${nivSel('','id="bNNiv"')}`:''}<button class="btn" id="bAf">Afegeix</button></div>
       <div class="fl" style="margin-top:10px"><b>Nova categoria</b><input type="text" id="bCatNom" placeholder="p. ex. Felicitacions"><button class="btn sec" id="bCatAf">Crea</button></div></div>
     ${cats.map(c=>{const its=b.items.filter(it=>(it.cat||'')===c.id||(!c.id&&it.cat&&!b.cats.some(k=>k.id===it.cat)));if(!c.id&&!its.length)return '';
-      return `<details class="bcfg" data-bco="${c.id}" ${bancCatObertes.has(c.id)?'open':''}><summary>${c.id?`<input type="text" value="${esc(c.nom)}" data-bcren="${c.id}" class="bcren" title="Canvia el nom">`:'<b>Sense categoria</b>'} <span class="aj">(${its.length})</span>${c.id?`<button class="x" data-bcdel="${c.id}" title="Elimina la categoria">✕</button>`:''}</summary>
-        <div class="llista">${its.map(it=>`<div class="fl"><textarea data-bit="${it.id}" rows="1" class="bitx">${esc(it.text)}</textarea>${nivSel(it.niv||'',`data-bniv="${it.id}"`)}<select data-bmv="${it.id}" title="Mou a una altra categoria">${cats.map(k=>`<option value="${k.id}" ${(it.cat||'')===k.id?'selected':''}>${esc(k.nom)}</option>`).join('')}</select><button class="x" data-bdel="${it.id}" title="Elimina">✕</button></div>`).join('')||'<p class="aj">Cap comentari.</p>'}</div></details>`}).join('')}`;
-  const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
-  on('#bAf','onclick',()=>{const ll=$('#bNous').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!ll.length)return toast('Escriu o enganxa algun comentari.');
-    const cat=$('#bNCat').value,niv=$('#bNNiv').value;ll.forEach(t=>b.items.push({id:uid(),cat,text:t,niv}));bancCatObertes.add(cat);save('afegir comentaris');rConfig();toast(ll.length+' comentari(s) afegit(s).')});
-  on('#bCatAf','onclick',()=>{const n=$('#bCatNom').value.trim();if(!n)return toast('Posa un nom a la categoria.');const id=uid();b.cats.push({id,nom:n});bancCatObertes.add(id);save('nova categoria de comentaris');rConfig()});
-  $$('[data-bcren]').forEach(i=>{i.onclick=e=>e.preventDefault();i.onkeydown=e=>{if(e.key===' ')e.stopPropagation()};i.onchange=()=>{const c=b.cats.find(x=>x.id===i.dataset.bcren);c.nom=i.value.trim()||c.nom;save('canviar categoria')}});
-  $$('[data-bcdel]').forEach(x=>x.onclick=async e=>{e.preventDefault();const c=b.cats.find(k=>k.id===x.dataset.bcdel),n=b.items.filter(it=>it.cat===c.id).length;
+      return `<details class="bcfg" data-bco="${c.id}" ${OB.has(c.id)?'open':''}><summary>${c.id?`<input type="text" value="${esc(c.nom)}" data-bcren="${c.id}" class="bcren" title="Canvia el nom">`:'<b>Sense categoria</b>'} <span class="aj">(${its.length})</span>${c.id?`<button class="x" data-bcdel="${c.id}" title="Elimina la categoria">✕</button>`:''}</summary>
+        <div class="llista">${its.map(it=>`<div class="fl"><textarea data-bit="${it.id}" rows="1" class="bitx">${esc(it.text)}</textarea>${ambNiv?nivSel(it.niv||'',`data-bniv="${it.id}"`):''}<select data-bmv="${it.id}" title="Mou a una altra categoria">${cats.map(k=>`<option value="${k.id}" ${(it.cat||'')===k.id?'selected':''}>${esc(k.nom)}</option>`).join('')}</select><button class="x" data-bdel="${it.id}" title="Elimina">✕</button></div>`).join('')||'<p class="aj">Cap comentari.</p>'}</div></details>`}).join('')}`;
+  const on=(id,ev,f)=>{const e=W.querySelector(id);if(e)e[ev]=f};
+  on('#bAf','onclick',()=>{const ll=W.querySelector('#bNous').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);if(!ll.length)return toast('Escriu o enganxa algun comentari.');
+    const cat=W.querySelector('#bNCat').value,niv=W.querySelector('#bNNiv')?.value||'';ll.forEach(t=>b.items.push({id:uid(),cat,text:t,niv}));OB.add(cat);save('afegir comentaris');rConfig();toast(ll.length+' comentari(s) afegit(s).')});
+  on('#bCatAf','onclick',()=>{const n=W.querySelector('#bCatNom').value.trim();if(!n)return toast('Posa un nom a la categoria.');const id=uid();b.cats.push({id,nom:n});OB.add(id);save('nova categoria de comentaris');rConfig()});
+  W.querySelectorAll('[data-bcren]').forEach(i=>{i.onclick=e=>e.preventDefault();i.onkeydown=e=>{if(e.key===' ')e.stopPropagation()};i.onchange=()=>{const c=b.cats.find(x=>x.id===i.dataset.bcren);c.nom=i.value.trim()||c.nom;save('canviar categoria')}});
+  W.querySelectorAll('[data-bcdel]').forEach(x=>x.onclick=async e=>{e.preventDefault();const c=b.cats.find(k=>k.id===x.dataset.bcdel),n=b.items.filter(it=>it.cat===c.id).length;
     if(!await confirma(`Eliminar la categoria «${c.nom}»${n?` i els seus ${n} comentaris`:''}?`,'Elimina'))return;b.cats=b.cats.filter(k=>k!==c);b.items=b.items.filter(it=>it.cat!==c.id);save('eliminar categoria de comentaris');rConfig()});
-  $$('[data-bit]').forEach(t=>{const fit=()=>{t.style.height='auto';t.style.height=t.scrollHeight+2+'px'};fit();t.oninput=fit;t.onchange=()=>{const it=b.items.find(x=>x.id===t.dataset.bit);it.text=t.value.trim()||it.text;save('editar comentari')}});
-  $$('[data-bniv]').forEach(sl=>sl.onchange=()=>{b.items.find(x=>x.id===sl.dataset.bniv).niv=sl.value;save('nivell del comentari')});
-  $$('[data-bmv]').forEach(sl=>sl.onchange=()=>{b.items.find(x=>x.id===sl.dataset.bmv).cat=sl.value;bancCatObertes.add(sl.value);save('moure comentari');rConfig()});
-  $$('[data-bdel]').forEach(x=>x.onclick=()=>{b.items=b.items.filter(it=>it.id!==x.dataset.bdel);save('eliminar comentari');rConfig()});
-  $$('details[data-bco]').forEach(d=>d.ontoggle=()=>{d.open?bancCatObertes.add(d.dataset.bco):bancCatObertes.delete(d.dataset.bco)})}
+  W.querySelectorAll('[data-bit]').forEach(t=>{const fit=()=>{t.style.height='auto';t.style.height=t.scrollHeight+2+'px'};fit();t.oninput=fit;t.onchange=()=>{const it=b.items.find(x=>x.id===t.dataset.bit);it.text=t.value.trim()||it.text;save('editar comentari')}});
+  W.querySelectorAll('[data-bniv]').forEach(sl=>sl.onchange=()=>{b.items.find(x=>x.id===sl.dataset.bniv).niv=sl.value;save('nivell del comentari')});
+  W.querySelectorAll('[data-bmv]').forEach(sl=>sl.onchange=()=>{b.items.find(x=>x.id===sl.dataset.bmv).cat=sl.value;OB.add(sl.value);save('moure comentari');rConfig()});
+  W.querySelectorAll('[data-bdel]').forEach(x=>x.onclick=()=>{b.items=b.items.filter(it=>it.id!==x.dataset.bdel);save('eliminar comentari');rConfig()});
+  W.querySelectorAll('details[data-bco]').forEach(d=>d.ontoggle=()=>{d.open?OB.add(d.dataset.bco):OB.delete(d.dataset.bco)})}
 /* Secció de dades (sempre editable, també amb la llibreta arxivada) */
 function rDades(dins){const el=dins?$('#dades'):$('#main');
   const drive=mode==='drive';
@@ -2277,6 +2346,13 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
+  sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩 Mesures</b>: clica la cel·la d'un alumne i, al panell de la dreta, tria <b>Personalització</b> o <b>Mesures addicionals</b> (una de les dues) i, a part, <b>PI</b>. El PI inclou sempre mesures addicionals.</li>
+    <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…). Els enllaços només es veuen al panell.</li>
+    <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
+    <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI. En passar-hi el ratolí, en surt el nom.</li>
+    <li><b>Amaga marques de diversitat</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. No surten mai a la Vista alumne ni al mòbil.</li>
+    <li>En exportar (PDF, full de càlcul o CSV), la llibreta pregunta si les vols incloure; per defecte, no. Cada llibreta té les seves mesures.</li>
+    <li>Les frases i les categories es creen a <b>⚙ › Banc d'atenció a la diversitat</b>. Escriu-hi <b>mesures</b>, no diagnòstics: són dades sensibles.</li></ul>`)+
   sec('Alumnes i classes',`<ul><li>Els <b>Llistats del curs</b> (⚙ › Llistats del curs) són la llista oficial de grups. Les llibretes hi agafen els alumnes amb «📇 Afegeix des dels llistats del curs».</li>
     <li>La <b>classe</b> ve dels Llistats: si un alumne canvia de grup (als Llistats o des de qualsevol llibreta), es canvia a totes les llibretes actives. Les arxivades conserven la que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.</li>
     <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
@@ -2339,9 +2415,9 @@ function rArxiu(){const arx=state.subjects.filter(s=>s.archived);
   $$('[data-axdel]').forEach(b=>b.onclick=()=>esborraArx([state.subjects.find(x=>x.id===b.dataset.axdel)]));
   $$('[data-acdel]').forEach(b=>b.onclick=()=>esborraArx(deCat(b.dataset.acdel),b.dataset.acdel||'Sense categoria'))}
 /* Arxiu: exportar a PDF (al Drive o, sense Drive, descarregat) i esborrar per sempre */
-async function exportaArx(subs,carpeta){if(!subs.length)return false;toast('⏳ Generant el PDF…',2000);
+async function exportaArx(subs,carpeta){if(!subs.length)return false;const dv=await preguntaDiv(subs);if(dv===null)return false;toast('⏳ Generant el PDF…',2000);
   const nom=nomFitxer(`${avui()} · Arxiu · ${carpeta||subs[0].name}.pdf`);
-  try{const doc=await fesPDF(subs,subs.length>1);
+  try{const doc=await fesPDF(subs,subs.length>1,dv);
     if(mode==='drive'){try{await pujaPDF(doc,nom);toast(`PDF desat al Drive: «${CARPDF}» › ${nom}`,6000);return true}catch(e){if(e.message!=='offline'&&e.message!=='reauth')console.error(e);doc.save(nom);toast('No s\'ha pogut desar al Drive: s\'ha descarregat a l\'ordinador.',6000);return true}}
     doc.save(nom);toast('PDF descarregat.');return true}
   catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000);return false}}
@@ -2639,10 +2715,13 @@ $('#iOk').onclick=()=>{const sub=cur(),cid=$('#iCol').value;snapshot(sub);impPla
 
 /* Panell de comentaris */
 $('#pnl').addEventListener('click',e=>{const sub=cur();const pn=e.target.closest('[data-pn]');if(pn){mouPanell(+pn.dataset.pn);return}
-  const bi=e.target.closest('[data-bi]');if(bi){const it=state.banc.items.find(x=>x.id===bi.dataset.bi);if(it)afegeixComentari(it.text);return}});
+  const dn=e.target.closest('[data-dvn]');if(dn){triaDiv(sub,PN.st,dn.dataset.dvn);return}
+  if(e.target.closest('[data-dvpi]')){triaDiv(sub,PN.st,'pi');return}
+  const bi=e.target.closest('[data-bi]');if(bi){const it=bancPN().items.find(x=>x.id===bi.dataset.bi);if(it)afegeixComentari(it.text);return}});
 $('#pnl').addEventListener('toggle',e=>{const d=e.target.closest?.('details[data-bc]');if(!d)return;PN.obertes??=new Set();d.open?PN.obertes.add(d.dataset.bc):PN.obertes.delete(d.dataset.bc)},true);
-$('#pnX').onclick=tancaPanell;$('#pnTxt').oninput=e=>desaComentari(e.target.value);
-$('#pnBuida').onclick=()=>{$('#pnTxt').value='';desaComentari('')};$('#pnCp').onclick=()=>copiaComentari(cur(),PN.st);
+$('#pnX').onclick=tancaPanell;$('#pnTxt').oninput=e=>PN.mode==='div'?desaProposta(e.target.value):desaComentari(e.target.value);
+$('#pnBuida').onclick=()=>{$('#pnTxt').value='';PN.mode==='div'?desaProposta(''):desaComentari('')};
+$('#pnCp').onclick=async()=>{if(PN.mode!=='div')return copiaComentari(cur(),PN.st);const t=(dvDe(cur(),PN.st).t||'').trim();if(!t)return toast('Aquest alumne no té proposta educativa.');toast(await copiaText(t)?'📋 Proposta educativa copiada.':'No s\'ha pogut copiar.')};
 $('#pnCerca').oninput=e=>{PN.cerca=e.target.value;pintaBancPanell(cur(),nivellAlumne(cur(),cur().students.find(x=>x.id===PN.st)))};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&PN.st&&!document.querySelector('dialog[open]')){tancaPanell()}});
 

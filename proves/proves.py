@@ -999,6 +999,86 @@ def p_calc_mode(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Atenció a la diversitat: mesures i PI, proposta, enllaços, banc, ratlla al nom, amagar i preguntar en exportar')
+def p_diversitat(b):
+    import io, openpyxl
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='resum';DV.prop=false;render()"); pg.wait_for_timeout(200)
+    st = pg.evaluate("alumnesAval(cur())[0].id"); st2 = pg.evaluate("alumnesAval(cur())[1].id")
+    comprova(pg.locator('th.dvph.pl').count() == 1, 'la columna Proposta educativa ha de començar plegada')
+    pg.click(f'td[data-dvm="{st}"]'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#pnl') and pg.is_visible('.dvop') and pg.is_visible('#pnLl'), 'el panell no s\'obre en mode diversitat')
+    pg.click('[data-dvpi]'); pg.wait_for_timeout(200)
+    d = pg.evaluate("cur().div[%r]" % st)
+    comprova(d.get('n') == 'ma' and d.get('pi') is True, f'el PI ha de posar mesures addicionals: {d}')
+    pg.click('[data-dvn=p]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().div[%r].n" % st) == 'ma', 'amb PI no es pot passar a personalització')
+    pg.fill('#pnTxt', 'Seure a primera fila. Enunciats curts i per passos, amb un text prou llarg perquè no hi càpiga en una sola línia de la columna.'); pg.wait_for_timeout(700)
+    comprova(pg.evaluate("cur().div[%r].t" % st).startswith('Seure'), 'no es desa la proposta educativa')
+    # enllaços: només web
+    pg.fill('#pnLlU', 'javascript:alert(1)'); pg.click('#pnLlAf'); pg.wait_for_timeout(100)
+    comprova(not pg.evaluate("cur().div[%r].ll" % st), 'no s\'han d\'acceptar enllaços que no siguin web')
+    pg.fill('#pnLlN', 'PI al Drive'); pg.fill('#pnLlU', 'docs.google.com/document/d/x'); pg.click('#pnLlAf'); pg.wait_for_timeout(150)
+    ll = pg.evaluate("cur().div[%r].ll" % st)
+    comprova(ll == [{'n': 'PI al Drive', 'u': 'https://docs.google.com/document/d/x'}] and pg.locator('#pnLl a[target=_blank]').count() == 1, f'enllaç: {ll}')
+    pg.click('#pnX')
+    # ratlla al nom: plena (PI) i el rètol
+    sp = pg.locator(f'tr[data-s="{st}"] .dvl')
+    comprova(sp.count() == 1 and 'pi' in sp.get_attribute('class') and sp.get_attribute('title') == 'Mesures addicionals · PI', 'ratlla del nom amb PI')
+    # segon alumne: personalització, ratlla partida
+    pg.click(f'td[data-dvm="{st2}"]'); pg.click('[data-dvn=p]'); pg.wait_for_timeout(150); pg.click('#pnX')
+    c2 = pg.locator(f'tr[data-s="{st2}"] .dvl').get_attribute('class')
+    comprova('p' in c2.split() and 'pi' not in c2.split(), f'personalització: {c2}')
+    # proposta desplegada en una sola línia
+    pg.click('#aDvH'); pg.wait_for_timeout(200)
+    h = pg.evaluate("[document.querySelector('tr[data-s=\"%s\"]').offsetHeight, document.querySelector('tr[data-s=\"%s\"]').offsetHeight]" % (st, st2))
+    comprova(abs(h[0] - h[1]) <= 2, f'la proposta no ha de fer més alta la fila: {h}')
+    # Llibreta: ratlla també
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    comprova(pg.locator(f'#tw tr[data-s="{st}"] .dvl.pi').count() == 1, 'a la Llibreta no surt la ratlla')
+    # amagar
+    pg.check('#bDvAm'); pg.wait_for_timeout(200)
+    comprova(pg.locator('.dvl').count() == 0, 'no s\'amaguen les ratlles')
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    comprova(pg.locator('td[data-dvm]').count() == 0 and pg.is_checked('#aDvAm'), 'a Avaluació han de desaparèixer les columnes de diversitat')
+    pg.uncheck('#aDvAm'); pg.wait_for_timeout(200)
+    # Vista alumne: res
+    pg.click('#aVA'); pg.wait_for_timeout(200)
+    comprova(pg.locator('.dvl, .dvchip').count() == 0, 'a la Vista alumne no hi ha d\'haver cap marca')
+    pg.evaluate("VA.on=false;render()")
+    # banc
+    pg.evaluate("tab='config';render()"); pg.wait_for_timeout(200)
+    pg.evaluate("document.querySelector('[data-cfg=bancdiv]').open=true")
+    W = '#bancDivW'
+    pg.fill(f'{W} #bCatNom', 'Avaluació'); pg.click(f'{W} #bCatAf'); pg.wait_for_timeout(200)
+    pg.evaluate("document.querySelector('[data-cfg=bancdiv]').open=true")
+    pg.fill(f'{W} #bNous', 'Més temps als exàmens'); pg.select_option(f'{W} #bNCat', label='Avaluació'); pg.click(f'{W} #bAf'); pg.wait_for_timeout(200)
+    bd = pg.evaluate("[state.bancDiv.cats.length, state.bancDiv.items.map(i=>i.text), state.banc.items.length]")
+    comprova(bd[0] == 1 and bd[1] == ['Més temps als exàmens'] and bd[2] == pg.evaluate("state.banc.items.length"), f'banc de diversitat: {bd}')
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    pg.click(f'td[data-dvm="{st2}"]'); pg.wait_for_timeout(200)
+    pg.evaluate("document.querySelectorAll('#pnBanc details').forEach(d=>d.open=true)")
+    pg.click('#pnBanc [data-bi]'); pg.wait_for_timeout(600)
+    comprova(pg.evaluate("cur().div[%r].t" % st2) == 'Més temps als exàmens', 'la frase del banc no s\'afegeix a la proposta')
+    comprova(pg.evaluate("cur().comentaris[%r]||''" % st2) == '', 'la frase no ha d\'anar al comentari d\'avaluació')
+    pg.click('#pnX')
+    # exportar: pregunta; per defecte no s'inclou
+    pg.evaluate("tab='config';render()"); pg.wait_for_timeout(200)
+    pg.evaluate("document.querySelector('[data-cfg=dades]').open=true")
+    n0 = len(FULLS); pg.click('#dFull'); pg.wait_for_timeout(300)
+    comprova(pg.is_visible('#dlgQ'), 'en exportar no pregunta per la diversitat')
+    pg.click('#qBtns button:has-text("No les incloguis")'); pg.wait_for_timeout(1500)
+    cap = [c.value for c in openpyxl.load_workbook(io.BytesIO(FULLS[-1][1]))[pg.evaluate("cur().name")][1]]
+    comprova(len(FULLS) == n0 + 1 and 'Mesures' not in cap, f'sense incloure: {cap}')
+    pg.click('#dFull'); pg.wait_for_timeout(300); pg.click('#qBtns button:has-text("Inclou-les")'); pg.wait_for_timeout(1500)
+    ws = openpyxl.load_workbook(io.BytesIO(FULLS[-1][1]))[pg.evaluate("cur().name")]
+    cap = [c.value for c in ws[1]]
+    comprova('Mesures' in cap and 'Proposta educativa' in cap, f'incloent: {cap}')
+    vals = [r[cap.index('Mesures')] for r in ws.iter_rows(min_row=2, values_only=True)]
+    comprova('Mesures addicionals · PI' in vals and 'Personalització' in vals, f'valors: {vals}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1078,7 +1158,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
