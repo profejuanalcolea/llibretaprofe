@@ -1010,9 +1010,9 @@ def p_diversitat(b):
     comprova(pg.is_visible('#pnl') and pg.is_visible('.dvop') and pg.is_visible('#pnLl'), 'el panell no s\'obre en mode diversitat')
     pg.click('[data-dvpi]'); pg.wait_for_timeout(200)
     d = pg.evaluate("cur().div[%r]" % st)
-    comprova(d.get('n') == 'ma' and d.get('pi') is True, f'el PI ha de posar mesures addicionals: {d}')
-    pg.click('[data-dvn=p]'); pg.wait_for_timeout(150)
-    comprova(pg.evaluate("cur().div[%r].n" % st) == 'ma', 'amb PI no es pot passar a personalització')
+    comprova(not d.get('n') and d.get('pi') is True, f'el PI és lliure, no ha de marcar res més: {d}')
+    pg.click('[data-dvn=p]'); pg.wait_for_timeout(150); pg.click('[data-dvn=ma]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("[cur().div[%r].n, cur().div[%r].pi]" % (st, st)) == ['ma', True], 'personalització i mesures addicionals són excloents; el PI es manté')
     pg.fill('#pnTxt', 'Seure a primera fila. Enunciats curts i per passos, amb un text prou llarg perquè no hi càpiga en una sola línia de la columna.'); pg.wait_for_timeout(700)
     comprova(pg.evaluate("cur().div[%r].t" % st).startswith('Seure'), 'no es desa la proposta educativa')
     # enllaços: només web

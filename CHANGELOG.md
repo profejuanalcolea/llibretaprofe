@@ -2,10 +2,10 @@
 
 ## 2.3 · ammonite · novembre 2026
 - **Atenció a la diversitat** (per llibreta):
-  - A Avaluació, columna **🧩 Mesures** (Personalització o Mesures addicionals, i PI a part; el PI inclou mesures addicionals) i columna **Proposta educativa**, plegada en obrir i d'una sola línia.
+  - A Avaluació, columna **🧩 Mesures** (Personalització o Mesures addicionals, i PI a part, lliure) i columna **Proposta educativa**, plegada en obrir i d'una sola línia.
   - Panell de la dreta com el dels comentaris: tria de mesures, proposta educativa amb 📋, **🔗 enllaços** (només visibles al panell) i **banc d'atenció a la diversitat** amb categories pròpies (⚙).
-  - Ratlla a l'esquerra del nom: groga (personalització) o blava (mesures addicionals); partida sense PI i plena amb PI.
-  - «Amaga marques de diversitat» per projectar; no surten mai a la Vista alumne ni al mòbil.
+  - Ratlla a l'esquerra del nom: groga (personalització) o blava (mesures addicionals); partida sense PI i plena amb PI (gris si només hi ha PI).
+  - «Amaga 🧩» per projectar; no surten mai a la Vista alumne ni al mòbil.
   - PDF, full de càlcul i CSV pregunten si s'inclouen (per defecte, no).
 
 ## 2.2.8 · ammonite · novembre 2026
