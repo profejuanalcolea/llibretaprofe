@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.6 · ammonite · novembre 2026
+- **Atenció a la diversitat:** Personalització, Mesures addicionals i PI es marquen lliurement (cap, alguna o totes). Amb les dues primeres, la ratlla del nom és meitat groga i meitat blava. Les marques que ja hi havia es conserven.
+
 ## 2.3.5 · ammonite · novembre 2026
 - **Corregit:** en compartir des d'Android, la llibreta s'obria però sense el formulari de l'enllaç (Chrome no hi deixa el paràmetre «share»).
 

@@ -790,7 +790,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3.5 · ammonite · novembre 2026',COMPILACIO='16/11 18:22';
+const VERSIO='2.3.6 · ammonite · novembre 2026',COMPILACIO='16/11 21:01';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -888,7 +888,7 @@ function migra(d){
     s.settings={...DEF(),...(s.settings||{})};
     s.icon??='📘';s.color??=LPAL[0][0];s.info??='';s.ocult??={cognoms:false,classe:false};s.archived??=null;s.recursos??=[];s.mostra??='tots';
     if(!s.ordre||s.ordre==='classe'){if(s.ordre==='classe')s.mostra='perclasse';s.ordre='cognoms'}
-    s.anot??={};s.ordreDir??='desc';s.comentaris??={};s.div??={};s.aval??={};s.aval.marques??={};
+    s.anot??={};s.ordreDir??='desc';s.comentaris??={};s.div??={};for(const d of Object.values(s.div)){if(d.n){if(d.n==='p')d.p=true;else if(d.n==='ma')d.ma=true;delete d.n}}s.aval??={};s.aval.marques??={};
     if(s.settings.npMode==='skip'&&!s.settings._fjMig)s.settings.fjMode=s.settings.fjMode||'skip';
     delete s.settings.npMode;
     /* el NP antic passa a ser F (falta) */
@@ -1569,7 +1569,7 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
       ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}">${esc(catTxt(sub,r))}</td>`}).join('')}
       <td class="${f?'l'+f.lvl:''}" style="font-weight:700">${esc(calcTxt(sub,f))}</td>
       ${fc?cella(sub,fc,st):'<td><span class="buida">—</span></td>'}
-      ${dvOn?(()=>{const d=dvDe(sub,st.id),t=(d.t||'').trim();return `<td class="dvc dvm" data-dvm="${st.id}" title="${d.n?esc(dvEtiq(d)):'Clica per marcar mesures'}">${dvChips(d)}</td><td class="dvc dvp ${DV.prop?'':'pl'}" data-dvp="${st.id}" title="${DV.prop?'Clica per veure-ho tot o escriure':esc(t)||'Sense proposta educativa'}">${DV.prop?(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>'):(t?'📝':'<span class="buida">·</span>')}</td>`})():''}
+      ${dvOn?(()=>{const d=dvDe(sub,st.id),t=(d.t||'').trim();return `<td class="dvc dvm" data-dvm="${st.id}" title="${dvTe(d)?esc(dvEtiq(d)):'Clica per marcar mesures'}">${dvChips(d)}</td><td class="dvc dvp ${DV.prop?'':'pl'}" data-dvp="${st.id}" title="${DV.prop?'Clica per veure-ho tot o escriure':esc(t)||'Sense proposta educativa'}">${DV.prop?(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>'):(t?'📝':'<span class="buida">·</span>')}</td>`})():''}
       <td class="com ${pleg?'pl':''}" data-com="${st.id}" title="${pleg?esc(com)||'Sense comentari':'Clica per escriure o triar comentaris del banc'}">${pleg?(com?'💬':'<span class="buida">·</span>'):(com?`<div class="comt">${esc(com)}</div>`:'<span class="buida">＋ comentari</span>')}</td>
       <td class="esf"><button class="cpb" data-cp="${st.id}" title="Copia el comentari" ${com?'':'disabled'}>📋</button>${marc?'<span class="mrc" title="Ja copiat">✔</span>':''}</td></tr>`}
   h+=`</tbody></table></div>${fc?'':'<p class="aj" style="margin-top:8px">ⓘ Aquesta llibreta encara no té cap columna de <b>nota final</b>. Crea-la a la pestanya Llibreta (＋ Columna › Nota final) i aquí podràs posar la nota de cada alumne.</p>'}`;
@@ -1622,14 +1622,19 @@ function clicAval(e,sub){
 /* ======================= 2.3 · Atenció a la diversitat (per llibreta; dades sensibles) ======================= */
 const DVN={p:'Personalització',ma:'Mesures addicionals'};
 const dvDe=(sub,id)=>sub.div?.[id]||{};
-const dvEtiq=d=>[d.n?DVN[d.n]:'',d.pi?'PI':''].filter(Boolean).join(' · ');
+const dvEtiq=d=>[d.p?'Personalització':'',d.ma?'Mesures addicionals':'',d.pi?'PI':''].filter(Boolean).join(' · ');
+const dvTe=d=>!!(d.p||d.ma||d.pi);
 function amagaDiv(){try{return localStorage.getItem('llibreta-amaga-div')==='1'}catch{return false}}
 function setAmagaDiv(v){try{localStorage.setItem('llibreta-amaga-div',v?'1':'0')}catch{}render()}
-const teDiv=sub=>Object.values(sub.div||{}).some(d=>d.n||d.pi||(d.t||'').trim()||d.ll?.length);
-const nDiv=sub=>Object.entries(sub.div||{}).filter(([id,d])=>(d.n||d.pi||(d.t||'').trim()||d.ll?.length)&&sub.students.some(s=>s.id===id)).length;
+const teDiv=sub=>Object.values(sub.div||{}).some(d=>dvTe(d)||(d.t||'').trim()||d.ll?.length);
+const nDiv=sub=>Object.entries(sub.div||{}).filter(([id,d])=>(dvTe(d)||(d.t||'').trim()||d.ll?.length)&&sub.students.some(s=>s.id===id)).length;
 /* ratlla a l'esquerra del nom: groc = personalització, blau = mesures addicionals; partida sense PI, plena amb PI */
-function dvSpan(sub,st){if(amagaDiv()||VA.on)return '';const d=dvDe(sub,st.id);if(!d.n&&!d.pi)return '';return `<span class="dvl ${d.n||'sn'}${d.pi?' pi':''}" title="${esc(dvEtiq(d))}"></span>`}
-function dvChips(d){return d.n||d.pi?`${d.n?`<span class="dvchip ${d.n}">${d.n==='p'?'P':'MA'}</span>`:''}${d.pi?'<span class="dvchip pi">PI</span>':''}`:'<span class="buida">＋</span>'}
+/* ratlla: groc = personalització, blau = mesures addicionals (les dues: meitat i meitat); partida sense PI, plena amb PI; gris si només PI */
+function dvSpan(sub,st){if(amagaDiv()||VA.on)return '';const d=dvDe(sub,st.id);if(!dvTe(d))return '';
+  const Y='#E0A800',B='#1F5FD1',G='#555',W='rgba(255,255,255,.9)',a=d.p?Y:d.ma?B:G,b=d.ma?B:d.p?Y:G;
+  const bg=d.pi?(d.p&&d.ma?`linear-gradient(90deg,${a} 0 3px,${b} 3px 6px)`:a):`linear-gradient(90deg,${a} 0 2.5px,${W} 2.5px 3.5px,${b} 3.5px 6px)`;
+  return `<span class="dvl" style="background:${bg}" title="${esc(dvEtiq(d))}"></span>`}
+function dvChips(d){return dvTe(d)?`${d.p?'<span class="dvchip p">P</span>':''}${d.ma?'<span class="dvchip ma">MA</span>':''}${d.pi?'<span class="dvchip pi">PI</span>':''}`:'<span class="buida">＋</span>'}
 function dvSet(sub,id,camp,v){sub.div??={};const d=sub.div[id]??={};if(v===undefined||v===''||v===false||(Array.isArray(v)&&!v.length))delete d[camp];else d[camp]=v;if(!Object.keys(d).length)delete sub.div[id]}
 const DV={prop:false};
 /* Pregunta abans d'exportar si hi ha dades de diversitat: null = cancel·la */
@@ -1650,7 +1655,7 @@ function pintaPanell(){const sub=cur(),st=sub?.students.find(x=>x.id===PN.st);if
   const sts=alumnesAval(sub),i=sts.findIndex(x=>x.id===st.id),f=finalDe(sub,st),fc=colFinal(sub),vf=fc?getG(sub,fc.id,st.id):undefined,lv=nivellAlumne(sub,st);
   $('#pnNom').textContent=(st.cognoms?st.cognoms+', ':'')+st.nom;$('#pnPos').textContent=`${i+1}/${sts.length}`;
   if(dvm){const d=dvDe(sub,st.id);$('#pnTit').innerHTML='🧩 Atenció a la diversitat';
-    $('#pnInfo').innerHTML=`<div class="dvop"><button data-dvn="p" class="p ${d.n==='p'?'on':''}" title="Mesures universals">Personalització</button><button data-dvn="ma" class="ma ${d.n==='ma'?'on':''}">Mesures addicionals</button><button data-dvpi class="pi ${d.pi?'on':''}" title="Pla de suport individualitzat">PI</button></div>`;
+    $('#pnInfo').innerHTML=`<div class="dvop"><button data-dvn="p" class="p ${d.p?'on':''}" title="Mesures universals">Personalització</button><button data-dvn="ma" class="ma ${d.ma?'on':''}">Mesures addicionals</button><button data-dvpi class="pi ${d.pi?'on':''}" title="Pla de suport individualitzat">PI</button></div>`;
     const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=d.t||'';pintaLlPanell(sub,st);$('#pnCerca').value=PN.cerca;pintaBancPanell(sub,0);return}
   $('#pnInfo').innerHTML=`<span class="chip">Càlcul: <b>${esc(calcTxt(sub,f))}</b></span>${fc?`<span class="chip ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${esc(fc.name)}: <b>${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</b></span>`:''}`;
   const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=sub.comentaris[st.id]||'';
@@ -1676,7 +1681,7 @@ function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
   $('#pnLlU').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#pnLlAf').click()}};
   $$('#pnLl [data-llx]').forEach(b=>b.onclick=()=>{const n=ll.filter((_,i)=>i!==+b.dataset.llx);dvSet(sub,st.id,'ll',n);save('treure enllaç de diversitat');pintaLlPanell(sub,st)})}
 function triaDiv(sub,st,k){if(RO())return toast('Llibreta arxivada: només lectura.');const d=dvDe(sub,st);
-  if(k==='pi')dvSet(sub,st,'pi',!d.pi);else dvSet(sub,st,'n',d.n===k?'':k);
+  dvSet(sub,st,k,!d[k]);
   save('mesures de diversitat');rResum()}
 function desaComentari(v){const sub=cur(),st=PN.st;if(!sub||!st)return;if(v.trim())sub.comentaris[st]=v;else delete sub.comentaris[st];
   delete sub.aval.marques[st];clearTimeout(desaComentari.h);desaComentari.h=setTimeout(()=>save('comentari'),500);
@@ -2005,7 +2010,7 @@ function pdfLlibreta(doc,sub,primera,ambDiv){const M=10,W=doc.internal.pageSize.
     doc.setFontSize(8);doc.setTextColor(90);doc.text(pt('(no compta): columna dins d\'una categoria que no compta per a la nota.'),M,y);doc.setTextColor(0);doc.lastAutoTable.finalY=y}
   if(anots.length){doc.autoTable({...base,startY:doc.lastAutoTable.finalY+6,head:[['Alumne','Columna','Comentari de la cel·la']],body:anots,columnStyles:{0:{cellWidth:50},1:{cellWidth:50}},headStyles:{...base.headStyles,fillColor:[230,81,0]}})}
   /* 2b. Atenció a la diversitat (només si s'ha triat incloure-la) */
-  if(ambDiv&&nDiv(sub)){const fl=sts.map(st=>[st,dvDe(sub,st.id)]).filter(([,d])=>d.n||d.pi||(d.t||'').trim()||d.ll?.length);
+  if(ambDiv&&nDiv(sub)){const fl=sts.map(st=>[st,dvDe(sub,st.id)]).filter(([,d])=>dvTe(d)||(d.t||'').trim()||d.ll?.length);
     let y=doc.lastAutoTable.finalY+8;if(y>doc.internal.pageSize.getHeight()-40){doc.addPage();capP('Atenció a la diversitat');y=M+14}
     doc.setFont('helvetica','bold');doc.setFontSize(10);doc.text(pt('Atenció a la diversitat (dades confidencials)'),M,y);
     doc.autoTable({...base,startY:y+2,head:[[...nomCols.map(c=>c.h),'Mesures','Proposta educativa','Enllaços']],body:fl.map(([st,d])=>[...nomVals(st),pt(dvEtiq(d)),pt(d.t||''),pt(dvLlTxt(d))]),
@@ -2395,10 +2400,10 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
-  sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, tria <b>Personalització</b> o <b>Mesures addicionals</b> (una de les dues) i, a part, <b>PI</b>, lliurement.</li>
+  sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los. Només es veuen al panell.</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
-    <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
+    <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals, <b>meitat groga i meitat blava</b> = totes dues. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
     <li><b>Amaga 🧩</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. No surten mai a la Vista alumne ni al mòbil.</li>
     <li>En exportar (PDF, full de càlcul o CSV), la llibreta pregunta si les vols incloure; per defecte, no. Cada llibreta té les seves mesures.</li>
     <li>Les frases i les categories es creen a <b>⚙ › Banc d'atenció a la diversitat</b>. Escriu-hi <b>mesures</b>, no diagnòstics: són dades sensibles.</li></ul>`)+

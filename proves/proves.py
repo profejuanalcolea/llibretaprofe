@@ -1010,9 +1010,11 @@ def p_diversitat(b):
     comprova(pg.is_visible('#pnl') and pg.is_visible('.dvop') and pg.is_visible('#pnLl'), 'el panell no s\'obre en mode diversitat')
     pg.click('[data-dvpi]'); pg.wait_for_timeout(200)
     d = pg.evaluate("cur().div[%r]" % st)
-    comprova(not d.get('n') and d.get('pi') is True, f'el PI és lliure, no ha de marcar res més: {d}')
+    comprova(not d.get('p') and not d.get('ma') and d.get('pi') is True, f'el PI és lliure, no ha de marcar res més: {d}')
     pg.click('[data-dvn=p]'); pg.wait_for_timeout(150); pg.click('[data-dvn=ma]'); pg.wait_for_timeout(150)
-    comprova(pg.evaluate("[cur().div[%r].n, cur().div[%r].pi]" % (st, st)) == ['ma', True], 'personalització i mesures addicionals són excloents; el PI es manté')
+    comprova(pg.evaluate("[cur().div[%r].p, cur().div[%r].ma, cur().div[%r].pi]" % (st, st, st)) == [True, True, True], 's\'han de poder marcar totes tres')
+    pg.click('[data-dvn=p]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("[!!cur().div[%r].p, cur().div[%r].ma, cur().div[%r].pi]" % (st, st, st)) == [False, True, True], 'cada marca es treu sola')
     pg.fill('#pnTxt', 'Seure a primera fila. Enunciats curts i per passos, amb un text prou llarg perquè no hi càpiga en una sola línia de la columna.'); pg.wait_for_timeout(700)
     comprova(pg.evaluate("cur().div[%r].t" % st).startswith('Seure'), 'no es desa la proposta educativa')
     # enllaços: plegats per defecte i només web
@@ -1026,18 +1028,18 @@ def p_diversitat(b):
     pg.click('#pnX')
     # ratlla al nom: plena (PI) i el rètol
     sp = pg.locator(f'tr[data-s="{st}"] .dvl')
-    comprova(sp.count() == 1 and 'pi' in sp.get_attribute('class') and sp.get_attribute('title') == 'Mesures addicionals · PI', 'ratlla del nom amb PI')
+    comprova(sp.count() == 1 and sp.get_attribute('title') == 'Mesures addicionals · PI' and 'rgba(255, 255, 255' not in sp.evaluate("e=>getComputedStyle(e).backgroundImage"), 'ratlla del nom amb PI (plena)')
     # segon alumne: personalització, ratlla partida
     pg.click(f'td[data-dvm="{st2}"]'); pg.click('[data-dvn=p]'); pg.wait_for_timeout(150); pg.click('#pnX')
-    c2 = pg.locator(f'tr[data-s="{st2}"] .dvl').get_attribute('class')
-    comprova('p' in c2.split() and 'pi' not in c2.split(), f'personalització: {c2}')
+    l2 = pg.locator(f'tr[data-s="{st2}"] .dvl')
+    comprova(l2.get_attribute('title') == 'Personalització' and 'rgba(255, 255, 255' in l2.evaluate("e=>getComputedStyle(e).backgroundImage"), 'personalització: ratlla partida')
     # proposta desplegada en una sola línia
     pg.click('#aDvH'); pg.wait_for_timeout(200)
     h = pg.evaluate("[document.querySelector('tr[data-s=\"%s\"]').offsetHeight, document.querySelector('tr[data-s=\"%s\"]').offsetHeight]" % (st, st2))
     comprova(abs(h[0] - h[1]) <= 2, f'la proposta no ha de fer més alta la fila: {h}')
     # Llibreta: ratlla també
     pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
-    comprova(pg.locator(f'#tw tr[data-s="{st}"] .dvl.pi').count() == 1, 'a la Llibreta no surt la ratlla')
+    comprova(pg.locator(f'#tw tr[data-s="{st}"] .dvl').count() == 1, 'a la Llibreta no surt la ratlla')
     # amagar
     pg.check('#bDvAm'); pg.wait_for_timeout(200)
     comprova(pg.locator('.dvl').count() == 0, 'no s\'amaguen les ratlles')
@@ -1078,6 +1080,9 @@ def p_diversitat(b):
     comprova('Mesures' in cap and 'Proposta educativa' in cap, f'incloent: {cap}')
     vals = [r[cap.index('Mesures')] for r in ws.iter_rows(min_row=2, values_only=True)]
     comprova('Mesures addicionals · PI' in vals and 'Personalització' in vals, f'valors: {vals}')
+    # migració: les dades antigues (n) passen a p / ma
+    m = pg.evaluate("(()=>{const d=JSON.parse(JSON.stringify(state));const s=d.subjects[0];s.div={a:{n:'ma',pi:true},b:{n:'p'}};migra(d);return [s.div.a,s.div.b]})()")
+    comprova(m == [{'ma': True, 'pi': True}, {'p': True}], f'migració: {m}')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
