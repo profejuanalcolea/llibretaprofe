@@ -526,7 +526,7 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 .dvamg{display:inline-flex;align-items:center;gap:5px;font-size:13px;margin-left:6px}
 
 /* 2.3.2 · escut d'entrada */
-body.escut #main{pointer-events:none;animation:escutFos 1s ease-out}
+body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 @keyframes escutFos{from{opacity:.35}to{opacity:1}}
 </style>
 </head>
@@ -782,7 +782,7 @@ body.escut #main{pointer-events:none;animation:escutFos 1s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3.2 · ammonite · novembre 2026',COMPILACIO='16/11 11:41';
+const VERSIO='2.3.3 · ammonite · novembre 2026',COMPILACIO='16/11 15:00';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1292,10 +1292,10 @@ function mostraLogin(){$('#login').style.display='flex';aplicaMob();const la=$('
   $('#lgOff').textContent=c?.pendent?'Continua sense connexió (hi ha canvis pendents de pujar)':'Continua sense connexió amb la còpia d\'aquest ordinador';
   $('#lgEntra').textContent=G.email?'Entra amb Google ('+G.email+')':'Entra amb Google'}
 $('#lgEntra').onclick=driveEntra;
-/* 2.3.2 · Escut d'entrada: durant 1 s després de tancar la pantalla d'entrada, la taula no fa cas de clics ni tecles
+/* 2.3.2 · Escut d'entrada (2 s des de la 2.3.3): durant 2 s després de tancar la pantalla d'entrada, la taula no fa cas de clics ni tecles
    (evita posar una nota sense voler amb el doble clic a «Entra amb Google») */
 let escutFins=0;
-function escut(ms=1000){escutFins=Date.now()+ms;document.body.classList.add('escut');clearTimeout(escut.t);escut.t=setTimeout(()=>document.body.classList.remove('escut'),ms)}
+function escut(ms=2000){escutFins=Date.now()+ms;document.body.classList.add('escut');clearTimeout(escut.t);escut.t=setTimeout(()=>document.body.classList.remove('escut'),ms)}
 new MutationObserver(()=>{const l=$('#login');const vis=l&&getComputedStyle(l).display!=='none';if(!vis&&escut.vis)escut();escut.vis=vis}).observe($('#login'),{attributes:true,attributeFilter:['style','class','hidden']});
 escut.vis=getComputedStyle($('#login')).display!=='none';
 ['keydown','pointerdown','mousedown','click','dblclick'].forEach(ev=>document.addEventListener(ev,e=>{if(Date.now()<escutFins&&e.target.closest?.('#main')){e.preventDefault();e.stopPropagation()}},true));
@@ -2375,7 +2375,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
     <li><b>PDF</b>: d'una llibreta, a Avaluació › «Desa en PDF al Drive»; de totes, a ⚙ › Dades; de les sortides, a Eines › Sortides; de l'arxiu, a la pestanya Arxiu.</li>
     <li><b>Full de càlcul</b>: a ⚙ › Dades, «Desa un full de càlcul al Drive». Una pestanya per llibreta activa (columnes, categories i nota final) i una per llistat del curs, sense fórmules. Es desa a la carpeta «Llibreta del Profe · PDF» com a Full de càlcul de Google. És una còpia per consultar: els canvis que hi facis no tornen a la llibreta.</li></ul>`)+
-  sec('Dreceres',`<ul><li>En entrar amb Google, la taula apareix amb un fos suau i durant <b>1 segon</b> no fa cas de cap clic ni tecla, perquè un doble clic a «Entra amb Google» no posi cap nota sense voler.</li><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. En passar el ratolí pel títol, en surt el nom sencer. Arrossega el títol per moure-la.</li>
+  sec('Dreceres',`<ul><li>En entrar amb Google, la taula apareix amb un fos suau i durant <b>2 segons</b> no fa cas de cap clic ni tecla, perquè un doble clic a «Entra amb Google» no posi cap nota sense voler.</li><li><b>Doble clic</b> al títol d'una columna: propietats. <b>⋯</b>: la resta d'opcions. En passar el ratolí pel títol, en surt el nom sencer. Arrossega el títol per moure-la.</li>
     <li><b>Fletxes</b> i <b>Retorn</b>: moure't per les cel·les. <b>Ctrl+Z / Ctrl+Y</b>: desfés i refés. <b>Ctrl+Maj+F</b>: plega o desplega la capçalera. <b>Alt + ↑ / ↓</b>: llibreta anterior o següent.</li>
     <li><b>Columnes sense categoria</b>: la franja de dalt agafa el color de la columna (gris clar per defecte). A ✎ Propietats pots escriure-hi un text lliure («Text de la franja»), que és només una etiqueta; doble clic a la franja obre les propietats.</li>
     <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina sense text. A la dreta hi queden només els avisos (sortides de l'aula, temporitzador, pòsits urgents), l'Ammo de l'estat del Drive i el botó ⌄ per tornar-la a obrir; també s'obre clicant en qualsevol lloc buit de la franja. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>

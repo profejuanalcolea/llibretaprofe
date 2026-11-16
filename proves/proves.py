@@ -129,7 +129,7 @@ def pagina_local(b, **kw):
     pg = ctx.new_page(); pg.errs = []; pg.drive = FILES
     pg.on('pageerror', lambda e: pg.errs.append(str(e)))
     pg.goto(URL); pg.evaluate('localStorage.clear()'); pg.reload(); pg.wait_for_timeout(400)
-    pg.click('#lgEntra'); pg.wait_for_timeout(1200)
+    pg.click('#lgEntra'); pg.wait_for_timeout(2200)
     return ctx, pg
 
 MITJANES_JS = """(()=>{const out={};for(const sub of state.subjects){if(sub.tipus==='llista')continue;const r={};
@@ -211,7 +211,7 @@ def p_drive(b):
     FILES = {}
     ctx = b.new_context(viewport={'width': 1400, 'height': 850}); ctx.add_init_script(INIT); ctx.route('**/*', google_amb(FILES))
     pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
-    pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(1200)
+    pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(2200)
     comprova(pg.evaluate('state.subjects.length') >= 1, 'no ha entrat')
     pg.evaluate("(()=>{const s=cur(),c=s.columns.find(c=>c.type==='num');setG(s,c.id,s.students[1].id,4.75);save('prova')})()")
     pg.wait_for_timeout(3500)
@@ -612,7 +612,7 @@ def p_ordinador(b):
     comprova(pg.evaluate("localStorage.getItem('llibreta-ordinador')") == 'meu' and pg.evaluate("!!localStorage.getItem('llibreta-drive-cache')"), 'en un ordinador propi no es guarda la còpia')
     comprova(not pg.locator('#alieTag').is_visible(), 'surt l\'etiqueta d\'ordinador aliè en un de propi')
     pg.wait_for_timeout(2500)   # que acabi el desat abans de recarregar
-    pg.reload(); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(1200)
+    pg.reload(); pg.wait_for_timeout(300); pg.click('#lgEntra'); pg.wait_for_timeout(2200)
     comprova(not (pg.is_visible('#dlgQ') and 'És el teu ordinador' in pg.inner_text('#qTit')), 'torna a preguntar en un ordinador que ja és propi: '+(pg.inner_text('#qTit') if pg.is_visible('#dlgQ') else ''))
     # botó d'esborrar
     comprova(not pg.is_visible('#dlgQ'), 'diàleg inesperat després de tornar a entrar: '+(pg.inner_text('#qTit') if pg.is_visible('#dlgQ') else ''))
@@ -1081,7 +1081,7 @@ def p_diversitat(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Escut d\'entrada: durant 1 s després d\'entrar, la taula no fa cas de clics ni tecles')
+@prova('Escut d\'entrada: durant 2 s després d\'entrar, la taula no fa cas de clics ni tecles')
 def p_escut(b):
     FILES = {}
     ctx = b.new_context(viewport={'width': 1400, 'height': 850}); ctx.add_init_script(INIT); ctx.route('**/*', google_amb(FILES))
@@ -1093,7 +1093,9 @@ def p_escut(b):
     comprova(pg.evaluate("document.body.classList.contains('escut')"), 'en entrar no s\'activa l\'escut')
     bb = inp.bounding_box(); pg.mouse.click(bb['x'] + 5, bb['y'] + 5); pg.keyboard.type('7')
     comprova(pg.evaluate("!document.activeElement.closest('#main')") and inp.input_value() != '7', 'durant l\'escut, el clic ha arribat a la taula')
-    pg.wait_for_timeout(1200)
+    pg.wait_for_timeout(1000)
+    comprova(pg.evaluate("document.body.classList.contains('escut')"), 'l\'escut ha de durar 2 segons')
+    pg.wait_for_timeout(1300)
     comprova(not pg.evaluate("document.body.classList.contains('escut')"), 'l\'escut no es treu')
     pg.mouse.click(bb['x'] + 5, bb['y'] + 5)
     comprova(pg.evaluate("!!document.activeElement.closest('#main')"), 'després de l\'escut, la taula ha de funcionar')

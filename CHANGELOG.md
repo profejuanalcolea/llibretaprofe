@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.3 · ammonite · novembre 2026
+- L'escut d'entrada passa d'1 a **2 segons**.
+
 ## 2.3.2 · ammonite · novembre 2026
 - **Escut d'entrada:** durant 1 segon després d'entrar, la taula no fa cas de clics ni tecles (apareix amb un fos suau), perquè el clic de més a «Entra amb Google» no posi cap nota sense voler.
 
