@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.5 · ammonite · novembre 2026
+- **Corregit:** en compartir des d'Android, la llibreta s'obria però sense el formulari de l'enllaç (Chrome no hi deixa el paràmetre «share»).
+
 ## 2.3.4 · ammonite · novembre 2026
 - **Mòbil · Enllaços:** botó ＋ per afegir enllaços generals o d'una llibreta; mantenint premut un enllaç, canviar-li el nom o treure'l.
 - **Compartir › Llibreta del Profe** a Android (app instal·lada): obre el formulari amb l'adreça i el títol posats. Cal tornar a instal·lar l'app perquè surti al menú Compartir.

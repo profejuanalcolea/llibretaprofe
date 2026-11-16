@@ -790,7 +790,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3.4 · ammonite · novembre 2026',COMPILACIO='16/11 18:07';
+const VERSIO='2.3.5 · ammonite · novembre 2026',COMPILACIO='16/11 18:22';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1772,7 +1772,8 @@ async function accioEnllac(k){const [on,id]=k.split('|'),ll=llistaEnl(on),r=ll.f
   if(a==='nom'){const n=prompt('Nom de l\'enllaç',r.name);if(n&&n.trim()){r.name=n.trim();save('nom d\'enllaç');render()}}
   else if(a==='treu'){if(await pregunta('Treure l\'enllaç',`Segur que vols treure «${r.name}»?`,[{t:'Cancel·la',v:false,cls:'sec'},{t:'Treu',v:true}])){ll.splice(ll.indexOf(r),1);save('treure enllaç');render()}}}
 /* Compartir › Llibreta del Profe (Android): es guarda el que arriba i s'obre el formulari quan la llibreta ja és carregada */
-(()=>{try{const q=new URLSearchParams(location.search);if(q.has('share')){sessionStorage.setItem('llibreta-share',JSON.stringify({t:q.get('t')||'',x:q.get('x')||'',u:q.get('u')||''}));history.replaceState(null,'',location.pathname)}}catch{}})();
+/* Chrome pot substituir la consulta de l'«action» pels paràmetres compartits: es detecta per qualsevol dels tres */
+(()=>{try{const q=new URLSearchParams(location.search);if(q.has('share')||q.has('u')||q.has('x')||q.has('t')){sessionStorage.setItem('llibreta-share',JSON.stringify({t:q.get('t')||'',x:q.get('x')||'',u:q.get('u')||''}));history.replaceState(null,'',location.pathname)}}catch{}})();
 function mirarShare(){let d=null;try{d=JSON.parse(sessionStorage.getItem('llibreta-share')||'null')}catch{}if(!d||!state)return;
   const lg=$('#login');if(lg&&getComputedStyle(lg).display!=='none'){setTimeout(mirarShare,500);return}try{sessionStorage.removeItem('llibreta-share')}catch{}
   const u=urlNeta(d.u||d.x||'');if(esMobil()){MB.sec='enl';rMobil()}formEnllac({u,n:(d.t||'').trim()})}

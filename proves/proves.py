@@ -1132,7 +1132,7 @@ def p_mobil_enl(b):
     comprova(pg.evaluate("(cur().recursos||[]).length") == n0l, 'no treu l\'enllaç')
     # Compartir d'Android: arriba per l'adreça i s'obre el formulari (abans, deixem que es desi tot al Drive)
     pg.wait_for_timeout(3500)
-    pg.goto(URL + '?share=1&t=Pautes%20lectura&x=Mira%20aix%C3%B2%20https%3A%2F%2Fexample.org%2Fpautes'); pg.wait_for_timeout(400)
+    pg.goto(URL + '?t=Pautes%20lectura&x=Mira%20aix%C3%B2%20https%3A%2F%2Fexample.org%2Fpautes')  # com ho envia Chrome: sense «share»; pg.wait_for_timeout(400)
     if pg.is_visible('#lgEntra'): pg.click('#lgEntra')
     pg.wait_for_timeout(2500)
     try: pg.wait_for_selector('#mbEnlF', timeout=5000)
