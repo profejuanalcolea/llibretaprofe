@@ -1081,6 +1081,25 @@ def p_diversitat(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Escut d\'entrada: durant 1 s després d\'entrar, la taula no fa cas de clics ni tecles')
+def p_escut(b):
+    FILES = {}
+    ctx = b.new_context(viewport={'width': 1400, 'height': 850}); ctx.add_init_script(INIT); ctx.route('**/*', google_amb(FILES))
+    pg = ctx.new_page(); pg.errs = []; pg.on('pageerror', lambda e: pg.errs.append(str(e)))
+    pg.goto(URL); pg.evaluate('localStorage.clear()'); pg.reload(); pg.wait_for_timeout(400)
+    pg.click('#lgEntra')
+    pg.wait_for_function("getComputedStyle(document.querySelector('#login')).display==='none'&&document.querySelector('#tw input.g')", timeout=8000)
+    inp = pg.locator('#tw td input.g').first
+    comprova(pg.evaluate("document.body.classList.contains('escut')"), 'en entrar no s\'activa l\'escut')
+    bb = inp.bounding_box(); pg.mouse.click(bb['x'] + 5, bb['y'] + 5); pg.keyboard.type('7')
+    comprova(pg.evaluate("!document.activeElement.closest('#main')") and inp.input_value() != '7', 'durant l\'escut, el clic ha arribat a la taula')
+    pg.wait_for_timeout(1200)
+    comprova(not pg.evaluate("document.body.classList.contains('escut')"), 'l\'escut no es treu')
+    pg.mouse.click(bb['x'] + 5, bb['y'] + 5)
+    comprova(pg.evaluate("!!document.activeElement.closest('#main')"), 'després de l\'escut, la taula ha de funcionar')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1160,7 +1179,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

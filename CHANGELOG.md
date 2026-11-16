@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.2 · ammonite · novembre 2026
+- **Escut d'entrada:** durant 1 segon després d'entrar, la taula no fa cas de clics ni tecles (apareix amb un fos suau), perquè el clic de més a «Entra amb Google» no posi cap nota sense voler.
+
 ## 2.3.1 · ammonite · novembre 2026
 - Al panell d'atenció a la diversitat, els **🔗 enllaços** van al final, sota el banc, i queden plegats (amb el nombre d'enllaços) perquè molestin poc.
 
