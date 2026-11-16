@@ -520,6 +520,7 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 .dvchip.p{border-color:#E0A800;color:#7a5c00;background:#fff8dc}.dvchip.ma{border-color:#1F5FD1;color:#1F5FD1;background:#eaf1ff}.dvchip.pi{border-color:#1F5FD1;background:#1F5FD1;color:#fff}
 .dvop{display:flex;gap:6px;flex-wrap:wrap}.dvop button{border:1.5px solid #ccc;background:#fff;border-radius:999px;padding:5px 12px;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}
 .dvop button.p.on{background:#E0A800;border-color:#E0A800;color:#111}.dvop button.ma.on,.dvop button.pi.on{background:#1F5FD1;border-color:#1F5FD1;color:#fff}.dvop button.pi{margin-left:8px}
+.dvlld{margin:14px 0 2px;border-top:1px solid #eee;padding-top:8px}.dvlld>summary{cursor:pointer;font-size:12.5px;color:#777;font-weight:600;list-style:none}.dvlld>summary::-webkit-details-marker{display:none}.dvlld>summary::before{content:'▸ ';}.dvlld[open]>summary::before{content:'▾ '}.dvlld[open]>summary{color:#111;margin-bottom:4px}
 .pntit{font-weight:700;font-size:13px;color:#555;margin:2px 0 4px}.pnsec{font-weight:700;font-size:13px;margin:10px 0 4px}
 .dvll{display:flex;align-items:center;gap:6px;padding:2px 0}.dvll a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dvamg{display:inline-flex;align-items:center;gap:5px;font-size:13px;margin-left:6px}
@@ -566,9 +567,9 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
   <div id="pnInfo" class="fl" style="margin:6px 0"></div>
   <textarea id="pnTxt" placeholder="Escriu el comentari o tria'n del banc de sota…"></textarea>
   <div class="fl"><button class="btn" id="pnCp">📋 Copia per a l'Esfera</button><button class="btn sec" id="pnBuida">Esborra</button></div>
-  <div id="pnLl" hidden></div>
   <input type="text" id="pnCerca" placeholder="🔍 Cerca al banc…" style="width:100%;margin-top:6px">
   <div id="pnBanc"></div>
+  <div id="pnLl" hidden></div>
 </aside>
 
 <div id="calc">
@@ -777,7 +778,7 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3 · ammonite · novembre 2026',COMPILACIO='16/11 11:18';
+const VERSIO='2.3.1 · ammonite · novembre 2026',COMPILACIO='16/11 11:31';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1621,7 +1622,7 @@ const dvLlTxt=d=>(d.ll||[]).map(l=>(l.n?l.n+': ':'')+l.u).join(' · ');
 /* ----- Panell del banc de comentaris ----- */
 const PN={st:null,cerca:'',mode:'com'};
 const bancPN=()=>PN.mode==='div'?state.bancDiv:state.banc;
-function obrePanell(stId,md='com'){PN.st=stId;PN.cerca='';PN.mode=md;$('#pnl').hidden=false;document.body.classList.add('pnl-on');pintaPanell();setTimeout(()=>$('#pnTxt')?.focus(),0)}
+function obrePanell(stId,md='com'){PN.st=stId;PN.cerca='';PN.mode=md;PN.llOb=false;$('#pnl').hidden=false;document.body.classList.add('pnl-on');pintaPanell();setTimeout(()=>$('#pnTxt')?.focus(),0)}
 function tancaPanell(){PN.st=null;const p=$('#pnl');if(p)p.hidden=true;document.body.classList.remove('pnl-on');$$('td.com.sel,td.dvc.sel').forEach(t=>t.classList.remove('sel'))}
 function pintaPanell(){const sub=cur(),st=sub?.students.find(x=>x.id===PN.st);if(!st){tancaPanell();return}
   $$('td.com.sel,td.dvc.sel').forEach(t=>t.classList.remove('sel'));const dvm=PN.mode==='div';
@@ -1648,8 +1649,9 @@ function afegeixComentari(text){const sub=cur(),st=PN.st;if(!sub||!st)return;con
 function desaProposta(v){const sub=cur(),st=PN.st;if(!sub||!st)return;dvSet(sub,st,'t',v.trim()?v:'');clearTimeout(desaProposta.h);desaProposta.h=setTimeout(()=>save('proposta educativa'),500);
   const td=document.querySelector(`td[data-dvp="${st}"]`);if(td){const t=v.trim();td.innerHTML=td.classList.contains('pl')?(t?'📝':'<span class="buida">·</span>'):(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>');td.title=td.classList.contains('pl')?t||'Sense proposta educativa':'Clica per veure-ho tot o escriure'}}
 function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
-  $('#pnLl').innerHTML=`<div class="pnsec">🔗 Enllaços</div>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
-    <div class="fl dvlla"><input type="text" id="pnLlN" placeholder="Nom (opcional)" style="width:34%"><input type="text" id="pnLlU" placeholder="Enganxa l'adreça (https://…)" style="flex:1;min-width:0"><button class="btn sec" id="pnLlAf">Afegeix</button></div>`;
+  $('#pnLl').innerHTML=`<details class="dvlld" ${PN.llOb?'open':''}><summary>🔗 Enllaços${ll.length?` (${ll.length})`:''}</summary>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
+    <div class="fl dvlla"><input type="text" id="pnLlN" placeholder="Nom (opcional)" style="width:34%"><input type="text" id="pnLlU" placeholder="Enganxa l'adreça (https://…)" style="flex:1;min-width:0"><button class="btn sec" id="pnLlAf">Afegeix</button></div></details>`;
+  $('#pnLl details').ontoggle=e=>{PN.llOb=e.target.open};
   $('#pnLlAf').onclick=()=>{let u=$('#pnLlU').value.trim();if(!u)return toast('Enganxa l\'adreça de l\'enllaç.');if(!/^https?:\/\//i.test(u)){if(/^[a-z]+:/i.test(u))return toast('Només es poden desar enllaços web (http o https).');u='https://'+u}
     dvSet(sub,st.id,'ll',[...ll,{n:$('#pnLlN').value.trim(),u}]);save('enllaç de diversitat');pintaLlPanell(sub,st)};
   $('#pnLlU').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#pnLlAf').click()}};
@@ -2345,7 +2347,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, tria <b>Personalització</b> o <b>Mesures addicionals</b> (una de les dues) i, a part, <b>PI</b>, lliurement.</li>
-    <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…). Els enllaços només es veuen al panell.</li>
+    <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los. Només es veuen al panell.</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
     <li><b>Amaga 🧩</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. No surten mai a la Vista alumne ni al mòbil.</li>

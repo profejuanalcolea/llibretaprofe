@@ -1015,7 +1015,9 @@ def p_diversitat(b):
     comprova(pg.evaluate("[cur().div[%r].n, cur().div[%r].pi]" % (st, st)) == ['ma', True], 'personalització i mesures addicionals són excloents; el PI es manté')
     pg.fill('#pnTxt', 'Seure a primera fila. Enunciats curts i per passos, amb un text prou llarg perquè no hi càpiga en una sola línia de la columna.'); pg.wait_for_timeout(700)
     comprova(pg.evaluate("cur().div[%r].t" % st).startswith('Seure'), 'no es desa la proposta educativa')
-    # enllaços: només web
+    # enllaços: plegats per defecte i només web
+    comprova(not pg.is_visible('#pnLlU'), 'els enllaços han de sortir plegats')
+    pg.click('#pnLl summary'); pg.wait_for_timeout(100)
     pg.fill('#pnLlU', 'javascript:alert(1)'); pg.click('#pnLlAf'); pg.wait_for_timeout(100)
     comprova(not pg.evaluate("cur().div[%r].ll" % st), 'no s\'han d\'acceptar enllaços que no siguin web')
     pg.fill('#pnLlN', 'PI al Drive'); pg.fill('#pnLlU', 'docs.google.com/document/d/x'); pg.click('#pnLlAf'); pg.wait_for_timeout(150)

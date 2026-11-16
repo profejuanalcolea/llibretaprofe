@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.1 · ammonite · novembre 2026
+- Al panell d'atenció a la diversitat, els **🔗 enllaços** van al final, sota el banc, i queden plegats (amb el nombre d'enllaços) perquè molestin poc.
+
 ## 2.3 · ammonite · novembre 2026
 - **Atenció a la diversitat** (per llibreta):
   - A Avaluació, columna **🧩** amb P / MA / PI (Personalització o Mesures addicionals, i PI a part, lliure) i columna **Proposta educativa**, plegada en obrir i d'una sola línia.
