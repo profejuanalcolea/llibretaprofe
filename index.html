@@ -512,7 +512,7 @@ td.fmis{box-shadow:inset 0 0 0 2px #E69F00}
 .dvl.p{background:linear-gradient(90deg,#E0A800 0 2.5px,rgba(255,255,255,.9) 2.5px 3.5px,#E0A800 3.5px 6px)}
 .dvl.ma{background:linear-gradient(90deg,#1F5FD1 0 2.5px,rgba(255,255,255,.9) 2.5px 3.5px,#1F5FD1 3.5px 6px)}
 .dvl.ma.pi{background:#1F5FD1}.dvl.p.pi{background:#E0A800}.dvl.sn.pi{background:#555}
-th.dvh,th.dvph{padding:6px 10px;white-space:nowrap}th.dvph{cursor:pointer;background:#f1f1f6}th.dvph.pl{width:40px;text-align:center}
+th.dvh,th.dvph{padding:6px 10px;white-space:nowrap}th.dvh{text-align:center;font-size:17px}td.dvm{text-align:center!important}th.dvph{cursor:pointer;background:#f1f1f6}th.dvph.pl{width:40px;text-align:center}
 td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:center;width:40px}td.dvc.sel{outline:2px solid var(--tar);outline-offset:-2px}
 .aval td.dvp:not(.pl){text-align:left!important}
 .dvt{max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
@@ -777,7 +777,7 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3 · ammonite · novembre 2026',COMPILACIO='16/11 11:14';
+const VERSIO='2.3 · ammonite · novembre 2026',COMPILACIO='16/11 11:18';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1542,7 +1542,7 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
   h+=`<div class="tw" id="tw"><table class="resum aval"><thead><tr><th class="fx" style="left:0;min-width:170px;text-align:left;padding:6px 10px">Cognoms</th><th class="fx fxlast" style="left:170px;min-width:${sub.nomW||120}px;max-width:${sub.nomW||120}px;width:${sub.nomW||120}px;text-align:left;padding:6px 10px">Nom</th>
     ${sub.categories.map(c=>`<th style="border-top:5px solid ${c.color};padding:6px 10px">${sigHtml(c)} ${esc(c.name)} · ${c.weight}%<span class="metode">${c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana':METODE[c.method]}</span></th>`).join('')}
     <th style="padding:6px 30px 6px 10px;position:relative" class="calch">Càlcul<span class="cmode">${{ass:'assoliments',num:'numèric',mixt:''}[modeCalc(sub)]}</span><button class="cmdots" data-cmode title="Com es mostra el càlcul">⋯</button></th><th style="padding:6px 10px;min-width:110px">${fc?esc(fc.name):'Nota final'}</th>
-    ${dvOn?`<th class="dvh" title="Atenció a la diversitat (clica una cel·la per editar-la)">🧩 Mesures</th><th class="dvph ${DV.prop?'':'pl'}" id="aDvH" title="Clica per ${DV.prop?'plegar':'desplegar'} la columna">${DV.prop?'Proposta educativa ▾':'📝 ▸'}</th>`:''}
+    ${dvOn?`<th class="dvh" title="Atenció a la diversitat: P personalització · MA mesures addicionals · PI (clica una cel·la per editar-la)">🧩</th><th class="dvph ${DV.prop?'':'pl'}" id="aDvH" title="Clica per ${DV.prop?'plegar':'desplegar'} la columna">${DV.prop?'Proposta educativa ▾':'📝 ▸'}</th>`:''}
     <th class="comh ${pleg?'pl':''}" id="aComH" title="Clica per ${pleg?'desplegar':'plegar'} la columna">${pleg?'💬 ▸':'💬 Comentari ▾'}</th><th style="padding:6px 8px" title="Copia el comentari per enganxar-lo a l'Esfera">Esfera</th></tr></thead><tbody>`;
   for(const st of sts){const f=finalDe(sub,st),com=sub.comentaris[st.id]||'',marc=sub.aval.marques[st.id];
     h+=`<tr data-s="${st.id}"><td class="fx nomc" style="left:0;text-align:left;font-weight:400">${dvSpan(sub,st)}${esc(st.cognoms||'')}</td><td class="fx fxlast nomc" style="left:170px;text-align:left;max-width:${sub.nomW||120}px" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>
@@ -1609,7 +1609,7 @@ const teDiv=sub=>Object.values(sub.div||{}).some(d=>d.n||d.pi||(d.t||'').trim()|
 const nDiv=sub=>Object.entries(sub.div||{}).filter(([id,d])=>(d.n||d.pi||(d.t||'').trim()||d.ll?.length)&&sub.students.some(s=>s.id===id)).length;
 /* ratlla a l'esquerra del nom: groc = personalització, blau = mesures addicionals; partida sense PI, plena amb PI */
 function dvSpan(sub,st){if(amagaDiv()||VA.on)return '';const d=dvDe(sub,st.id);if(!d.n&&!d.pi)return '';return `<span class="dvl ${d.n||'sn'}${d.pi?' pi':''}" title="${esc(dvEtiq(d))}"></span>`}
-function dvChips(d){return d.n||d.pi?`${d.n?`<span class="dvchip ${d.n}">${DVN[d.n]}</span>`:''}${d.pi?'<span class="dvchip pi">PI</span>':''}`:'<span class="buida">＋</span>'}
+function dvChips(d){return d.n||d.pi?`${d.n?`<span class="dvchip ${d.n}">${d.n==='p'?'P':'MA'}</span>`:''}${d.pi?'<span class="dvchip pi">PI</span>':''}`:'<span class="buida">＋</span>'}
 function dvSet(sub,id,camp,v){sub.div??={};const d=sub.div[id]??={};if(v===undefined||v===''||v===false||(Array.isArray(v)&&!v.length))delete d[camp];else d[camp]=v;if(!Object.keys(d).length)delete sub.div[id]}
 const DV={prop:false};
 /* Pregunta abans d'exportar si hi ha dades de diversitat: null = cancel·la */
@@ -2344,7 +2344,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
-  sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩 Mesures</b>: clica la cel·la d'un alumne i, al panell de la dreta, tria <b>Personalització</b> o <b>Mesures addicionals</b> (una de les dues) i, a part, <b>PI</b>, lliurement.</li>
+  sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, tria <b>Personalització</b> o <b>Mesures addicionals</b> (una de les dues) i, a part, <b>PI</b>, lliurement.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…). Els enllaços només es veuen al panell.</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
