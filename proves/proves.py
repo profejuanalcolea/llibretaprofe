@@ -1102,6 +1102,47 @@ def p_escut(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Mòbil · Enllaços: afegir (generals o de llibreta), canviar el nom i treure mantenint premut, i Compartir d\'Android')
+def p_mobil_enl(b):
+    FILES = {}
+    ctx = b.new_context(**p_mobil.dev); ctx.add_init_script(INIT_BASE); ctx.route('**/*', google_amb(FILES))
+    pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(300)
+    if pg.is_visible('#dlgQ'): pg.click('#qBtns button:has-text("Sí, és meu")')
+    pg.wait_for_timeout(2500)
+    pg.click('#mbBar [data-mbsec=enl]'); pg.wait_for_timeout(200)
+    n0g, n0l = pg.evaluate("[(state.recursos||[]).length,(cur().recursos||[]).length]")
+    pg.click('#mbAfEnl'); pg.fill('#efU', 'docs.google.com/doc/1'); pg.fill('#efN', 'Rúbrica nova'); pg.click('#efD'); pg.wait_for_timeout(200)
+    pg.click('#mbAfEnl'); pg.fill('#efU', 'https://example.org/general'); pg.select_option('#efOn', 'gen'); pg.click('#efD'); pg.wait_for_timeout(200)
+    r = pg.evaluate("[cur().recursos.at(-1), state.recursos.at(-1), (state.recursos||[]).length, (cur().recursos||[]).length]")
+    comprova(r[0]['name'] == 'Rúbrica nova' and r[0]['url'] == 'https://docs.google.com/doc/1' and r[3] == n0l + 1, f'enllaç de llibreta: {r[0]}')
+    comprova(r[1]['url'] == 'https://example.org/general' and r[1]['name'] == 'example.org/general' and r[2] == n0g + 1, f'enllaç general: {r[1]}')
+    pg.click('#mbAfEnl'); pg.fill('#efU', 'javascript:alert(1)'); pg.click('#efD'); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#mbEnlF') and pg.evaluate("(state.recursos||[]).length") == n0g + 1, 'no s\'han d\'acceptar adreces que no siguin web'); pg.click('#efC')
+    # mantenir premut → canvia el nom
+    a = pg.locator('#main a.mbal', has_text='Rúbrica nova'); bb = a.bounding_box()
+    pg.once('dialog', lambda d: d.accept('Rúbrica 2'))
+    pg.mouse.move(bb['x'] + 10, bb['y'] + 10); pg.mouse.down(); pg.wait_for_timeout(750); pg.mouse.up(); pg.wait_for_timeout(200)
+    pg.click('#qBtns button:has-text("Canvia el nom")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().recursos.at(-1).name") == 'Rúbrica 2', 'no canvia el nom mantenint premut')
+    # mantenir premut → treu
+    a = pg.locator('#main a.mbal', has_text='Rúbrica 2'); bb = a.bounding_box()
+    pg.mouse.move(bb['x'] + 10, bb['y'] + 10); pg.mouse.down(); pg.wait_for_timeout(750); pg.mouse.up(); pg.wait_for_timeout(200)
+    pg.click('#qBtns button:has-text("Treu")'); pg.wait_for_timeout(150); pg.click('#qBtns button:has-text("Treu")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("(cur().recursos||[]).length") == n0l, 'no treu l\'enllaç')
+    # Compartir d'Android: arriba per l'adreça i s'obre el formulari (abans, deixem que es desi tot al Drive)
+    pg.wait_for_timeout(3500)
+    pg.goto(URL + '?share=1&t=Pautes%20lectura&x=Mira%20aix%C3%B2%20https%3A%2F%2Fexample.org%2Fpautes'); pg.wait_for_timeout(400)
+    if pg.is_visible('#lgEntra'): pg.click('#lgEntra')
+    pg.wait_for_timeout(2500)
+    try: pg.wait_for_selector('#mbEnlF', timeout=5000)
+    except Exception: pass
+    v = pg.evaluate("[!!document.querySelector('#mbEnlF'), document.querySelector('#efU')?.value, document.querySelector('#efN')?.value]")
+    comprova(v == [True, 'https://example.org/pautes', 'Pautes lectura'], f'Compartir no obre el formulari amb l\'adreça: {v}')
+    comprova('share' not in pg.url, 'l\'adreça de la pàgina ha de quedar neta')
+    comprova(not errs, 'errors JS: %s' % errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1181,7 +1222,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

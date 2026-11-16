@@ -68,6 +68,7 @@ python3 proves/proves.py
 | Mode del càlcul | ⋯ de Càlcul: Assoliments, Numèric o Mixt; nota final que no encaixa marcada; rètols de capçalera només amb el nom |
 | Atenció a la diversitat | Mesures i PI, proposta, enllaços, banc propi, ratlla al nom, amagar, Vista alumne sense marques i pregunta en exportar |
 | Escut d'entrada | Durant 2 s després d'entrar, la taula no fa cas de clics ni tecles; després funciona |
+| Enllaços al mòbil | Afegir generals o de llibreta, canviar el nom i treure mantenint premut, Compartir d'Android |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

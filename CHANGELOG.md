@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.3.4 · ammonite · novembre 2026
+- **Mòbil · Enllaços:** botó ＋ per afegir enllaços generals o d'una llibreta; mantenint premut un enllaç, canviar-li el nom o treure'l.
+- **Compartir › Llibreta del Profe** a Android (app instal·lada): obre el formulari amb l'adreça i el títol posats. Cal tornar a instal·lar l'app perquè surti al menú Compartir.
+
 ## 2.3.3 · ammonite · novembre 2026
 - L'escut d'entrada passa d'1 a **2 segons**.
 

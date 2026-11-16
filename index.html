@@ -528,6 +528,14 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 /* 2.3.2 · escut d'entrada */
 body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 @keyframes escutFos{from{opacity:.35}to{opacity:1}}
+
+/* 2.3.4 · afegir enllaços al mòbil */
+.mbaf{width:100%;margin:6px 0 4px;padding:12px;font-size:16px}
+.mbal{-webkit-touch-callout:none;user-select:none}
+.mbfull{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.4);display:flex;align-items:flex-end;justify-content:center}
+.mbfc{background:#fff;width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:18px 16px 24px;box-sizing:border-box}
+.mbfc h3{margin:0 0 10px}.mbfc label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}.mbfc input,.mbfc select{width:100%;box-sizing:border-box;font-size:16px;padding:10px;border:1.5px solid #ccc;border-radius:10px}
+.mbfc .btn{flex:1;padding:12px;font-size:16px}
 </style>
 </head>
 <body>
@@ -782,7 +790,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3.3 · ammonite · novembre 2026',COMPILACIO='16/11 15:00';
+const VERSIO='2.3.4 · ammonite · novembre 2026',COMPILACIO='16/11 18:07';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1331,7 +1339,7 @@ async function comprovaCursNou(){const k=cursKey();if(!state)return;if(!state.cu
   $('#cuCanc').onclick=()=>d.close()}
 function render(){if(!state)return;aplicaColors();{const s0=cur();if(s0?.cls&&!s0.cls.link&&mode==='drive'&&G.token&&!enllacDemanat.has(s0.id)){enllacDemanat.add(s0.id);enllacCls(s0)}}$('#cursLbl').textContent='Curs '+cursCurt(cursKey());if(!cursComprovat){cursComprovat=true;setTimeout(comprovaCursNou,700)}
   const esLl=cur()?.tipus==='llista';$('#tabs [data-t=resum]').hidden=esLl;if(esLl&&tab==='resum')tab=tabPrincipal='llibreta';
-  renderSel();document.body.classList.toggle('mob',esMobil());document.body.classList.toggle('bpleg',barraPlegada()&&!esMobil());if(esMobil()){tancaPanell();VA.on=false;rMobil();estat();return}$$('#tabs button,.tabic').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));if(tab!=='resum'){tancaPanell();VA.on=false}
+  renderSel();document.body.classList.toggle('mob',esMobil());if(!esMobil())setTimeout(mirarShare,0);document.body.classList.toggle('bpleg',barraPlegada()&&!esMobil());if(esMobil()){tancaPanell();VA.on=false;rMobil();estat();return}$$('#tabs button,.tabic').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));if(tab!=='resum'){tancaPanell();VA.on=false}
   if(tab==='alumnes'){tab='config';alObert=true}
   $('#mbBar')?.remove();({llibreta:rLlibreta,resum:rResum,config:rConfig,eines:rEines,arxiu:rArxiu,bloc:rBloc})[tab]();estat();btnHist();pintaSortides()}
 const capPlegada=()=>{try{return localStorage.getItem('llibreta-cap-plegada')==='1'}catch{return false}};
@@ -1736,10 +1744,39 @@ function barraMobil(){let b=$('#mbBar');if(!b){b=document.createElement('div');b
   const nAl=state?state.posits.filter(p=>nivPosit(p)).length:0;
   b.innerHTML=`<button data-mbsec="ll" class="${sec==='ll'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7.5h8M8 11h6"/></svg><span>Llibreta</span></button><button data-mbsec="bloc" class="${sec==='bloc'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="5" width="15" height="16.5" rx="2"/><path d="M8 3v4M12 3v4M16 3v4"/><path d="M8 11.5h8M8 15h8M8 18.5h5"/></svg><span>Bloc${nAl?` <b>${nAl}</b>`:''}</span></button><button data-mbsec="enl" class="${sec==='enl'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Enllaços</span></button>`;
   b.querySelectorAll('[data-mbsec]').forEach(x=>x.onclick=()=>{MB.sec=x.dataset.mbsec;MB.st=null;rMobil();scrollTo(0,0)})}
-function rMobilEnl(){const sub=cur(),ll=(t,rs)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span><b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
-  const h=ll(`D'aquesta llibreta${sub?' · '+esc(sub.name):''}`,sub?.recursos||[])+ll('Generals',state.recursos||[]);
-  $('#main').innerHTML=h||'<p class="aj" style="text-align:center;margin-top:30px">Encara no hi ha enllaços. S\'afegeixen des de l\'ordinador, a 🧰 Eines.</p>'}
-function rMobil(){barraMobil();if(MB.sec==='bloc'){rBloc();return}if(MB.sec==='enl'){rMobilEnl();return}
+function rMobilEnl(){const sub=cur(),ll=(t,rs,on)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" data-enl="${on}|${r.id}"><span><b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
+  const h=ll(`D'aquesta llibreta${sub?' · '+esc(sub.name):''}`,sub?.recursos||[],sub?sub.id:'')+ll('Generals',state.recursos||[],'gen');
+  $('#main').innerHTML=`<button class="btn mbaf" id="mbAfEnl">＋ Afegeix un enllaç</button>`+(h?h+'<p class="aj" style="text-align:center;margin-top:14px">Mantén premut un enllaç per canviar-li el nom o treure\'l.</p>':'<p class="aj" style="text-align:center;margin-top:30px">Encara no hi ha enllaços.</p>');
+  $('#mbAfEnl').onclick=()=>formEnllac();
+  /* mantenir premut: canvia el nom o treu */
+  $$('#main [data-enl]').forEach(a=>{let t=null,llarg=false;
+    a.addEventListener('pointerdown',()=>{llarg=false;t=setTimeout(()=>{llarg=true;accioEnllac(a.dataset.enl)},600)});
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=>a.addEventListener(ev,()=>clearTimeout(t)));
+    a.addEventListener('contextmenu',e=>e.preventDefault());a.addEventListener('click',e=>{if(llarg){e.preventDefault();llarg=false}})})}
+/* 2.3.4 · enllaços des del mòbil (i des de «Compartir» d'Android) */
+function llistaEnl(on){if(on==='gen')return state.recursos??=[];const x=state.subjects.find(s=>s.id===on);return x?(x.recursos??=[]):[]}
+function urlNeta(u){u=(u||'').trim();const m=u.match(/https?:\/\/\S+/i);if(m)return m[0];if(!u||/^[a-z]+:/i.test(u))return '';return 'https://'+u}
+function formEnllac(pre={}){$('#mbEnlF')?.remove();const sub=cur(),d=document.createElement('div');d.id='mbEnlF';d.className='mbfull';
+  d.innerHTML=`<div class="mbfc"><h3>＋ Afegeix un enllaç</h3>
+    <label>Adreça</label><input type="url" id="efU" placeholder="https://…" value="${esc(pre.u||'')}">
+    <label>Nom <span class="aj">(opcional)</span></label><input type="text" id="efN" value="${esc(pre.n||'')}" maxlength="80">
+    <label>On va</label><select id="efOn"><option value="${sub?.id||''}" ${sub?'':'disabled'}>D'aquesta llibreta · ${esc(sub?.name||'—')}</option>${actives().filter(x=>x.id!==sub?.id).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}<option value="gen" ${sub?'':'selected'}>Generals</option></select>
+    <div class="fl" style="margin-top:14px"><button class="btn" id="efD">Desa</button><button class="btn sec" id="efC">Cancel·la</button></div></div>`;
+  document.body.appendChild(d);setTimeout(()=>(pre.u?$('#efN'):$('#efU'))?.focus(),50);
+  $('#efC').onclick=()=>d.remove();
+  $('#efD').onclick=()=>{const u=urlNeta($('#efU').value);if(!u)return toast('Escriu una adreça web (http o https).');const on=$('#efOn').value;
+    const nom=$('#efN').value.trim()||u.replace(/^https?:\/\/(www\.)?/,'').slice(0,40);
+    llistaEnl(on).push({id:uid(),name:nom,url:u,grup:'',icon:'🔗'});save('enllaç nou');d.remove();toast('🔗 Enllaç desat'+(on==='gen'?' als generals.':'.'));render()}}
+async function accioEnllac(k){const [on,id]=k.split('|'),ll=llistaEnl(on),r=ll.find(x=>x.id===id);if(!r)return;
+  const a=await pregunta(r.name,r.url,[{t:'Cancel·la',v:null,cls:'sec'},{t:'Treu',v:'treu',cls:'sec'},{t:'Canvia el nom',v:'nom'}]);
+  if(a==='nom'){const n=prompt('Nom de l\'enllaç',r.name);if(n&&n.trim()){r.name=n.trim();save('nom d\'enllaç');render()}}
+  else if(a==='treu'){if(await pregunta('Treure l\'enllaç',`Segur que vols treure «${r.name}»?`,[{t:'Cancel·la',v:false,cls:'sec'},{t:'Treu',v:true}])){ll.splice(ll.indexOf(r),1);save('treure enllaç');render()}}}
+/* Compartir › Llibreta del Profe (Android): es guarda el que arriba i s'obre el formulari quan la llibreta ja és carregada */
+(()=>{try{const q=new URLSearchParams(location.search);if(q.has('share')){sessionStorage.setItem('llibreta-share',JSON.stringify({t:q.get('t')||'',x:q.get('x')||'',u:q.get('u')||''}));history.replaceState(null,'',location.pathname)}}catch{}})();
+function mirarShare(){let d=null;try{d=JSON.parse(sessionStorage.getItem('llibreta-share')||'null')}catch{}if(!d||!state)return;
+  const lg=$('#login');if(lg&&getComputedStyle(lg).display!=='none'){setTimeout(mirarShare,500);return}try{sessionStorage.removeItem('llibreta-share')}catch{}
+  const u=urlNeta(d.u||d.x||'');if(esMobil()){MB.sec='enl';rMobil()}formEnllac({u,n:(d.t||'').trim()})}
+function rMobil(){barraMobil();setTimeout(mirarShare,0);if(MB.sec==='bloc'){rBloc();return}if(MB.sec==='enl'){rMobilEnl();return}
   const sub=cur(),m=$('#main');if(!sub){m.innerHTML='<div class="buit">No hi ha cap llibreta activa.</div>';return}
   const sts=alumnesAval(sub);let h=`<div class="mbcap" style="background:${sub.color||LPAL[0][0]}"><span class="capic">${sub.icon||'📘'}</span><div><b>${esc(sub.name)}</b><div class="capsub">${sts.length} alumnes · mode consulta (només lectura)</div></div></div>`;
   if(MB.st&&sts.some(x=>x.id===MB.st)){const i=sts.findIndex(x=>x.id===MB.st),st=sts[i];
@@ -2381,7 +2418,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina sense text. A la dreta hi queden només els avisos (sortides de l'aula, temporitzador, pòsits urgents), l'Ammo de l'estat del Drive i el botó ⌄ per tornar-la a obrir; també s'obre clicant en qualsevol lloc buit de la franja. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
-    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b>. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+
+    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b>: amb <b>＋ Afegeix un enllaç</b> en pots desar de nous (generals o d'una llibreta) i, mantenint-ne premut un, li canvies el nom o el treus. Si tens la llibreta instal·lada com a app a Android, també pots fer <b>Compartir › Llibreta del Profe</b> des de Chrome, el Drive o qualsevol app: s'obre el formulari amb l'adreça posada. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+
   sec('Per a companys de l\'institut',`<ol><li>Obre <b>${esc(url)}</b> amb Chrome o Edge.</li><li>Clica <b>Entra amb Google</b> amb el compte del centre.</li>
     <li>El primer cop es crea sola una llibreta <b>EXEMPLE</b> per provar-ho tot. Després en crees de noves amb el <b>＋</b> taronja.</li></ol>
     <p class="aj">Les dades de cadascú són al seu propi Drive: ningú més les veu. A GitHub només hi ha el programa, mai dades d'alumnes.</p>`)+
