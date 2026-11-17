@@ -1202,6 +1202,29 @@ def p_grups(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columna bloquejada: candau a la capçalera, cel·les no editables, ni enganxar ni nota de grup; es desbloqueja')
+def p_bloq(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    c = pg.evaluate("(()=>{const s=cur();return s.columns.find(c=>c.type==='num'&&!c.amp).id})()")
+    st = pg.evaluate("cur().students[0].id"); v0 = pg.evaluate("getG(cur(),%r,%r)" % (c, st))
+    pg.click(f'th.colh[data-col="{c}"]', position={'x': 5, 'y': 5}); pg.wait_for_timeout(100)
+    pg.evaluate("obreHMenu(document.querySelector('[data-hm=\"%s\"]'))" % c); pg.click('#hMenu [data-ha=bloq]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().columns.find(x=>x.id===%r).bloq" % c) is True, 'no es bloqueja des del menú ⋯')
+    comprova(pg.locator(f'th.colh[data-col="{c}"] .candw svg').count() == 1, 'no surt el candau a la capçalera')
+    inp = pg.locator(f'#tw td[data-c="{c}"][data-s="{st}"] input.g')
+    comprova(inp.is_disabled(), 'la cel·la hauria d\'estar desactivada')
+    pg.locator(f'#tw td[data-c="{c}"][data-s="{st}"]').click(force=True); pg.wait_for_timeout(150)
+    comprova('bloquejada' in pg.inner_text('#toast'), 'en clicar no avisa que està bloquejada')
+    # propietats: desbloqueja
+    pg.evaluate("obreCol(%r)" % c); pg.wait_for_timeout(300)
+    comprova(pg.is_checked('#cBloq'), 'a Propietats ha de sortir marcada')
+    pg.uncheck('#cBloq'); pg.click('#dlgCol button:has-text("Desa")'); pg.wait_for_timeout(300)
+    comprova(not pg.evaluate("cur().columns.find(x=>x.id===%r).bloq" % c) and not pg.locator(f'#tw td[data-c="{c}"][data-s="{st}"] input.g').is_disabled(), 'no es desbloqueja')
+    comprova(pg.evaluate("getG(cur(),%r,%r)" % (c, st)) == v0, 'bloquejar no ha de tocar les notes')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1281,7 +1304,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

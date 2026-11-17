@@ -70,6 +70,7 @@ python3 proves/proves.py
 | Escut d'entrada | Durant 2 s després d'entrar, la taula no fa cas de clics ni tecles; després funciona |
 | Enllaços al mòbil | Afegir generals o de llibreta, canviar el nom i treure mantenint premut, Compartir d'Android |
 | Treball en grup | Columna Grups, grups a l'atzar equilibrats i de N alumnes, mostra per grups i un grup, ordenar, nota de grup |
+| Columna bloquejada | Candau a la capçalera, cel·les no editables i avís; es desbloqueja des de Propietats sense tocar les notes |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

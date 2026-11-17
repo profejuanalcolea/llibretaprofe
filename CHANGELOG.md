@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.4.2 · ammonite · novembre 2026
+- Corregit: en treure el text de la franja d'una columna sense categoria a Propietats, no s'esborrava.
+- **Columnes bloquejades** (⋯ o Propietats): candau de línia d'un sol color al costat del nom; les cel·les no es poden canviar (ni enganxar, nota de grup, grups a l'atzar ni Classroom).
+
 ## 2.4.1 · ammonite · novembre 2026
 - **Grups:** cada grup té una forma negra davant del nom (● ▲ ■ ◆ ★ ✚…), a la cel·la, a les franges de Mostra per grups i als menús, perquè es reconegui sense dependre del color. Colors una mica més marcats.
 

@@ -542,6 +542,11 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 .grsh{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:5px;margin-right:8px;color:#111;font-style:normal;font-size:13px;vertical-align:middle}
 .grnom b{margin:0 4px 0 3px;color:#111}td.grc select.g{color:#111;font-weight:600}
 .atzr{display:flex;align-items:center;gap:6px;margin:8px 0;font-size:14.5px}
+
+/* 2.4.2 · columnes bloquejades */
+.candw{display:inline-flex;vertical-align:middle;margin-left:4px;color:#8a8a8a}.cand{display:block}
+#hMenu .cand{display:inline-block;vertical-align:-1px;margin-right:2px;color:#555}
+td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{color:inherit;opacity:1;-webkit-text-fill-color:currentColor;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -643,7 +648,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
       <option value="classe">Classe (grup de l'alumne)</option><option value="url">URL (enllaç)</option><option value="lliure">Lliure (escriu el que vulguis)</option>
     </optgroup></select></div>
   <div class="fl"><label class="lb">Amplada</label><select id="cAmp"><option value="estreta">estreta</option><option value="normal">normal</option><option value="ampla">ampla</option><option value="plegada">plegada</option></select>
-    <label style="margin-left:12px"><input type="checkbox" id="cOcu"> Amaga la columna</label></div>
+    <label style="margin-left:12px"><input type="checkbox" id="cOcu"> Amaga la columna</label><label style="margin-left:12px" title="Les cel·les no es poden canviar fins que la desbloquegis"><input type="checkbox" id="cBloq"> Bloqueja</label></div>
   <div class="fl" id="cMaxF"><label class="lb">Nota màxima</label><input type="number" id="cMax" class="mini" min="1" step="1" value="10"></div>
   <div id="cClasseF">
     <div class="fl" style="align-items:flex-start"><label class="lb">Classes</label><div style="flex:1"><textarea id="cClasses" rows="4" placeholder="Una per línia, amb el nom sencer: 4t A, 2n Batx B…" style="width:100%;font:inherit"></textarea>
@@ -800,7 +805,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.4.1 · ammonite · novembre 2026',COMPILACIO='17/11 11:17';
+const VERSIO='2.4.2 · ammonite · novembre 2026',COMPILACIO='17/11 11:40';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -813,6 +818,9 @@ const EVAL=['num','ord','ass','ext'];
 const GRSH=['●','▲','■','◆','★','✚','▼','♣','♥','♠','⬟','✱'];
 const grSh=(c,o)=>GRSH[(c.opcions||[]).indexOf(o)]||'';
 const grTxt=(c,o)=>o?(c.type==='grup'?grSh(c,o)+' '+o.t:o.t):'';
+/* 2.4.2 · columnes bloquejades: candau de línia, d'un sol color */
+const CANDAU='<svg class="cand" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+const candau=c=>c.bloq?`<span class="candw" title="Columna bloquejada">${CANDAU}</span>`:'';
 const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
 const METODE={mean:'mitjana',median:'mediana',mode:'moda'};
 const PAL=[['#E69F00','taronja'],['#56B4E9','blau cel'],['#009E73','verd blavós'],['#F0E442','groc'],['#0072B2','blau'],['#D55E00','vermelló'],['#CC79A7','rosa'],['#7F7F7F','gris']];
@@ -1394,11 +1402,11 @@ function urlHtml(v,ro){return v?`<a class="lnk" href="${esc(v)}" target="_blank"
 const incHtml=v=>(v?.y||v?.r)?`${v.y?`<span class="tg y"></span>${v.y}`:''}${v.r?`<span class="tg r"></span>${v.r}`:''}`:'<span class="buida">＋</span>';
 function calcHtml(sub,st){const f=finalDe(sub,st);return f?`<span class="calc" title="Càlcul ponderat de referència">${esc(modeCalc(sub)==='ass'?LV[f.lvl]:fmt(f.num))}</span>`:''}
 const faltaCls=v=>v==='F'?'vF':v==='FJ'?'vFJ':v==='NAV'?'vNAV':'';
-function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="${c.id}" data-s="${st.id}"`,dis=RO()?'disabled':'';
+function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="${c.id}" data-s="${st.id}"`,dis=RO()||c.bloq?'disabled':'';
   if(c.amp==='plegada')return `<td class="plcc" ${a}></td>`;
   const cv=c.cls?.vals?.[st.id],clsMan=cv&&cv.v!==undefined&&v!==cv.v,clsC=c.cls&&cv?(clsMan?' clsman':cv.draft?' clsdraft':''):'';
   const an=sub.anot?.[c.id+'|'+st.id],anC=(an?(an.h?' anh':'')+(an.t?' ant':''):'')+clsC+(c.amp==='estreta'?' estr':''),anI=an?.t?`<i class="antri"></i>`:'',anT=(an?.t||cv)?` title="${esc([an?.t?'💬 '+an.t:'',cv?`🎓 Classroom: ${cv.p===undefined||cv.p===null?'sense nota':fmt(cv.p)+(c.cls.max?'/'+c.cls.max:'')}${cv.draft?' (esborrany, encara no retornada)':''}${clsMan?' · canviada a mà a la llibreta':''}`:''].filter(Boolean).join('\n'))}"`:'';
-  const td=(k,inner,foc)=>`<td ${a} class="${cls} ${k}${anC}" style="${sty}"${anT}${foc?' tabindex="0"':''}>${inner}${anI}</td>`;
+  const td=(k,inner,foc)=>`<td ${a} class="${cls} ${k}${anC}${c.bloq?' bloq':''}" style="${sty}"${anT}${foc?' tabindex="0"':''}>${inner}${anI}</td>`;
   const fa=faltaCls(v);
   switch(c.type){
   case 'num':return td(fa,`<input class="g" ${a} ${dis} value="${v===undefined?'':v==='NAV'?NAVT:esc(String(v).replace('.',','))}" inputmode="decimal">`);
@@ -1442,7 +1450,7 @@ function obreAnMenu(td,x,y){if(RO())return;const sub=cur();sub.anot??={};const k
 function tancaAnMenu(){$('#anMenu').style.display='none'}
 /* 2.4 · «Posa aquesta nota a tot el grup» */
 const GRCOPIA=['num','ord','ass','final','check','icones','opc','lliure','dits'];
-function grupMenu(sub,cid,sid){const c=sub.columns.find(x=>x.id===cid),v=getG(sub,cid,sid);if(!c||!GRCOPIA.includes(c.type)||v===undefined||v==='')return '';
+function grupMenu(sub,cid,sid){const c=sub.columns.find(x=>x.id===cid),v=getG(sub,cid,sid);if(!c||c.bloq||!GRCOPIA.includes(c.type)||v===undefined||v==='')return '';
   const gcs=sub.columns.filter(x=>x.type==='grup');return gcs.map(gc=>{const gid=getG(sub,gc.id,sid),o=opcDe(gc,gid);if(!o)return '';
     const n=sub.students.filter(st=>st.id!==sid&&getG(sub,gc.id,st.id)===gid).length;return n?`<button data-an="g:${gc.id}">👥 Posa-la a tot el grup «${esc(grTxt(gc,o))}»${gcs.length>1?' · '+esc(gc.name):''} (${n})</button>`:''}).join('')}
 async function notaAlGrup(sub,cid,sid,gcid){const c=sub.columns.find(x=>x.id===cid),gc=sub.columns.find(x=>x.id===gcid);if(!c||!gc)return;
@@ -1452,7 +1460,7 @@ async function notaAlGrup(sub,cid,sid,gcid){const c=sub.columns.find(x=>x.id===c
     if(!r)return;if(r==='buits')quins=altres.filter(st=>!plens.includes(st))}
   quins.forEach(st=>setG(sub,cid,st.id,v,1));save('nota de grup');rLlibreta();toast(`👥 Nota posada a ${quins.length} alumne${quins.length===1?'':'s'} del grup. Es pot desfer amb ↶.`)}
 /* 2.4 · Grups a l'atzar, equilibrats; opcionalment barrejant classes */
-function grupsAtzar(sub,c){const sts=sub.students.filter(st=>!st.baixa),cl=colsClasse(sub).length?new Set(sts.map(st=>classeDe(sub,st)).filter(Boolean)):new Set(),teG=sts.some(st=>opcDe(c,getG(sub,c.id,st.id)));
+function grupsAtzar(sub,c){if(c.bloq)return toast('Columna bloquejada: desbloqueja-la al menú ⋯.');const sts=sub.students.filter(st=>!st.baixa),cl=colsClasse(sub).length?new Set(sts.map(st=>classeDe(sub,st)).filter(Boolean)):new Set(),teG=sts.some(st=>opcDe(c,getG(sub,c.id,st.id)));
   let d=$('#dlgAtz');d?.remove();d=document.createElement('dialog');d.id='dlgAtz';d.className='dlg';
   d.innerHTML=`<h3 style="margin-top:0">🎲 Grups a l'atzar · ${esc(c.name)}</h3><p class="aj">${sts.length} alumnes.</p>
     <label class="atzr"><input type="radio" name="atzM" value="n" checked> Fes <input type="number" id="atzN" min="2" max="12" value="${(c.opcions||[]).length}" style="width:64px"> grups</label>
@@ -1569,7 +1577,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
       const tools=ro?'':`<button class="hdots" data-hm="${c.id}" data-first="${g.solt?0:first?1:0}" data-last="${g.solt?0:last?1:0}" title="Opcions de la columna">⋯</button>`;
-      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
+      return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}${candau(c)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}${candau(c)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${r.sh?`<i class="grsh" style="background:${r.col}">${r.sh}</i>`:''}${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
@@ -1942,7 +1950,7 @@ const enllacDemanat=new Set();
 async function enllacCls(sub){if(sub.cls.link)return;try{const c=await (await gf(`${CLSAPI}/courses/${sub.cls.id}`)).json();if(c.alternateLink){sub.cls.link=c.alternateLink;save(null,true);render()}}catch{}}
 function carregaRoster(){return ambCarrega(async()=>{await assegCls();const sub=cur();enllacCls(sub);CL.roster=await cf(`/courses/${sub.cls.id}/students`);CL.props=proposaParelles(sub,CL.roster)})}
 function carregaTasques(){return ambCarrega(async()=>{await assegCls();const sub=cur();CL.tasques=(await cf(`/courses/${sub.cls.id}/courseWork?courseWorkStates=PUBLISHED`)).sort((a,b)=>(b.creationTime||'').localeCompare(a.creationTime||''))})}
-async function sincCol(sub,c){const subs=await cf(`/courses/${sub.cls.id}/courseWork/${c.cls.cw}/studentSubmissions`);const per=new Map(subs.map(x=>[x.userId,x]));
+async function sincCol(sub,c){if(c.bloq){c.cls.sinc=Date.now();return {posades:0,manuals:0,draft:0,bloq:1}}const subs=await cf(`/courses/${sub.cls.id}/courseWork/${c.cls.cw}/studentSubmissions`);const per=new Map(subs.map(x=>[x.userId,x]));
   c.cls.vals??={};let posades=0,manuals=0,draft=0;
   for(const st of sub.students){if(!st.cid)continue;const sm=per.get(st.cid);if(!sm)continue;
     const g=sm.assignedGrade??sm.draftGrade,esD=sm.assignedGrade==null&&sm.draftGrade!=null;let v;
@@ -2442,6 +2450,8 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>↶ ↷</b> desfan i refan qualsevol canvi (fins a 30 passos).</li>
     <li><b>És el teu ordinador?</b> Es pregunta el primer cop que entres en un navegador. En un ordinador d'una altra persona la llibreta només dura mentre la pestanya és oberta; en acabar, surt (⚙ › Dades › Surt) i tanca també la sessió de Google. Si t'equivoques, ⚙ › Dades › «Esborra la còpia d'aquest ordinador».</li>
     <li>Si obres la llibreta en <b>dues pestanyes</b>, te n'avisa i en deixa treballar només una. Si s'ha desat fa poc des d'<b>un altre ordinador</b>, també t'avisa.</li></ul>`)+
+  sec('Columnes bloquejades',`<ul><li>Al menú <b>⋯</b> de la capçalera o a <b>✎ Propietats</b>: <b>Bloqueja</b>. Surt un candau petit al costat del nom i les cel·les no es poden canviar: ni escrivint, ni enganxant, ni amb la nota de grup, els grups a l'atzar o la sincronització de Classroom. La columna es veu, compta i s'exporta igual. Es desbloqueja al mateix lloc.</li>
+    <li>El <b>punt blau</b> a la cantonada d'una cel·la d'una columna de Classroom vol dir que l'has canviada a mà i ja no coincideix amb Classroom (en sincronitzar, es manté la teva).</li></ul>`)+
   sec('Treball en grup',`<ul><li>Columna de tipus <b>Grups</b> (＋ Columna › Grups): tries quants grups (de 2 a 12), es diuen G1, G2… i cadascun té una <b>forma</b> (● ▲ ■ ◆ ★ ✚…) i un color; els pots canviar el nom. No compta per a la nota. En pots tenir més d'una (una per treball).</li>
     <li><b>⋯ › 🎲 Grups a l'atzar</b>: tria quants grups o quants alumnes per grup; els reparteix equilibrats i, si hi ha alumnes de diverses classes, les pot barrejar. També pot omplir només els alumnes sense grup.</li>
     <li><b>⋯ › 👥 Mostra per grups</b> (o <b>Mostra</b> › per grups / un sol grup): els alumnes surten agrupats amb una franja per grup. També es pot ordenar per la columna (⇅ o «Ordena per»).</li>
@@ -2638,7 +2648,7 @@ document.addEventListener('paste',async e=>{const el=document.activeElement;if(!
   const res=await pregunta('Enganxar de l\'Excel',`S'ompliran ${nR} alumne${nR===1?'':'s'} × ${nC} ${nC===1?'columna':'columnes'}, començant per ${trs[r0].querySelector('.nomc')?.textContent||''}. Les caselles amb text no vàlid es deixaran com estaven. Ho podràs desfer amb «↶ Desfés».`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Enganxa',v:1}]);
   if(!res)return;snapshot(sub);let ok=0,ko=0;
   for(let i=0;i<nR;i++)for(let j=0;j<nC;j++){const c=sub.columns.find(x=>x.id===colIds[j]);const raw=rows[i][j];if(raw===undefined)continue;
-    if(!ENGANXABLES.includes(c.type)){ko++;continue}const r=valorDe(sub,c,raw);if(!r.ok){ko++;continue}setG(sub,c.id,trs[r0+i].dataset.s,r.val,true);ok++}
+    if(!ENGANXABLES.includes(c.type)||c.bloq){ko++;continue}const r=valorDe(sub,c,raw);if(!r.ok){ko++;continue}setG(sub,c.id,trs[r0+i].dataset.s,r.val,true);ok++}
   save('enganxar de l\'Excel');rLlibreta();toast(`${ok} caselles enganxades${ko?`, ${ko} no vàlides (no s'han tocat)`:''}.`,5000)});
 document.addEventListener('keydown',e=>{
   if(!(e.ctrlKey||e.metaKey)||!state)return;const k=e.key.toLowerCase();
@@ -2666,6 +2676,7 @@ $('#main').addEventListener('click',e=>{if(!state)return;const sub=cur();
   const pl=e.target.closest('[data-pleg]');if(pl){const id=pl.dataset.pleg;sub.plegades=sub.plegades||[];const i=sub.plegades.indexOf(id);if(i<0)sub.plegades.push(id);else sub.plegades.splice(i,1);save();rLlibreta();return}
   const th=e.target.closest('th.colh');
   if(RO()){if(e.target.closest('td.clk,td.inc,button[data-url]'))toast('Llibreta arxivada: només lectura.');return}
+  const bq=e.target.closest('#tw td.bloq');if(bq&&!e.target.closest('a')){toast('Columna bloquejada: desbloqueja-la al menú ⋯ de la capçalera.');return}
   const gmv=e.target.closest('button[data-bk]');if(gmv){e.stopPropagation();mouBloc(sub,gmv.dataset.bk,+gmv.dataset.d);rLlibreta();return}
   const mv=e.target.closest('[data-mv]');if(mv){e.stopPropagation();mouCol(sub,mv.closest('th').dataset.col,+mv.dataset.mv);rLlibreta();return}
   const plc=e.target.closest('[data-plc]');if(plc){const c=sub.columns.find(x=>x.id===plc.dataset.plc);c.ampAnt=c.amp&&c.amp!=='plegada'?c.amp:'normal';c.amp='plegada';save('plegar columna');rLlibreta();return}
@@ -2710,7 +2721,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cCat').innerHTML='<option value="">— Sense categoria</option>'+sub.categories.map(c=>`<option value="${c.id}">${esc(c.sigla)} · ${esc(c.name)}${sub.tipus==='llista'?'':' ('+c.weight+'%)'}</option>`).join('');
   $('#cCat').value=colEd?(sub.categories.some(k=>k.id===colEd.cat)?colEd.cat:''):(sub.categories[0]?.id||'');
   $('#cTipus').disabled=!!colEd&&(Object.keys(sub.grades[colEd.id]||{}).length>0||colEd.type==='ext');
-  $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;colColor=colEd?.color||'#D9D9D9';pintaColColor();$('#cFr').value=colEd?.franja||'';
+  $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;$('#cBloq').checked=!!colEd?.bloq;colColor=colEd?.color||'#D9D9D9';pintaColColor();$('#cFr').value=colEd?.franja||'';
   $('#cDel').style.visibility=colEd?'visible':'hidden';$('#cDup').style.display=colEd&&colEd.type!=='final'&&colEd.type!=='classe'?'':'none';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
 function tipusUI(inici){const t=$('#cTipus').value;
   $('#cMaxF').style.display=t==='num'?'flex':'none';$('#cClasseF').style.display=t==='classe'?'block':'none';
@@ -2803,10 +2814,10 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   if(type==='icones'){const ic=splitIcones($('#cIcones').value);if(ic.length<2)return toast('Posa com a mínim dues icones (fins a 5).');o.icons=ic}
   if(type==='classe'){o.classes=[...new Set($('#cClasses').value.split('\n').map(x=>x.trim()).filter(Boolean))]}
   if(type==='ext'){if(!$('#cSrc').value)return toast('No hi ha cap llibreta enllaçada. Primer duplica una llibreta.');o.src=$('#cSrc').value;o.item=$('#cItem').value}
-  o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;o.color=colColor;const fr=$('#cFr').value.trim();if(fr)o.franja=fr;else delete o.franja;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
+  o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;if($('#cBloq').checked)o.bloq=true;else delete o.bloq;o.color=colColor;const fr=$('#cFr').value.trim();if(fr)o.franja=fr;else delete o.franja;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
   /* si una columna surt d'una categoria, es queda al costat d'on era */
   if(colEd&&colEd.cat&&!o.cat&&sub.categories.some(k=>k.id===colEd.cat)){sincBlocs(sub);const i=sub.blocs.findIndex(x=>x.t==='cat'&&x.id===colEd.cat);sub.blocs.splice(i+1,0,{t:'col',id:colEd.id})}
-  if(colEd)Object.assign(colEd,o);else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
+  if(colEd){Object.assign(colEd,o);if(!o.bloq)delete colEd.bloq;if(!o.franja)delete colEd.franja}else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
 $('#cDel').onclick=async()=>{const sub=cur();if(!await confirma(`Eliminar la columna «${colEd.name}» i totes les seves dades?`,'Elimina'))return;
   sub.columns=sub.columns.filter(c=>c!==colEd);delete sub.grades[colEd.id];save('eliminar columna');$('#dlgCol').close();rLlibreta()};
 function omple(totes){const sub=cur(),arr=$('#cArr').value;let n=0;snapshot(sub);
@@ -3071,7 +3082,7 @@ function obreHMenu(btn){const sub=cur(),c=sub.columns.find(x=>x.id===btn.dataset
   m.innerHTML=`<div style="padding:6px 10px;font-weight:700;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
     <button data-ha="prop">✎ Propietats…</button>${ord?`<button data-ha="ord">⇅ Ordena per aquesta columna</button>`:''}<button data-ha="pleg">👁 Plega</button>
     <button data-ha="esq" ${btn.dataset.first==='1'?'disabled':''}>← Mou a l'esquerra</button><button data-ha="dre" ${btn.dataset.last==='1'?'disabled':''}>→ Mou a la dreta</button>
-    ${dup?`<button data-ha="dup">⧉ Duplica</button>`:''}<button data-ha="data">📅 Posa la data d'avui al nom</button>
+    ${dup?`<button data-ha="dup">⧉ Duplica</button>`:''}<button data-ha="data">📅 Posa la data d'avui al nom</button>${RO()?'':`<button data-ha="bloq">${CANDAU} ${c.bloq?'Desbloqueja':'Bloqueja'}</button>`}
     ${c.type==='grup'?`<hr><button data-ha="gmos">👥 ${sub.mostra==='gp:'+c.id?'Treu la vista per grups':'Mostra per grups'}</button>${RO()?'':`<button data-ha="gatz">🎲 Grups a l'atzar…</button>`}`:''}`;
   m.dataset.col=c.id;$$('.hdots.on').forEach(x=>x.classList.remove('on'));btn.classList.add('on');
   const r=btn.getBoundingClientRect();m.style.display='block';m.style.left=Math.min(r.left,innerWidth-250)+'px';m.style.top=Math.min(r.bottom+4,innerHeight-m.offsetHeight-8)+'px';m.querySelector('[data-ha]').focus()}
@@ -3079,6 +3090,7 @@ function tancaHMenu(){$('#hMenu').style.display='none';$$('.hdots.on').forEach(x
 $('#hMenu').addEventListener('click',e=>{const b=e.target.closest('[data-ha]');if(!b||b.disabled)return;const sub=cur(),id=$('#hMenu').dataset.col,c=sub.columns.find(x=>x.id===id);tancaHMenu();if(!c)return;
   const a=b.dataset.ha;
   if(a==='prop')return obreCol(id);
+  if(a==='bloq'){if(c.bloq)delete c.bloq;else c.bloq=true;save(c.bloq?'bloquejar columna':'desbloquejar columna');toast(c.bloq?'Columna bloquejada.':'Columna desbloquejada.');return rLlibreta()}
   if(a==='gmos'){sub.mostra=sub.mostra==='gp:'+id?'tots':'gp:'+id;save(null,true);return rLlibreta()}
   if(a==='gatz')return grupsAtzar(sub,c);
   if(a==='ord'){const k='col:'+id;if(sub.ordre!==k){sub.ordre=k;sub.ordreDir='desc'}else if(sub.ordreDir==='desc')sub.ordreDir='asc';else{sub.ordre='cognoms';sub.ordreDir='desc'}save(null,true);return rLlibreta()}
