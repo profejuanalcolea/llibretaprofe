@@ -547,6 +547,35 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 .candw{display:inline-flex;vertical-align:middle;margin-left:4px;color:#8a8a8a}.cand{display:block}
 #hMenu .cand{display:inline-block;vertical-align:-1px;margin-right:2px;color:#555}
 td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{color:inherit;opacity:1;-webkit-text-fill-color:currentColor;cursor:not-allowed}
+
+/* 2.5 · Animacions de l'Ammo (entrada i crèdits) */
+#lgAmmo{position:relative}#lgAmmo svg{width:88px;height:auto;margin-left:4px;overflow:visible}#credAmmo{position:relative;cursor:pointer}#credAmmo svg{overflow:visible}
+.amb .jump,.amb .bob,.amb .body,.amb .tent,.amb .eye,.amb .lid,.amb .spark{transform-box:fill-box}
+.amb .afx{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.amb.am-flota .bob{animation:amFlota 3.2s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes amFlota{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.amb.am-parpella .eye{animation:amUll 1.2s}.amb.am-parpella .lid{animation:amPar 1.2s}
+@keyframes amUll{0%,30%,48%,62%,80%,100%{opacity:1}32%,46%,64%,78%{opacity:0}}@keyframes amPar{0%,30%,48%,62%,80%,100%{opacity:0}32%,46%,64%,78%{opacity:1}}
+.amb.am-saluda .tent{animation:amTent .32s ease-in-out 4 alternate;transform-origin:0% 50%}.amb.am-saluda .tent:nth-of-type(2){animation-delay:.08s}.amb.am-saluda .tent:nth-of-type(3){animation-delay:.16s}
+@keyframes amTent{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+.amb.am-salta .jump{animation:amSalta .9s cubic-bezier(.3,.7,.4,1);transform-origin:50% 100%}
+@keyframes amSalta{0%{transform:translateY(0) scale(1,1)}15%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-22px) scale(.96,1.05)}75%{transform:translateY(0) scale(1.08,.92)}100%{transform:none}}
+.amb.am-gira svg{animation:amGira 1s ease-in-out;transform-origin:50% 55%}@keyframes amGira{to{transform:rotate(360deg)}}
+.amb.am-balanc svg{animation:amBal 1.8s ease-in-out;transform-origin:50% 60%}@keyframes amBal{0%,100%{transform:rotate(0)}25%{transform:rotate(-22deg)}70%{transform:rotate(18deg)}}
+.amb.am-mira .jump{animation:amMira 2.4s ease-in-out;transform-origin:50% 50%}@keyframes amMira{0%,100%{transform:scaleX(1)}12%,55%{transform:scaleX(-1)}}
+.amb.am-idea .spark{animation:amSpark 1.4s ease-out;transform-origin:50% 50%}.amb.am-idea .eye{animation:amObre 1.4s;transform-origin:50% 50%}
+@keyframes amSpark{0%{opacity:0;transform:scale(.2) rotate(0)}20%{opacity:1;transform:scale(1.3) rotate(40deg)}60%{opacity:1;transform:scale(1) rotate(90deg)}100%{opacity:0;transform:scale(.6) rotate(140deg)}}
+@keyframes amObre{0%,100%{transform:scale(1)}20%,60%{transform:scale(1.25)}}
+/* s'amaga dins la closca i dorm; en despertar, torna a sortir */
+.amb.am-amaga .body{animation:amAmaga .7s ease-in forwards;transform-origin:0% 0%}
+@keyframes amAmaga{to{transform:translate(-3px,-5px) scale(.08);opacity:0}}
+.amb.am-surt .body{animation:amSurt .6s cubic-bezier(.3,1.5,.5,1);transform-origin:0% 0%}
+@keyframes amSurt{from{transform:translate(-3px,-5px) scale(.08);opacity:0}to{transform:none;opacity:1}}
+.amb .abub{position:absolute;border:2px solid #4a90c2;border-radius:50%;opacity:0;animation:amBub 1.7s ease-out forwards}
+@keyframes amBub{0%{opacity:0;transform:translateY(0) scale(.4)}15%{opacity:.9}100%{opacity:0;transform:translateY(-60px) scale(1)}}
+.amb .azz{position:absolute;font:800 14px Inter,system-ui,sans-serif;color:#7a5a3a;opacity:0;animation:amZz 2.6s ease-out forwards}
+@keyframes amZz{0%{opacity:0;transform:translate(0,0) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translate(22px,-44px) scale(1.25)}}
+@media(prefers-reduced-motion:reduce){.amb *,.amb{animation:none!important}}
 </style>
 </head>
 <body>
@@ -603,7 +632,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 </div>
 
 <div id="login">
-  <div id="lgAmmo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="70" height="67" aria-hidden="true"><g class="jump"><g class="bob">
+  <div id="lgAmmo" class="amb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="70" height="67" aria-hidden="true"><g class="jump"><g class="bob">
  <g class="body">
   <path class="tent" d="M60 72 q8 -2 14 -8" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
   <path class="tent" d="M61 78 q9 0 16 -2" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
@@ -775,7 +804,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 
 <!-- Crèdits -->
 <dialog id="dlgCred" style="text-align:center;min-width:340px">
-  <div id="credAmmo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="84" height="80" aria-label="Ammo, la mascota ammonit"><g class="jump"><g class="bob">
+  <div id="credAmmo" class="amb" title="Clica l'Ammo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="84" height="80" aria-label="Ammo, la mascota ammonit"><g class="jump"><g class="bob">
  <g class="body">
   <path class="tent" d="M60 72 q8 -2 14 -8" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
   <path class="tent" d="M61 78 q9 0 16 -2" fill="none" stroke="#141414" stroke-width="2.8" stroke-linecap="round"/>
@@ -805,7 +834,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.4.2 · ammonite · novembre 2026',COMPILACIO='17/11 11:40';
+const VERSIO='2.5 · ammonite · novembre 2026',COMPILACIO='17/11 21:33';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1323,7 +1352,7 @@ function surt(){try{if(G.token)google.accounts.oauth2.revoke(G.token,()=>{})}cat
   G.token=null;G.fileId=null;G.rev=null;G.brut=false;state=null;iniciaHist();$('#main').innerHTML='';mostraLogin();estat();renderSel();pintaAlie();
   if(alie)pregunta('Tanca també la sessió de Google','Aquest ordinador és d\'una altra persona. La llibreta ja no hi és, però el teu compte de Google encara pot estar obert en aquest navegador: tanca-li la sessió (a google.com, la teva foto › Tanca la sessió).',[{t:'Entesos',v:1}])}
 $('#btnSurt').onclick=async()=>{if(G.brut){await driveDesa();if(G.brut&&!await confirma('Hi ha canvis que encara no s\'han pogut pujar al Drive. Si surts ara, es perdran.','Surt igualment','Canvis pendents'))return}surt()};
-function mostraLogin(){$('#login').style.display='flex';aplicaMob();const la=$('#lgAmmo');la.classList.remove('anim');void la.offsetWidth;la.classList.add('anim');const c=llegeixCache();$('#lgOff').hidden=!c;
+function mostraLogin(){$('#login').style.display='flex';aplicaMob();setTimeout(amEntrada,0);const c=llegeixCache();$('#lgOff').hidden=!c;
   $('#lgOff').textContent=c?.pendent?'Continua sense connexió (hi ha canvis pendents de pujar)':'Continua sense connexió amb la còpia d\'aquest ordinador';
   $('#lgEntra').textContent=G.email?'Entra amb Google ('+G.email+')':'Entra amb Google'}
 $('#lgEntra').onclick=driveEntra;
@@ -2198,6 +2227,26 @@ function obreCmMenu(btn){if($('#cmMenu')){$('#cmMenu').remove();return}const sub
 document.addEventListener('pointerdown',e=>{if($('#cmMenu')&&!e.target.closest('#cmMenu,[data-cmode]'))$('#cmMenu').remove()},true);
 document.addEventListener('click',e=>{const b=e.target.closest('[data-cmode]');if(b){e.stopPropagation();obreCmMenu(b)}},true);
 
+/* 2.5 · Animacions de l'Ammo */
+const AM_ACC=['parpella','saluda','salta','gira','balanc','mira','idea','bombolles'],AM_DUR={parpella:1300,saluda:1500,salta:1000,gira:1100,balanc:1900,mira:2500,idea:1500,bombolles:1900};
+const amReduit=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function amFx(el,k){let f=el.querySelector('.afx');if(!f){f=document.createElement('div');f.className='afx';el.appendChild(f)}f.innerHTML='';
+  if(k==='bombolles')[0,1,2].forEach(i=>{const b=document.createElement('i');b.className='abub';const z=6+i*3;b.style.cssText=`width:${z}px;height:${z}px;left:${60+i*5}%;top:56%;animation-delay:${i*.35}s`;f.appendChild(b)});
+  if(k==='zz')[0,1,2].forEach(i=>{const z=document.createElement('span');z.className='azz';z.textContent='z';z.style.cssText=`left:55%;top:30%;font-size:${11+i*4}px;animation-delay:${i*.7}s`;f.appendChild(z)})}
+function amFes(el,k,base='flota'){if(!el||amReduit())return;el.className='amb'+(base?' am-'+base:'');void el.offsetWidth;el.classList.add('am-'+k);amFx(el,k);
+  clearTimeout(el._t);if(k!=='amaga')el._t=setTimeout(()=>{el.classList.remove('am-'+k)},AM_DUR[k]||1500)}
+const AM={ult:'',t:null,quiet:0,dorm:false};
+function amTria(){let k;do k=AM_ACC[Math.floor(Math.random()*AM_ACC.length)];while(k===AM.ult);AM.ult=k;return k}
+/* entrada: flota sempre; cada 6-10 s una acció; si fa 60 s que no es toca res, s'amaga a la closca i dorm */
+function amEntrada(){const el=$('#lgAmmo');clearTimeout(AM.t);if(!el||amReduit())return;AM.quiet=Date.now();AM.dorm=false;el.className='amb am-flota';setTimeout(()=>amFes(el,'saluda'),500);
+  const tic=()=>{if(getComputedStyle($('#login')).display==='none')return;
+    if(!AM.dorm&&Date.now()-AM.quiet>60000){AM.dorm=true;amFes(el,'amaga',null);const zz=()=>{if(AM.dorm&&getComputedStyle($('#login')).display!=='none'){amFx(el,'zz');AM.zt=setTimeout(zz,3200)}};AM.zt=setTimeout(zz,800)}
+    else if(!AM.dorm)amFes(el,amTria());
+    AM.t=setTimeout(tic,6000+Math.random()*4000)};
+  AM.t=setTimeout(tic,6000+Math.random()*3000)}
+['pointermove','keydown','pointerdown','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{AM.quiet=Date.now();if(AM.dorm){AM.dorm=false;clearTimeout(AM.zt);const el=$('#lgAmmo');amFes(el,'surt');el.querySelector('.afx')&&(el.querySelector('.afx').innerHTML='');setTimeout(()=>amFes(el,'parpella'),700)}},{passive:true}));
+$('#credAmmo').addEventListener('click',()=>amFes($('#credAmmo'),amTria(),null));
+
 /* ======================= Alumnat del curs (llistats oficials, comuns a totes les llibretes) ======================= */
 const grupOrd=(a,b)=>a.localeCompare(b,'ca',{numeric:true});
 function alumnatDe(k=cursKey(),ambBaixes=false){return (state.alumnat||[]).filter(a=>a.curs===k&&(ambBaixes||!a.baixa))}
@@ -2894,7 +2943,7 @@ $('#tabs').onclick=e=>{const b=e.target.closest('button');if(!b||!state)return;t
 $$('.tabic').forEach(b=>b.onclick=()=>{if(!state)return;tab=tab===b.dataset.t?tabPrincipal:b.dataset.t;render()});
 $('#btnCopia').onclick=()=>copia();
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key.toLowerCase()==='f'&&state&&tab==='llibreta'){e.preventDefault();plegaCap()}});
-$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO+' · compilació '+COMPILACIO;const a=$('#credAmmo');a.classList.remove('anim');$('#dlgCred').showModal();void a.offsetWidth;a.classList.add('anim')};$('#credX').onclick=()=>$('#dlgCred').close();
+$('#logo').onclick=()=>{$('#credVer').textContent=VERSIO+' · compilació '+COMPILACIO;$('#dlgCred').showModal();setTimeout(()=>amFes($('#credAmmo'),'saluda',null),250)};$('#credX').onclick=()=>$('#dlgCred').close();
 
 /* ======================= Eines ======================= */
 function nivPosit(p){if(!p.data||p.fet)return '';const d=Math.round((new Date(p.data+'T12:00')-new Date(avui()+'T12:00'))/864e5);

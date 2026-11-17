@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5 · ammonite · novembre 2026
+- **L'Ammo, més viu:** a l'entrada és més gran dins la rodona, flota i cada pocs segons fa alguna cosa a l'atzar (parpelleja, saluda amb els tentacles, salta, fa la volta, es gronxa, mira cap a l'altre costat, té una idea, fa bombolles). Si l'entrada fa un minut que espera, es fica dins la closca i dorm; es desperta en moure el ratolí. Als crèdits saluda i, a cada clic, fa una cosa nova. Res es mou si l'ordinador té activat «reduir el moviment».
+
 ## 2.4.2 · ammonite · novembre 2026
 - Corregit: en treure el text de la franja d'una columna sense categoria a Propietats, no s'esborrava.
 - **Columnes bloquejades** (⋯ o Propietats): candau de línia d'un sol color al costat del nom; les cel·les no es poden canviar (ni enganxar, nota de grup, grups a l'atzar ni Classroom).
