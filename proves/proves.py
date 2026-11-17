@@ -1148,6 +1148,58 @@ def p_mobil_enl(b):
     comprova(not errs, 'errors JS: %s' % errs)
     ctx.close()
 
+@prova('Treball en grup: columna Grups, grups a l\'atzar equilibrats, mostra per grups, ordenar i nota de grup')
+def p_grups(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    pg.evaluate("obreCol()"); pg.wait_for_timeout(300)
+    pg.select_option('#cTipus', 'grup'); pg.fill('#cNom', 'Treball volcans')
+    comprova(pg.is_visible('#cGrupF') and pg.locator('#cGrL input').count() == 6, 'el diàleg de Grups ha de proposar 6 grups')
+    pg.fill('#cGrN', '3'); pg.dispatch_event('#cGrN', 'input'); pg.wait_for_timeout(100)
+    pg.locator('#cGrL input').first.fill('Volcans')
+    pg.click('#dlgCol button:has-text("Desa")'); pg.wait_for_timeout(300)
+    c = pg.evaluate("cur().columns.find(c=>c.name==='Treball volcans')")
+    comprova(c and c['type'] == 'grup' and [o['t'] for o in c['opcions']] == ['Volcans', 'G2', 'G3'] and not c.get('cat'), f'columna: {c}')
+    cid = c['id']; n = pg.evaluate("cur().students.length")
+    # atzar: 3 grups equilibrats
+    pg.evaluate("grupsAtzar(cur(),cur().columns.find(c=>c.id===%r))" % cid); pg.wait_for_timeout(200)
+    pg.click('#atzF'); pg.wait_for_timeout(300)
+    mides = pg.evaluate("(()=>{const c=cur().columns.find(c=>c.id===%r);return c.opcions.map(o=>cur().students.filter(st=>getG(cur(),c.id,st.id)===o.id).length)})()" % cid)
+    comprova(sum(mides) == n and max(mides) - min(mides) <= 1, f'grups desequilibrats: {mides}')
+    comprova(pg.evaluate("cur().mostra") == 'gp:' + cid and pg.locator('#tw tr.sepc').count() == 3, 'ha de mostrar els alumnes per grups, amb una franja per grup')
+    # grups de 4 alumnes
+    pg.evaluate("grupsAtzar(cur(),cur().columns.find(c=>c.id===%r))" % cid); pg.wait_for_timeout(200)
+    pg.check('[name=atzM][value=k]'); pg.fill('#atzK', '4'); pg.click('#atzF'); pg.wait_for_timeout(300)
+    ng = pg.evaluate("cur().columns.find(c=>c.id===%r).opcions.length" % cid)
+    comprova(ng == -(-n // 4), f'grups de 4: {ng} grups per a {n} alumnes')
+    # un sol grup
+    gid = pg.evaluate("cur().columns.find(c=>c.id===%r).opcions[0].id" % cid)
+    pg.select_option('#bMos', 'gg:%s:%s' % (cid, gid)); pg.wait_for_timeout(200)
+    vis = pg.locator('#tw tbody tr[data-s]').count()
+    comprova(vis == pg.evaluate("cur().students.filter(st=>getG(cur(),%r,st.id)===%r).length" % (cid, gid)) and vis > 0, f'un sol grup: {vis}')
+    pg.select_option('#bMos', 'tots'); pg.wait_for_timeout(200)
+    # ordenar per grup
+    pg.select_option('#bOrd', 'col:' + cid); pg.wait_for_timeout(200)
+    ordre = pg.evaluate("[...document.querySelectorAll('#tw tbody tr[data-s]')].map(tr=>cur().columns.find(c=>c.id===%r).opcions.findIndex(o=>o.id===getG(cur(),%r,tr.dataset.s)))" % (cid, cid))
+    comprova(ordre == sorted(ordre), f'ordenar per grup: {ordre}')
+    pg.select_option('#bOrd', 'cognoms'); pg.wait_for_timeout(200)
+    # nota de grup
+    ncol = pg.evaluate("(()=>{const s=cur();const c={id:'gn1',name:'Nota treball',type:'num',cat:'',max:10};s.columns.push(c);save();render();return c.id})()"); pg.wait_for_timeout(200)
+    st0 = pg.evaluate("cur().students[0].id"); g0 = pg.evaluate("getG(cur(),%r,%r)" % (cid, st0))
+    membres = pg.evaluate("cur().students.filter(st=>getG(cur(),%r,st.id)===%r).map(st=>st.id)" % (cid, g0))
+    altre = [x for x in membres if x != st0][0]
+    pg.evaluate("setG(cur(),'gn1',%r,5,1);setG(cur(),'gn1',%r,8,1);save();render()" % (altre, st0)); pg.wait_for_timeout(200)
+    pg.locator(f'#tw td[data-c="gn1"][data-s="{st0}"]').click(button='right'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#anMenu [data-an^="g:"]').count() == 1, 'el clic dret no ofereix «Posa-la a tot el grup»')
+    pg.click('#anMenu [data-an^="g:"]'); pg.wait_for_timeout(200)
+    pg.click('#qBtns button:has-text("Només als buits")'); pg.wait_for_timeout(300)
+    v = pg.evaluate("cur().students.filter(st=>getG(cur(),%r,st.id)===%r).map(st=>getG(cur(),'gn1',st.id))" % (cid, g0))
+    comprova(v.count(8) == len(membres) - 1 and 5 in v, f'nota de grup (només buits): {v}')
+    fora = pg.evaluate("cur().students.filter(st=>getG(cur(),%r,st.id)!==%r).some(st=>getG(cur(),'gn1',st.id)!==undefined)" % (cid, g0))
+    comprova(not fora, 'la nota de grup no ha de sortir del grup')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1227,7 +1279,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

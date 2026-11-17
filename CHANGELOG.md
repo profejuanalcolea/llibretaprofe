@@ -1,5 +1,11 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.4 · ammonite · novembre 2026
+- **Treball en grup:** columna nova de tipus **Grups** (2 a 12 grups, colors automàtics, noms editables; no compta per a la nota).
+  - **🎲 Grups a l'atzar** (menú ⋯): per nombre de grups o d'alumnes per grup, equilibrats, barrejant classes si cal, o només per als que no en tenen.
+  - **Mostra per grups** (franja per grup) i un sol grup; ordenar per la columna.
+  - **Nota de grup:** clic dret a una nota › «Posa-la a tot el grup» (pregunta abans de sobreescriure).
+
 ## 2.3.6 · ammonite · novembre 2026
 - **Atenció a la diversitat:** Personalització, Mesures addicionals i PI es marquen lliurement (cap, alguna o totes). Amb les dues primeres, la ratlla del nom és meitat groga i meitat blava. Les marques que ja hi havia es conserven.
 

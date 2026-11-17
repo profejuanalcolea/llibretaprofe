@@ -536,6 +536,11 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 .mbfc{background:#fff;width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:18px 16px 24px;box-sizing:border-box}
 .mbfc h3{margin:0 0 10px}.mbfc label{display:block;font-weight:600;font-size:14px;margin:10px 0 4px}.mbfc input,.mbfc select{width:100%;box-sizing:border-box;font-size:16px;padding:10px;border:1.5px solid #ccc;border-radius:10px}
 .mbfc .btn{flex:1;padding:12px;font-size:16px}
+
+/* 2.4 · columna Grups */
+#cGrupF{display:none}.grnoms{display:flex;flex-wrap:wrap;gap:6px}.grnom{border-radius:8px;padding:3px}.grnom input{width:110px;border:0;background:rgba(255,255,255,.75);border-radius:6px;padding:4px 6px;font-size:13.5px}
+.grdot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:7px;vertical-align:middle;border:1px solid rgba(255,255,255,.6)}
+.atzr{display:flex;align-items:center;gap:6px;margin:8px 0;font-size:14.5px}
 </style>
 </head>
 <body>
@@ -630,7 +635,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
       <option value="final">Nota final (la poses tu, amb càlcul de referència)</option>
     </optgroup>
     <optgroup label="Seguiment">
-      <option value="check">Check (fet / no fet)</option><option value="opc">Opcions (desplegable propi)</option><option value="dits">Dits 👍 👎</option><option value="icones" id="cTipusIc">Icones (tria-les tu)</option>
+      <option value="check">Check (fet / no fet)</option><option value="opc">Opcions (desplegable propi)</option><option value="grup">Grups (treball en grup)</option><option value="dits">Dits 👍 👎</option><option value="icones" id="cTipusIc">Icones (tria-les tu)</option>
       <option value="inc">Incidències (targetes)</option>
     </optgroup>
     <optgroup label="Informació">
@@ -656,6 +661,10 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
       <button type="button" class="btn sec" id="cOpcAf" style="padding:3px 10px;font-size:13px">＋ Opció</button>
       <span style="font-size:12.5px;color:var(--suau);margin-left:6px">De 2 a 6. Ex.: Lliurat · Tard · No lliurat</span>
       <div class="opcpre" id="cOpcPre"><span style="font-size:12.5px;color:var(--suau)">Suggeriments:</span></div></div></div>
+  </div>
+  <div id="cGrupF">
+    <div class="fl"><label class="lb">Nombre de grups</label><input type="number" id="cGrN" min="2" max="12" style="width:80px"><span style="font-size:12.5px;color:var(--suau)">de 2 a 12 · els pots canviar el nom · no compta per a la nota</span></div>
+    <div class="fl" style="align-items:flex-start"><label class="lb">Noms</label><div class="grnoms" id="cGrL"></div></div>
   </div>
   <div id="cExtF">
     <div class="fl"><label class="lb">Llibreta</label><select id="cSrc"></select></div>
@@ -790,7 +799,7 @@ body.escut #main{pointer-events:none;animation:escutFos 2s ease-out}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.3.6 · ammonite · novembre 2026',COMPILACIO='16/11 21:01';
+const VERSIO='2.4 · ammonite · novembre 2026',COMPILACIO='17/11 10:59';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -799,7 +808,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const fmt=x=>(Math.round(x*100)/100).toLocaleString('ca-ES',{maximumFractionDigits:2});
 const LV=['','NA','AS','AN','AE'];
 const EVAL=['num','ord','ass','ext'];
-const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
+const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
 const METODE={mean:'mitjana',median:'mediana',mode:'moda'};
 const PAL=[['#E69F00','taronja'],['#56B4E9','blau cel'],['#009E73','verd blavós'],['#F0E442','groc'],['#0072B2','blau'],['#D55E00','vermelló'],['#CC79A7','rosa'],['#7F7F7F','gris']];
 const ICONGRUPS=[
@@ -917,7 +926,7 @@ const lvlOrd=(x,s)=>{const[a,b,c]=s.ordCuts;return x<a?1:x<b?2:x<c?3:4};
 function valorText(c,v){if(v===undefined||v===null||v==='')return '';
   if(c.type==='inc')return `${v.y||0}G ${v.r||0}V`;
   if(c.type==='check')return v==='fet'?'fet':'no fet';
-  if(c.type==='opc')return opcDe(c,v)?.t||'';
+  if(c.type==='opc'||c.type==='grup')return opcDe(c,v)?.t||'';
   if(v==='NAV')return NAVT;
   return typeof v==='number'?String(v).replace('.',','):String(v)}
 
@@ -1009,7 +1018,7 @@ function valorOrdre(sub,st,key){const s=sub.settings;
   const v=getG(sub,c.id,st.id);if(v===undefined||v===''||v==='FJ'||v==='NAV')return null;if(v==='F')return 0;
   if(c.type==='num')return v/(c.max||10)*10;if(c.type==='ord')return +v/s.ordMax*10;if(c.type==='ass')return s.assVals[v]??null;
   if(c.type==='final')return typeof v==='number'?v:(s.assVals[v]??null);
-  if(c.type==='opc'){const i=(c.opcions||[]).findIndex(o=>o.id===v);return i<0?null:-i}return null}
+  if(c.type==='opc'||c.type==='grup'){const i=(c.opcions||[]).findIndex(o=>o.id===v);return i<0?null:-i}return null}
 function alumnesOrdenats(sub,ordre){const o=ordre||sub.ordre||'cognoms',a=[...sub.students];
   const kCg=s=>(s.cognoms||s.nom)+' '+s.nom,perCg=(x,y)=>kCg(x).localeCompare(kCg(y),'ca');
   if(o==='cognoms')a.sort(perCg);
@@ -1037,7 +1046,12 @@ function canviaClasse(sub,st,v){v=(v||'').trim();const a=alumneLl(st);
 function propagaGrup(a){let n=0;state.subjects.forEach(sub=>{if(sub.archived)return;sub.students.filter(x=>x.aid===a.id).forEach(x=>{const cl=colClasse(sub);afegeixClasse(cl,a.grup);
   if((getG(sub,cl.id,x.id)||'')!==(a.grup||'')){setG(sub,cl.id,x.id,a.grup||undefined,1);n++}})});return n}
 /* Llista de files visibles: alumnes i, si cal, separadors de classe */
-function filesVisibles(sub,filtre,ordre){const a=alumnesOrdenats(sub,ordre),m=filtre??sub.mostra??'tots';
+function filesVisibles(sub,filtre,ordre){const a=alumnesOrdenats(sub,ordre);let m=filtre??sub.mostra??'tots';
+  if(m.startsWith('gp:')||m.startsWith('gg:')){const [k,cid,gid]=m.split(':'),c=sub.columns.find(x=>x.id===cid&&x.type==='grup');
+    if(c){const gv=st=>getG(sub,cid,st.id);if(k==='gg')return a.filter(st=>gv(st)===gid).map(st=>({st}));
+      const out=[];(c.opcions||[]).forEach(o=>{const l=a.filter(st=>gv(st)===o.id);if(l.length){out.push({sep:o.t,n:l.length,col:o.col});l.forEach(st=>out.push({st}))}});
+      const sg=a.filter(st=>!(c.opcions||[]).some(o=>o.id===gv(st)));if(sg.length){out.push({sep:'Sense grup',n:sg.length});sg.forEach(st=>out.push({st}))}return out}
+    m='tots'}
   if(!colsClasse(sub).length||m==='tots')return a.map(st=>({st}));
   if(m.startsWith('c:')){const k=m.slice(2);return a.filter(st=>classeDe(sub,st)===k).map(st=>({st}))}
   const g=new Map();a.forEach(st=>{const k=classeDe(sub,st);if(!g.has(k))g.set(k,[]);g.get(k).push(st)});
@@ -1395,7 +1409,7 @@ function cella(sub,c,st,cls='',sty=''){const v=getG(sub,c.id,st.id),a=`data-c="$
     return td(dif?'cldif':'',`<select class="g" ${a} ${dis} title="${al?(dif?`Als Llistats del curs és «${esc(al.grup||'—')}». Fes «Recupera les classes» a ⚙ › Alumnes.`:'Ve dels Llistats del curs: si la canvies, es canvia allà i a totes les llibretes.'):'Classe escrita a mà (l\'alumne no és als Llistats del curs)'}">${o.map(x=>`<option value="${esc(x)}" ${(v??'')===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`)}
   case 'check':return td('clk',checkHtml(v),1);
   case 'icones':return td('clk',v?esc(v):'<span class="buida">·</span>',1);
-  case 'opc':{const o=opcDe(c,v);return `<td ${a} class="${cls} opcc${anC}" style="${sty}${o?.col?';background:'+o.col:''}"${anT}><select class="g" ${a} ${dis}><option value=""></option>${(c.opcions||[]).map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.t)}</option>`).join('')}</select>${anI}</td>`}
+  case 'opc':case 'grup':{const o=opcDe(c,v);return `<td ${a} class="${cls} opcc${anC}" style="${sty}${o?.col?';background:'+o.col:''}"${anT}><select class="g" ${a} ${dis}><option value=""></option>${(c.opcions||[]).map(x=>`<option value="${x.id}" ${x.id===v?'selected':''}>${esc(x.t)}</option>`).join('')}</select>${anI}</td>`}
   case 'url':return td('url',urlHtml(v,RO()),1);
   case 'lliure':return td('',`<input class="g lliure" ${a} ${dis} value="${esc(v??'')}"${v?` title="${esc(v)}"`:''}>`);
   case 'inc':return td('inc',incHtml(v),1);
@@ -1418,10 +1432,44 @@ $('#main').addEventListener('mousedown',e=>{const h=e.target.closest('.nomres');
 /* ----- Marca i comentari en una cel·la (privat: no surt a la Vista alumne) ----- */
 let anCel=null;
 function obreAnMenu(td,x,y){if(RO())return;const sub=cur();sub.anot??={};const k=td.dataset.c+'|'+td.dataset.s,an=sub.anot[k]||{};anCel={k,td};
-  const m=$('#anMenu');m.innerHTML=`<button data-an="h">🖍 ${an.h?'Treu la marca':'Marca'}</button><button data-an="t">💬 ${an.t?'Edita el comentari':'Comentari…'}</button>${an.h||an.t?'<button data-an="x">✕ Treu-ho tot</button>':''}`;
+  const m=$('#anMenu');m.innerHTML=`<button data-an="h">🖍 ${an.h?'Treu la marca':'Marca'}</button><button data-an="t">💬 ${an.t?'Edita el comentari':'Comentari…'}</button>${an.h||an.t?'<button data-an="x">✕ Treu-ho tot</button>':''}${grupMenu(sub,td.dataset.c,td.dataset.s)}`;
   m.style.display='block';m.style.left=Math.min(x,innerWidth-200)+'px';m.style.top=Math.min(y,innerHeight-130)+'px';m.querySelector('button').focus()}
 function tancaAnMenu(){$('#anMenu').style.display='none'}
-async function accioAn(acc){const sub=cur();sub.anot??={};if(!anCel)return;const {k}=anCel,an={...(sub.anot[k]||{})};tancaAnMenu();
+/* 2.4 · «Posa aquesta nota a tot el grup» */
+const GRCOPIA=['num','ord','ass','final','check','icones','opc','lliure','dits'];
+function grupMenu(sub,cid,sid){const c=sub.columns.find(x=>x.id===cid),v=getG(sub,cid,sid);if(!c||!GRCOPIA.includes(c.type)||v===undefined||v==='')return '';
+  const gcs=sub.columns.filter(x=>x.type==='grup');return gcs.map(gc=>{const gid=getG(sub,gc.id,sid),o=opcDe(gc,gid);if(!o)return '';
+    const n=sub.students.filter(st=>st.id!==sid&&getG(sub,gc.id,st.id)===gid).length;return n?`<button data-an="g:${gc.id}">👥 Posa-la a tot el grup «${esc(o.t)}»${gcs.length>1?' · '+esc(gc.name):''} (${n})</button>`:''}).join('')}
+async function notaAlGrup(sub,cid,sid,gcid){const c=sub.columns.find(x=>x.id===cid),gc=sub.columns.find(x=>x.id===gcid);if(!c||!gc)return;
+  const v=getG(sub,cid,sid),gid=getG(sub,gcid,sid),altres=sub.students.filter(st=>st.id!==sid&&getG(sub,gcid,st.id)===gid);
+  const plens=altres.filter(st=>{const w=getG(sub,cid,st.id);return w!==undefined&&w!==''&&w!==v});let quins=altres;
+  if(plens.length){const r=await pregunta('👥 Nota de grup',`${plens.length===1?'1 alumne del grup ja té':plens.length+' alumnes del grup ja tenen'} una altra nota a «${c.name}».`,[{t:'Cancel·la',v:null,cls:'sec'},{t:'Només als buits',v:'buits',cls:'sec'},{t:'Sobreescriu',v:'tots'}]);
+    if(!r)return;if(r==='buits')quins=altres.filter(st=>!plens.includes(st))}
+  quins.forEach(st=>setG(sub,cid,st.id,v,1));save('nota de grup');rLlibreta();toast(`👥 Nota posada a ${quins.length} alumne${quins.length===1?'':'s'} del grup. Es pot desfer amb ↶.`)}
+/* 2.4 · Grups a l'atzar, equilibrats; opcionalment barrejant classes */
+function grupsAtzar(sub,c){const sts=sub.students.filter(st=>!st.baixa),cl=colsClasse(sub).length?new Set(sts.map(st=>classeDe(sub,st)).filter(Boolean)):new Set(),teG=sts.some(st=>opcDe(c,getG(sub,c.id,st.id)));
+  let d=$('#dlgAtz');d?.remove();d=document.createElement('dialog');d.id='dlgAtz';d.className='dlg';
+  d.innerHTML=`<h3 style="margin-top:0">🎲 Grups a l'atzar · ${esc(c.name)}</h3><p class="aj">${sts.length} alumnes.</p>
+    <label class="atzr"><input type="radio" name="atzM" value="n" checked> Fes <input type="number" id="atzN" min="2" max="12" value="${(c.opcions||[]).length}" style="width:64px"> grups</label>
+    <label class="atzr"><input type="radio" name="atzM" value="k"> Grups de <input type="number" id="atzK" min="2" max="15" value="4" style="width:64px"> alumnes</label>
+    ${cl.size>1?`<label class="atzr"><input type="checkbox" id="atzBar" checked> Barreja les classes (${[...cl].map(esc).join(', ')})</label>`:''}
+    ${teG?`<label class="atzr"><input type="checkbox" id="atzBuits"> Només els alumnes sense grup (no toca els que ja en tenen)</label>`:''}
+    <p class="aj">Es pot desfer amb ↶. Després els pots retocar a mà.</p>
+    <div class="fl" style="justify-content:flex-end"><button class="btn sec" id="atzC">Cancel·la</button><button class="btn" id="atzF">🎲 Fes els grups</button></div>`;
+  document.body.appendChild(d);d.showModal();$('#atzC').onclick=()=>d.close();
+  $('#atzF').onclick=()=>{const buits=$('#atzBuits')?.checked,bar=$('#atzBar')?.checked;
+    let pool=buits?sts.filter(st=>!opcDe(c,getG(sub,c.id,st.id))):[...sts];if(!pool.length){d.close();return toast('Tots els alumnes ja tenen grup.')}
+    const mode=d.querySelector('[name=atzM]:checked').value;let n=mode==='k'?Math.ceil(sts.length/Math.max(2,+$('#atzK').value||4)):+$('#atzN').value||c.opcions.length;n=Math.max(2,Math.min(12,n));
+    if(buits)n=c.opcions.length;else{while(c.opcions.length<n)c.opcions.push({id:uid(),t:'G'+(c.opcions.length+1),col:GRCOL[c.opcions.length]});if(c.opcions.length>n)c.opcions.length=n}
+    const bar6=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+    if(bar&&!buits){const per=new Map();bar6(pool).forEach(st=>{const k=classeDe(sub,st);if(!per.has(k))per.set(k,[]);per.get(k).push(st)});const ls=[...per.values()].sort((x,y)=>y.length-x.length);pool=[];
+      while(ls.some(l=>l.length))ls.forEach(l=>{if(l.length)pool.push(l.shift())})}else bar6(pool);
+    sub.grades[c.id]??={};const g=sub.grades[c.id];if(!buits)Object.keys(g).forEach(k=>delete g[k]);
+    const mida=c.opcions.map(o=>sts.filter(st=>g[st.id]===o.id).length);
+    pool.forEach(st=>{let m=Math.min(...mida);const cand=mida.map((x,i)=>x===m?i:-1).filter(i=>i>=0),i=cand[Math.floor(Math.random()*cand.length)];g[st.id]=c.opcions[i].id;mida[i]++});
+    d.close();sub.mostra='gp:'+c.id;save('grups a l\'atzar');rLlibreta();toast(`🎲 ${pool.length} alumnes repartits en ${c.opcions.length} grups. Es pot desfer amb ↶.`,5000)}}
+async function accioAn(acc){const sub=cur();sub.anot??={};if(!anCel)return;
+  if(acc.startsWith('g:')){const [cid,sid]=anCel.k.split('|');tancaAnMenu();return notaAlGrup(sub,cid,sid,acc.slice(2))}const {k}=anCel,an={...(sub.anot[k]||{})};tancaAnMenu();
   if(acc==='h')an.h=an.h?undefined:1;
   else if(acc==='t'){const [cid,sid]=k.split('|'),c=sub.columns.find(x=>x.id===cid),st=sub.students.find(x=>x.id===sid);
     const t=await pregunta('💬 Comentari de la cel·la',`${c?.name||''} · ${st?nomComplet(st):''}. Només el veus tu (no surt a la Vista alumne).`,[{t:'Cancel·la',v:false,cls:'sec'},{t:'Desa',v:true}],an.t||'');if(t===false||t===null)return;an.t=t.trim()||undefined}
@@ -1449,7 +1497,7 @@ function totalCella(sub,c,sts){if(c.amp==='plegada')return '<td class="plcc"></t
     case 'ext':{const rs=sts.map(st=>resolveExt(sub,c,st)).filter(r=>r&&r.k==='num');if(rs.length){t='Ø '+fmt(mean(rs.map(r=>r.x)));tt='Mitjana (sobre 10)'}break}
     case 'check':{const f=vals.filter(v=>v==='fet').length;t=`${f}/${sts.length} ✔`;tt='Fets sobre el total';break}
     case 'icones':{t=iconesDe(c).map(i=>{const n=vals.filter(v=>v===i).length;return n?`${i}${n}`:''}).filter(Boolean).join(' ');break}
-    case 'opc':{t=(c.opcions||[]).map(o=>{const n=vals.filter(v=>v===o.id).length;return n?`${n} ${esc(o.t)}`:''}).filter(Boolean).join(' · ');tt='Recompte de cada opció';break}
+    case 'opc':case 'grup':{t=(c.opcions||[]).map(o=>{const n=vals.filter(v=>v===o.id).length;return n?`${n} ${esc(o.t)}`:''}).filter(Boolean).join(' · ');tt='Recompte de cada opció';break}
     case 'inc':{let y=0,r=0;vals.forEach(v=>{y+=v.y||0;r+=v.r||0});t=(y?`<span class="tg y"></span>${y}`:'')+(r?`<span class="tg r"></span>${r}`:'');tt='Total de targetes';break}
   }
   return `<td class="tot" title="${esc(tt)}">${t}</td>`}
@@ -1465,14 +1513,16 @@ function subtitolCol(sub,c){
 /* ======================= Pestanya Llibreta ======================= */
 function opcionsOrdre(sub){const o=sub.ordre||'cognoms',op=(v,t)=>`<option value="${v}" ${o===v?'selected':''}>${esc(t)}</option>`;
   const avals=grups(sub).flatMap(g=>g.cols).filter(c=>['num','ord','ass','final','ext'].includes(c.type));
-  if(sub.tipus==='llista')return op('cognoms','cognoms')+op('nom','nom')+op('llista','ordre de la llista');
-  return op('cognoms','cognoms')+op('nom','nom')+op('llista','ordre de la llista')+
+  if(sub.tipus==='llista')return op('cognoms','cognoms')+op('nom','nom')+op('llista','ordre de la llista')+sub.columns.filter(c=>c.type==='grup').map(c=>op('col:'+c.id,'👥 '+c.name)).join('');
+  const grs=sub.columns.filter(c=>c.type==='grup');
+  return op('cognoms','cognoms')+op('nom','nom')+op('llista','ordre de la llista')+(grs.length?`<optgroup label="Per grup">${grs.map(c=>op('col:'+c.id,'👥 '+c.name)).join('')}</optgroup>`:'')+
     `<optgroup label="Per nota">${op('calc','càlcul ponderat')}${sub.categories.map(c=>op('cat:'+c.id,'categoria · '+c.name)).join('')}${avals.map(c=>op('col:'+c.id,c.name)).join('')}</optgroup>`}
 const ordrePerNota=sub=>!['cognoms','nom','llista'].includes(sub.ordre||'cognoms');
 function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
   const m=$('#main'),old=$('#tw'),sx=old?.scrollLeft||0,sy=old?.scrollTop||0,ro=RO();
   const cls=colsClasse(sub),clas=classesDe(sub),mostra=sub.mostra||'tots';
-  const mosH=cls.length?`<label><span class="lt">Mostra </span><select id="bMos"><option value="tots" ${mostra==='tots'?'selected':''}>tots</option><option value="perclasse" ${mostra==='perclasse'?'selected':''}>tots per classes</option>${clas.map(k=>`<option value="c:${esc(k)}" ${mostra==='c:'+k?'selected':''}>${esc(k)}</option>`).join('')}</select></label>`:'';
+  const gcs=sub.columns.filter(c=>c.type==='grup'),so=(v,t)=>`<option value="${esc(v)}" ${mostra===v?'selected':''}>${esc(t)}</option>`;
+  const mosH=cls.length||gcs.length?`<label><span class="lt">Mostra </span><select id="bMos">${so('tots','tots')}${cls.length?so('perclasse','tots per classes')+clas.map(k=>so('c:'+k,k)).join(''):''}${gcs.map(c=>`<optgroup label="👥 ${esc(c.name)}">${so('gp:'+c.id,'per grups')}${(c.opcions||[]).map(o=>so('gg:'+c.id+':'+o.id,o.t)).join('')}</optgroup>`).join('')}</select></label>`:'';
   const ordH=`<label><span class="lt">Ordena per </span><select id="bOrd">${opcionsOrdre(sub)}</select></label>${ordrePerNota(sub)?`<button class="btn sec" id="bDir" title="Canvia el sentit">${sub.ordreDir==='asc'?'↑<span class="lt"> de baixa a alta</span>':'↓<span class="lt"> de alta a baixa</span>'}</button>`:''}`;
   const mini=capPlegada()?`${ro?'':'<button class="btn" id="bCol" title="Nova columna">＋<span class="lt"> Columna</span></button>'}${mosH}${ordH}${ocultesXip(sub)}`:'';
   let barra=capPlegada()?mini:`<div class="cbr1">
@@ -1517,7 +1567,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No compta per a la nota">⊘</span> ':''}${esc(c.name)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
-  h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
+  h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${r.col?`<i class="grdot" style="background:${r.col}"></i>`:''}${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
     return `<tr data-s="${st.id}">`+fix.map((f,fi)=>f.k==='cognoms'?`<td class="fx ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.cognoms||'')}</td>`
       :f.k==='nom'?`<td class="fx nomc ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.nom)}</td>`
       :cella(sub,f.c,st,'fx cl '+(f.last?'fxlast':''),stf(f))).join('')+
@@ -1695,7 +1745,7 @@ function valorVista(sub,c,st){const v=getG(sub,c.id,st.id);
   if(c.type==='ext'){const r=resolveExt(sub,c,st);return r?`<span class="vchip ${r.k==='fj'?'vFJ':r.k==='nav'?'vNAV':r.label==='F'?'vF':r.lvl?'l'+r.lvl:''}">${esc(r.label)}</span>`:'<span class="buida">—</span>'}
   if(v===undefined||v==='')return '<span class="buida">—</span>';
   if(v==='F'||v==='FJ'||v==='NAV')return `<span class="vchip ${faltaCls(v)}">${v==='NAV'?NAVT:v}</span>`;
-  if(c.type==='opc'){const o=opcDe(c,v);return o?`<span class="vchip" style="${o.col?'background:'+o.col:''}">${esc(o.t)}</span>`:'<span class="buida">—</span>'}
+  if(c.type==='opc'||c.type==='grup'){const o=opcDe(c,v);return o?`<span class="vchip" style="${o.col?'background:'+o.col:''}">${esc(o.t)}</span>`:'<span class="buida">—</span>'}
   switch(c.type){case 'num':return `<span class="vchip l${lvlNum(v/(c.max||10)*10,sub.settings)}">${fmt(v)}${(c.max||10)!==10?' / '+c.max:''}</span>`;
     case 'ord':return `<span class="vchip l${lvlOrd(+v,sub.settings)}">${v}</span>`;case 'ass':return `<span class="vchip l${LV.indexOf(v)}">${v}</span>`;
     case 'final':return `<span class="vchip l${lvlFinal(v,sub.settings)}"><b>${esc(String(v).replace('.',','))}</b></span>`;
@@ -1970,7 +2020,7 @@ function textCella(sub,c,st){const v=getG(sub,c.id,st.id);
   if(v==='NAV')return NAVT;
   switch(c.type){case 'num':return typeof v==='number'?fmt(v)+((c.max||10)!==10?'/'+c.max:''):v;case 'final':return typeof v==='number'?fmt(v):v;
     case 'check':return v==='fet'?'Sí':v==='no'?'No':'';case 'inc':return (v.y?v.y+' G':'')+(v.r?' '+v.r+' V':'');case 'url':return 'enllaç';
-    case 'icones':return pt(v)||'•';case 'opc':return pt(opcDe(c,v)?.t||'');default:return pt(valorText(c,v))}}
+    case 'icones':return pt(v)||'•';case 'opc':case 'grup':return pt(opcDe(c,v)?.t||'');default:return pt(valorText(c,v))}}
 function nomFitxer(t){return t.replace(/[\\/:*?"<>|]/g,'-').slice(0,120)}
 const PDFCOL={1:[255,214,214],2:[255,241,184],3:[214,236,255],4:[212,245,217]};
 function pdfLlibreta(doc,sub,primera,ambDiv){const M=10,W=doc.internal.pageSize.getWidth(),ara=new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'});
@@ -2387,6 +2437,10 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>↶ ↷</b> desfan i refan qualsevol canvi (fins a 30 passos).</li>
     <li><b>És el teu ordinador?</b> Es pregunta el primer cop que entres en un navegador. En un ordinador d'una altra persona la llibreta només dura mentre la pestanya és oberta; en acabar, surt (⚙ › Dades › Surt) i tanca també la sessió de Google. Si t'equivoques, ⚙ › Dades › «Esborra la còpia d'aquest ordinador».</li>
     <li>Si obres la llibreta en <b>dues pestanyes</b>, te n'avisa i en deixa treballar només una. Si s'ha desat fa poc des d'<b>un altre ordinador</b>, també t'avisa.</li></ul>`)+
+  sec('Treball en grup',`<ul><li>Columna de tipus <b>Grups</b> (＋ Columna › Grups): tries quants grups (de 2 a 12), es diuen G1, G2… amb un color cadascun i els pots canviar el nom. No compta per a la nota. En pots tenir més d'una (una per treball).</li>
+    <li><b>⋯ › 🎲 Grups a l'atzar</b>: tria quants grups o quants alumnes per grup; els reparteix equilibrats i, si hi ha alumnes de diverses classes, les pot barrejar. També pot omplir només els alumnes sense grup.</li>
+    <li><b>⋯ › 👥 Mostra per grups</b> (o <b>Mostra</b> › per grups / un sol grup): els alumnes surten agrupats amb una franja per grup. També es pot ordenar per la columna (⇅ o «Ordena per»).</li>
+    <li><b>Nota de grup</b>: posa la nota a un alumne, fes <b>clic dret</b> a la cel·la i tria <b>«👥 Posa-la a tot el grup»</b>. Si algú del grup ja té una altra nota, pregunta si la sobreescriu o només omple els buits. Es pot desfer amb ↶.</li></ul>`)+
   sec('Columnes i notes',`<ul><li><b>＋ Columna</b>: Numèrica, Escala ordinal, Assoliments, D'una altra llibreta, Nota final, Check, Opcions (un desplegable amb les teves opcions i colors, amb suggeriments d'un clic: 😊 😐 😞, 🟢 🟡 🔴, 👍 👎, ⭐, ✔ ✘; també hi pots posar qualsevol icona amb Windows + .), Dits, Incidències, Classe, URL i Lliure.</li>
     <li>En passar el ratolí pel títol d'una columna surt el botó <b>⋯</b>: propietats, ordenar, plegar, moure, duplicar i posar la data d'avui al nom. Les columnes també es mouen <b>arrossegant el títol</b> dins de la seva categoria. Una columna plegada es desplega clicant-la.</li>
     <li>Al nom de la columna: <b>📅</b> hi posa la data d'avui (el nom el pots continuar escrivint). Al quadre d'una columna que ja existeix, <b>⧉ Duplica</b> en fa una còpia buida amb la data d'avui.</li>
@@ -2530,11 +2584,11 @@ function valorDe(sub,c,raw){const v=String(raw??'').trim();if(v==='')return{ok:t
   case 'final':{if(/^(na|as|an|ae)$/i.test(v))return{ok:true,val:v.toUpperCase()};const n=+v.replace(',','.');return isNaN(n)||n<0||n>10?{ok:false}:{ok:true,val:n}}
   case 'check':{const k=norm(v);if(['fet','x','si','1','ok','✔','✓'].includes(k)||v==='✔'||v==='✓')return{ok:true,val:'fet'};if(['no','0','no fet','✘'].includes(k)||v==='✘')return{ok:true,val:'no'};return{ok:false}}
   case 'icones':return iconesDe(c).includes(v)?{ok:true,val:v}:{ok:false};
-  case 'opc':{const o=(c.opcions||[]).find(x=>x.id===v||normOpc(x.t)===normOpc(v));return o?{ok:true,val:o.id}:{ok:false}}
+  case 'opc':case 'grup':{const o=(c.opcions||[]).find(x=>x.id===v||normOpc(x.t)===normOpc(v));return o?{ok:true,val:o.id}:{ok:false}}
   case 'url':return{ok:true,val:/^https?:\/\//i.test(v)?v:'https://'+v};
   case 'classe':case 'lliure':return{ok:true,val:v};
   default:return{ok:false}}}
-const ENGANXABLES=['num','ord','ass','final','check','icones','opc','url','classe','lliure'];
+const ENGANXABLES=['num','ord','ass','final','check','icones','opc','grup','url','classe','lliure'];
 function refrescaCella(sub,c,stId){const td=document.querySelector(`td[data-c="${c.id}"][data-s="${stId}"]`);if(!td)return;
   const st=sub.students.find(s=>s.id===stId);const fx=td.classList.contains('fx');
   td.outerHTML=cella(sub,c,st,fx?td.className.split(' ').filter(x=>['fx','cl','fxlast'].includes(x)).join(' '):'',fx?td.getAttribute('style'):'')}
@@ -2547,7 +2601,7 @@ $('#main').addEventListener('change',e=>{const el=e.target;if(!el.classList.cont
   setG(sub,c.id,stId,r.val);
   if(el.tagName==='INPUT'&&typeof r.val==='string'&&c.type!=='lliure'){const vis=r.val==='NAV'?NAVT:r.val;if(el.value!==vis)el.value=vis}
   if(el.tagName==='INPUT')el.defaultValue=el.value;
-  if(c.type==='opc'){refrescaCella(sub,c,stId);actualitzaFila(stId);return}
+  if(c.type==='opc'||c.type==='grup'){refrescaCella(sub,c,stId);actualitzaFila(stId);if(c.type==='grup'&&(sub.mostra||'').includes(c.id))rLlibreta();return}
   const tdc=el.closest('td');if(tdc&&['num','ord','ass','final'].includes(c.type)){tdc.classList.remove('vF','vFJ','vNAV','l1','l2','l3','l4');const k=classeCella(sub,c,r.val);if(k)tdc.classList.add(k)}
   actualitzaFila(stId);
   $$(`td.ext[data-s="${stId}"]`).forEach(td=>{const cc=sub.columns.find(x=>x.id===td.dataset.c);if(cc)refrescaCella(sub,cc,stId)})});
@@ -2643,7 +2697,8 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cClasses').value=(colEd?.type==='classe'?classesDe(sub,false).concat(colEd.classes||[]):[]).filter((x,i,a)=>x&&a.indexOf(x)===i).sort(grupOrd).join('\n');
   $('#cIcones').value=(colEd?.icons||['😀','😐','😟']).join(' ');
   $('#cCompta').checked=colEd?(EVAL.includes(colEd.type)?!colEd.noCompta:!!colEd.compta):true;mapaV={...(colEd?.vals||{})};
-  opcEd=(colEd?.opcions||[{t:'Lliurat',col:OPCOL[1]},{t:'Tard',col:OPCOL[2]},{t:'No lliurat',col:OPCOL[3]}]).map(o=>({id:o.id||uid(),t:o.t,col:o.col||''}));pintaOpc();
+  grEd=colEd?.type==='grup'?colEd.opcions.map(o=>({...o})):[1,2,3,4,5,6].map(i=>({id:uid(),t:'G'+i}));pintaGr();
+  opcEd=(colEd?.type==='opc'?colEd.opcions:[{t:'Lliurat',col:OPCOL[1]},{t:'Tard',col:OPCOL[2]},{t:'No lliurat',col:OPCOL[3]}]).map(o=>({id:o.id||uid(),t:o.t,col:o.col||''}));pintaOpc();
   $('#cTipusIc').hidden=!(colEd?.type==='icones');
   const fe=fontsExt(sub);$('#cSrc').innerHTML=fe.length?fe.map(x=>`<option value="${x.s.id}">${x.s.icon||''} ${esc(x.s.name)}${x.s.archived?' (arxivada)':''} · ${x.n} alumnes</option>`).join(''):'<option value="">Cap llibreta enllaçada (duplica\'n una primer)</option>';
   if(colEd?.src)$('#cSrc').value=colEd.src;omplItems($('#cSrc').value,colEd?.item);
@@ -2654,7 +2709,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cDel').style.visibility=colEd?'visible':'hidden';$('#cDup').style.display=colEd&&colEd.type!=='final'&&colEd.type!=='classe'?'':'none';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
 function tipusUI(inici){const t=$('#cTipus').value;
   $('#cMaxF').style.display=t==='num'?'flex':'none';$('#cClasseF').style.display=t==='classe'?'block':'none';
-  $('#cIconesF').style.display=t==='icones'?'block':'none';$('#cOpcF').style.display=t==='opc'?'block':'none';$('#cExtF').style.display=t==='ext'?'block':'none';
+  $('#cIconesF').style.display=t==='icones'?'block':'none';$('#cOpcF').style.display=t==='opc'?'block':'none';$('#cGrupF').style.display=t==='grup'?'block':'none';$('#cExtF').style.display=t==='ext'?'block':'none';
   const agr=AGRUP.includes(t)||t==='dits',pond=['icones','check','dits','opc'].includes(t);
   $('#cCatF').style.display=EVAL.includes(t)||agr?'flex':'none';
   const ev=EVAL.includes(t),llista=cur()?.tipus==='llista',senseCat=!$('#cCat').value;
@@ -2673,7 +2728,12 @@ let colColor='#D9D9D9';const COLPAL=[['#D9D9D9','gris clar'],...PAL];
 function pintaColColor(){$('#cColor').innerHTML=COLPAL.map(([h,n])=>`<button type="button" style="background:${h}" class="${colColor.toUpperCase()===h?'on':''}" data-cc="${h}" title="${n}"></button>`).join('')}
 $('#cColor').onclick=e=>{const b=e.target.closest('[data-cc]');if(!b)return;colColor=b.dataset.cc;pintaColColor()};
 $('#cSrc').onchange=()=>omplItems($('#cSrc').value);
-let mapaV={},opcEd=[];
+let mapaV={},opcEd=[],grEd=[];
+/* 2.4 · Columna Grups: colors fixos per posició */
+const GRCOL=['#FFE0B2','#C8E6C9','#BBDEFB','#F8BBD0','#D1C4E9','#FFF59D','#B2EBF2','#FFCCBC','#DCEDC8','#CFD8DC','#F0F4C3','#E1BEE7'];
+function pintaGr(){$('#cGrN').value=grEd.length;$('#cGrL').innerHTML=grEd.map((g,i)=>`<span class="grnom" style="background:${GRCOL[i]}"><input type="text" value="${esc(g.t)}" data-gri="${i}" maxlength="24"></span>`).join('')}
+$('#cGrN').oninput=e=>{const n=Math.max(2,Math.min(12,+e.target.value||0));if(!+e.target.value)return;while(grEd.length<n)grEd.push({id:uid(),t:'G'+(grEd.length+1)});grEd.length=n;pintaGr()};
+$('#cGrL').oninput=e=>{const i=e.target.dataset.gri;if(i!==undefined)grEd[i].t=e.target.value};
 /* Suggeriments d'Opcions: [text, índex de color d'OPCOL] (1 verd, 2 groc, 3 vermell, 6 taronja) */
 const OPCPRE=[[['😊',1],['😐',2],['😞',3]],[['🟢',1],['🟡',2],['🔴',3]],[['👍',1],['👎',3]],[['⭐',2],['⭐⭐',6],['⭐⭐⭐',1]],[['✔',1],['✘',3]],[['Lliurat',1],['Tard',2],['No lliurat',3]]];
 $('#cOpcPre').insertAdjacentHTML('beforeend',OPCPRE.map((p,i)=>`<button type="button" class="preset" data-opre="${i}" title="Omple les opcions i els colors">${p.map(x=>esc(x[0])).join(/[a-z]/i.test(p[0][0])?' · ':' ')}</button>`).join(''));
@@ -2721,6 +2781,12 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   if(!name)return toast('Posa un nom a la columna.');
   const o={name,type,cat:EVAL.includes(type)||AGRUP.includes(type)||type==='dits'?$('#cCat').value:'',max:Math.max(1,+$('#cMax').value||10)};
   if(EVAL.includes(type))o.noCompta=!!o.cat&&!$('#cCompta').checked&&cur().tipus!=='llista';
+  if(type==='grup'){const gs=grEd.map((g,i)=>({id:g.id,t:g.t.trim()||'G'+(i+1),col:GRCOL[i]}));
+    if(new Set(gs.map(x=>normOpc(x.t))).size<gs.length)return toast('Hi ha dos grups amb el mateix nom.');
+    if(colEd){const ids=new Set(gs.map(x=>x.id)),g=sub.grades[colEd.id]||{},perd=Object.values(g).filter(v=>!ids.has(v)).length;
+      if(perd&&!await confirma(`${perd} alumne${perd===1?'':'s'} són en un grup que has tret i quedaran sense grup.`,'Continua'))return;
+      Object.keys(g).forEach(k=>{if(!ids.has(g[k]))delete g[k]})}
+    o.opcions=gs}
   if(type==='opc'){const ops=opcEd.map(x=>({...x,t:x.t.trim()})).filter(x=>x.t);if(ops.length<2||ops.length>6)return toast('Posa entre 2 i 6 opcions.');
     if(new Set(ops.map(x=>normOpc(x.t))).size<ops.length)return toast('Hi ha dues opcions amb el mateix nom.');
     if(colEd){const ids=new Set(ops.map(x=>x.id)),g=sub.grades[colEd.id]||{},perd=Object.values(g).filter(v=>!ids.has(v)).length;
@@ -2996,17 +3062,20 @@ $('#recOk').onclick=async()=>{const {sub,plan}=REC,ks=new Set($$('[data-rec]:che
   save('recuperar les classes dels llistats');$('#dlgRecCl').close();rAlumnes();toast(`${sel.length} alumne${sel.length===1?'':'s'} amb la classe dels Llistats. Es pot desfer amb ↶.`,6000)};
 /* Menú ⋯ de la capçalera de cada columna, i moure columnes arrossegant el títol (dins de la mateixa categoria) */
 function obreHMenu(btn){const sub=cur(),c=sub.columns.find(x=>x.id===btn.dataset.hm);if(!c)return;const m=$('#hMenu');
-  const ord=['num','ord','ass','final','ext','opc'].includes(c.type),dup=c.type!=='final'&&c.type!=='classe';
+  const ord=['num','ord','ass','final','ext','opc','grup'].includes(c.type),dup=c.type!=='final'&&c.type!=='classe';
   m.innerHTML=`<div style="padding:6px 10px;font-weight:700;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(c.name)}</div>
     <button data-ha="prop">✎ Propietats…</button>${ord?`<button data-ha="ord">⇅ Ordena per aquesta columna</button>`:''}<button data-ha="pleg">👁 Plega</button>
     <button data-ha="esq" ${btn.dataset.first==='1'?'disabled':''}>← Mou a l'esquerra</button><button data-ha="dre" ${btn.dataset.last==='1'?'disabled':''}>→ Mou a la dreta</button>
-    ${dup?`<button data-ha="dup">⧉ Duplica</button>`:''}<button data-ha="data">📅 Posa la data d'avui al nom</button>`;
+    ${dup?`<button data-ha="dup">⧉ Duplica</button>`:''}<button data-ha="data">📅 Posa la data d'avui al nom</button>
+    ${c.type==='grup'?`<hr><button data-ha="gmos">👥 ${sub.mostra==='gp:'+c.id?'Treu la vista per grups':'Mostra per grups'}</button>${RO()?'':`<button data-ha="gatz">🎲 Grups a l'atzar…</button>`}`:''}`;
   m.dataset.col=c.id;$$('.hdots.on').forEach(x=>x.classList.remove('on'));btn.classList.add('on');
   const r=btn.getBoundingClientRect();m.style.display='block';m.style.left=Math.min(r.left,innerWidth-250)+'px';m.style.top=Math.min(r.bottom+4,innerHeight-m.offsetHeight-8)+'px';m.querySelector('[data-ha]').focus()}
 function tancaHMenu(){$('#hMenu').style.display='none';$$('.hdots.on').forEach(x=>x.classList.remove('on'))}
 $('#hMenu').addEventListener('click',e=>{const b=e.target.closest('[data-ha]');if(!b||b.disabled)return;const sub=cur(),id=$('#hMenu').dataset.col,c=sub.columns.find(x=>x.id===id);tancaHMenu();if(!c)return;
   const a=b.dataset.ha;
   if(a==='prop')return obreCol(id);
+  if(a==='gmos'){sub.mostra=sub.mostra==='gp:'+id?'tots':'gp:'+id;save(null,true);return rLlibreta()}
+  if(a==='gatz')return grupsAtzar(sub,c);
   if(a==='ord'){const k='col:'+id;if(sub.ordre!==k){sub.ordre=k;sub.ordreDir='desc'}else if(sub.ordreDir==='desc')sub.ordreDir='asc';else{sub.ordre='cognoms';sub.ordreDir='desc'}save(null,true);return rLlibreta()}
   if(a==='pleg'){c.ampAnt=c.amp&&c.amp!=='plegada'?c.amp:'normal';c.amp='plegada';save('plegar columna');return rLlibreta()}
   if(a==='esq'||a==='dre'){mouCol(sub,id,a==='esq'?-1:1);return rLlibreta()}
