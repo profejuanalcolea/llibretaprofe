@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.4.1 · ammonite · novembre 2026
+- **Grups:** cada grup té una forma negra davant del nom (● ▲ ■ ◆ ★ ✚…), a la cel·la, a les franges de Mostra per grups i als menús, perquè es reconegui sense dependre del color. Colors una mica més marcats.
+
 ## 2.4 · ammonite · novembre 2026
 - **Treball en grup:** columna nova de tipus **Grups** (2 a 12 grups, colors automàtics, noms editables; no compta per a la nota).
   - **🎲 Grups a l'atzar** (menú ⋯): per nombre de grups o d'alumnes per grup, equilibrats, barrejant classes si cal, o només per als que no en tenen.

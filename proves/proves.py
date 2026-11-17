@@ -1167,6 +1167,8 @@ def p_grups(b):
     mides = pg.evaluate("(()=>{const c=cur().columns.find(c=>c.id===%r);return c.opcions.map(o=>cur().students.filter(st=>getG(cur(),c.id,st.id)===o.id).length)})()" % cid)
     comprova(sum(mides) == n and max(mides) - min(mides) <= 1, f'grups desequilibrats: {mides}')
     comprova(pg.evaluate("cur().mostra") == 'gp:' + cid and pg.locator('#tw tr.sepc').count() == 3, 'ha de mostrar els alumnes per grups, amb una franja per grup')
+    sh = pg.evaluate("[[...document.querySelectorAll('#tw tr.sepc .grsh')].map(e=>e.textContent), document.querySelector('#tw td.grc select.g option:checked').textContent]")
+    comprova(sh[0] == ['●', '▲', '■'] and sh[1][:1] in '●▲■', f'cada grup ha de tenir la seva forma: {sh}')
     # grups de 4 alumnes
     pg.evaluate("grupsAtzar(cur(),cur().columns.find(c=>c.id===%r))" % cid); pg.wait_for_timeout(200)
     pg.check('[name=atzM][value=k]'); pg.fill('#atzK', '4'); pg.click('#atzF'); pg.wait_for_timeout(300)
