@@ -1225,6 +1225,30 @@ def p_bloq(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Bloc: caselles ☐/☑ amb el botó i amb [ ], marcar amb un clic i «Treu els fets»')
+def p_bloc_check(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='bloc';render()"); pg.wait_for_timeout(200)
+    t = pg.locator('#blTxt'); t.click(); pg.keyboard.press('Control+End')
+    pg.keyboard.type('\n[ ] Corregir exàmens\nFotocòpies')
+    v = t.input_value()
+    comprova('☐ Corregir exàmens' in v, f'[ ] no es converteix en casella: {v!r}')
+    pg.click('#blChk'); pg.wait_for_timeout(100)
+    v = t.input_value()
+    comprova('☐ Fotocòpies' in v, f'el botó ☐ no posa la casella: {v!r}')
+    # clic a la casella de «Corregir exàmens» → ☑
+    i = v.index('☐ Corregir'); pg.evaluate("(()=>{const t=document.querySelector('#blTxt');t.focus();t.setSelectionRange(%d,%d);t.dispatchEvent(new MouseEvent('click',{bubbles:true}))})()" % (i + 1, i + 1)); pg.wait_for_timeout(150)
+    v = t.input_value()
+    comprova('☑ Corregir exàmens' in v and pg.evaluate("state.bloc.pestanyes.find(p=>p.id===state.bloc.actiu).text").count('☑') == 1, f'el clic no marca la casella: {v!r}')
+    # clic enmig del text no marca res
+    k = v.index('Fotocòpies') + 4; pg.evaluate("(()=>{const t=document.querySelector('#blTxt');t.setSelectionRange(%d,%d);t.dispatchEvent(new MouseEvent('click',{bubbles:true}))})()" % (k, k)); pg.wait_for_timeout(100)
+    comprova('☐ Fotocòpies' in t.input_value(), 'un clic al text no ha de marcar la casella')
+    pg.click('#blFets'); pg.wait_for_timeout(150); pg.click('#qBtns button:has-text("Esborra")'); pg.wait_for_timeout(200)
+    v = t.input_value()
+    comprova('Corregir exàmens' not in v and '☐ Fotocòpies' in v, f'«Treu els fets»: {v!r}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1304,7 +1328,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

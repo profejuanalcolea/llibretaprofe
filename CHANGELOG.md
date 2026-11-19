@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.1 · ammonite · novembre 2026
+- **Bloc:** caselles ☐ que es marquen ☑ amb un clic (també al mòbil). Botó ☐ o escriure «[ ]» al principi de la línia; «Treu els fets» esborra les línies marcades (es pot desfer amb ↶).
+
 ## 2.5 · ammonite · novembre 2026
 - **L'Ammo, més viu:** a l'entrada és més gran dins la rodona, flota i cada pocs segons fa alguna cosa a l'atzar (parpelleja, saluda amb els tentacles, salta, fa la volta, es gronxa, mira cap a l'altre costat, té una idea, fa bombolles). Si l'entrada fa un minut que espera, es fica dins la closca i dorm; es desperta en moure el ratolí. Als crèdits saluda i, a cada clic, fa una cosa nova. Res es mou si l'ordinador té activat «reduir el moviment».
 
