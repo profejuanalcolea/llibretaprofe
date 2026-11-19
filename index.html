@@ -579,6 +579,12 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 
 /* 2.5.1 · caselles al Bloc */
 .blck{font-size:17px;line-height:1;padding:2px 9px}
+
+/* 2.5.1 · icones i colors dels enllaços; eines del Bloc en una fila */
+.ric{flex:0 0 auto;display:block}.fitxa.fitxar{gap:9px}.mbric{display:flex;align-items:center;gap:10px}
+.ricw{display:flex;flex-wrap:wrap;gap:5px}.ricb{border:1.5px solid #ddd;background:#fff;border-radius:8px;padding:5px 6px;cursor:pointer;display:flex;align-items:center;gap:3px}.ricb small{font-size:11px;color:#777}.ricb.on{border-color:#111;box-shadow:0 0 0 1px #111}
+.rcol{width:26px;height:26px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer;font-size:11px;color:#999;padding:0}.rcol.on{border-color:#111;box-shadow:0 0 0 2px #111}
+.bleines{display:flex;gap:6px;align-items:center;padding:6px 0 2px}.mob .bleines .blx{padding:6px 12px}
 </style>
 </head>
 <body>
@@ -798,6 +804,8 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
   <div class="fl"><label class="lb">Adreça</label><input type="text" id="rUrl" placeholder="https://…" style="flex:1"></div>
   <div style="display:none"><input type="text" id="rGrup" list="rGrups"><datalist id="rGrups"></datalist></div>
   <div style="display:none"><input type="text" id="rIc"></div>
+  <div class="fl" style="align-items:flex-start"><label class="lb">Icona</label><div class="ricw" id="rIcs"></div></div>
+  <div class="fl"><label class="lb">Color</label><div class="ricw" id="rCols"></div></div>
   <div class="fl"><label class="lb">On</label><select id="rOn"><option value="ll">Aquesta llibreta</option><option value="gen">General (totes)</option></select></div>
   <div class="fl" style="margin-top:14px;justify-content:space-between">
     <button class="btn perill" id="rDel">Elimina</button>
@@ -837,7 +845,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.1 · ammonite · novembre 2026',COMPILACIO='19/11 22:01';
+const VERSIO='2.5.1 · ammonite · novembre 2026',COMPILACIO='19/11 22:23';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -873,6 +881,24 @@ const ICONS=ICONGRUPS.flatMap(g=>g[1]);
 const JOCS={pal:{nom:'Pàl·lid',c:{na:'#ffd6d6',as:'#fff1b8',an:'#d6ecff',ae:'#d4f5d9'}},int:{nom:'Intens',c:{na:'#ff9b9b',as:'#ffd84d',an:'#7dbdf5',ae:'#7dd98e'}}};
 function colorsAss(){const j=state?.colors||{joc:'pal'};return j.joc==='pers'?{...JOCS.pal.c,...(j.pers||{})}:(JOCS[j.joc]||JOCS.pal).c}
 function aplicaColors(){const c=colorsAss(),r=document.documentElement.style;for(const k in c)r.setProperty('--'+k,c[k])}
+/* 2.5.1 · icones minimalistes (línia negra) per als enllaços */
+const RIC={
+ enl:['Enllaç','<path d="M6.5 9.5l3-3M5 11.5l-1 1a2.1 2.1 0 0 1-3-3l2.5-2.5a2.1 2.1 0 0 1 3 0M11 4.5l1-1a2.1 2.1 0 0 1 3 3l-2.5 2.5a2.1 2.1 0 0 1-3 0" transform="translate(0 0)"/>'],
+ doc:['Document','<path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9.5 1.5V5H13M6 8h5M6 10.5h5M6 13h3"/>'],
+ full:['Full de càlcul','<rect x="2.5" y="2.5" width="11" height="11" rx="1"/><path d="M2.5 6.5h11M2.5 10h11M6.5 2.5v11"/>'],
+ pres:['Presentació','<rect x="1.5" y="2.5" width="13" height="8.5" rx="1"/><path d="M8 11v3M5.5 14.5h5"/>'],
+ carp:['Carpeta','<path d="M1.5 4.5v8.5h13V5.5H7.5L6 3.5H1.5z"/>'],
+ cal:['Calendari','<rect x="2" y="3" width="12" height="11" rx="1.2"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3"/>'],
+ vid:['Vídeo','<rect x="1.5" y="3.5" width="13" height="9" rx="1.5"/><path d="M6.5 6v4l3.5-2z"/>'],
+ form:['Formulari','<rect x="2.5" y="1.5" width="11" height="13" rx="1"/><path d="M5 5.5l1 1 2-2M5 10l1 1 2-2M9.5 5.5h2M9.5 10h2"/>'],
+ llib:['Llibre','<path d="M2 3c2-1 4-1 6 .5 2-1.5 4-1.5 6-.5v10c-2-1-4-1-6 .5-2-1.5-4-1.5-6-.5z"/><path d="M8 3.5v10"/>'],
+ img:['Imatge','<rect x="1.5" y="2.5" width="13" height="11" rx="1"/><circle cx="5.5" cy="6" r="1.2"/><path d="M1.5 12l4-3.5 3 2.5 2-1.5 4 3"/>'],
+ web:['Web','<circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c2 2 2.6 4.2 2.6 6.5S10 12.5 8 14.5C6 12.5 5.4 10.3 5.4 8S6 3.5 8 1.5"/>'],
+ estr:['Avaluació','<path d="M8 1.8l1.9 3.9 4.3.6-3.1 3 .7 4.3L8 11.6 4.2 13.6l.7-4.3-3.1-3 4.3-.6z"/>']};
+const ricSvg=(k,mida=16)=>`<svg class="ric" viewBox="0 0 16 16" width="${mida}" height="${mida}" fill="none" stroke="#111" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${(RIC[k]||RIC.enl)[1]}</svg>`;
+/* icona per defecte segons l'adreça */
+function ricAuto(u){u=(u||'').toLowerCase();return /docs\.google\.com\/document|\.docx?(\?|$)|\.pdf(\?|$)/.test(u)?'doc':/spreadsheets|\.xlsx?(\?|$)|\.csv(\?|$)/.test(u)?'full':/presentation|\.pptx?(\?|$)/.test(u)?'pres':/drive\.google\.com\/drive\/folders/.test(u)?'carp':/calendar/.test(u)?'cal':/youtu|vimeo|\.mp4/.test(u)?'vid':/forms\.gle|\/forms\//.test(u)?'form':/\.(png|jpe?g|gif|webp|svg)(\?|$)/.test(u)?'img':'enl'}
+const ricDe=r=>RIC[r.ic]?r.ic:ricAuto(r.url);
 const PCOL=['#fff59d','#ffcc80','#a5d6a7','#90caf9','#f48fb1','#e0e0e0'];
 function textSobre(hex){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (0.299*r+0.587*g+0.114*b)>150?'#111':'#fff'}
 /* Separa icones: per espais o comes, o una a una si estan enganxades (emojis compostos inclosos) */
@@ -1844,7 +1870,7 @@ function barraMobil(){let b=$('#mbBar');if(!b){b=document.createElement('div');b
   const nAl=state?state.posits.filter(p=>nivPosit(p)).length:0;
   b.innerHTML=`<button data-mbsec="ll" class="${sec==='ll'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="M8 7.5h8M8 11h6"/></svg><span>Llibreta</span></button><button data-mbsec="bloc" class="${sec==='bloc'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="5" width="15" height="16.5" rx="2"/><path d="M8 3v4M12 3v4M16 3v4"/><path d="M8 11.5h8M8 15h8M8 18.5h5"/></svg><span>Bloc${nAl?` <b>${nAl}</b>`:''}</span></button><button data-mbsec="enl" class="${sec==='enl'?'on':''}"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg><span>Enllaços</span></button>`;
   b.querySelectorAll('[data-mbsec]').forEach(x=>x.onclick=()=>{MB.sec=x.dataset.mbsec;MB.st=null;rMobil();scrollTo(0,0)})}
-function rMobilEnl(){const sub=cur(),ll=(t,rs,on)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" data-enl="${on}|${r.id}"><span><b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
+function rMobilEnl(){const sub=cur(),ll=(t,rs,on)=>rs.length?`<h3 class="mbh">${t}</h3><div class="mbenl">${rs.map(r=>`<a class="mbal" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" data-enl="${on}|${r.id}" style="${r.col?'background:'+r.col:''}"><span class="mbric">${ricSvg(ricDe(r),20)}<b>${esc(r.name)}</b></span><span class="mbv">↗</span></a>`).join('')}</div>`:'';
   const h=ll(`D'aquesta llibreta${sub?' · '+esc(sub.name):''}`,sub?.recursos||[],sub?sub.id:'')+ll('Generals',state.recursos||[],'gen');
   $('#main').innerHTML=`<button class="btn mbaf" id="mbAfEnl">＋ Afegeix un enllaç</button>`+(h?h+'<p class="aj" style="text-align:center;margin-top:14px">Mantén premut un enllaç per canviar-li el nom o treure\'l.</p>':'<p class="aj" style="text-align:center;margin-top:30px">Encara no hi ha enllaços.</p>');
   $('#mbAfEnl').onclick=()=>formEnllac();
@@ -1860,13 +1886,14 @@ function formEnllac(pre={}){$('#mbEnlF')?.remove();const sub=cur(),d=document.cr
   d.innerHTML=`<div class="mbfc"><h3>＋ Afegeix un enllaç</h3>
     <label>Adreça</label><input type="url" id="efU" placeholder="https://…" value="${esc(pre.u||'')}">
     <label>Nom <span class="aj">(opcional)</span></label><input type="text" id="efN" value="${esc(pre.n||'')}" maxlength="80">
+    <label>Color</label><div class="ricw" id="efCols">${['',...PCOL].map(c=>`<button type="button" class="rcol ${c?'':'on'}" data-efc="${c}" style="background:${c||'#fff'}">${c?'':'✕'}</button>`).join('')}</div>
     <label>On va</label><select id="efOn"><option value="${sub?.id||''}" ${sub?'':'disabled'}>D'aquesta llibreta · ${esc(sub?.name||'—')}</option>${actives().filter(x=>x.id!==sub?.id).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}<option value="gen" ${sub?'':'selected'}>Generals</option></select>
     <div class="fl" style="margin-top:14px"><button class="btn" id="efD">Desa</button><button class="btn sec" id="efC">Cancel·la</button></div></div>`;
   document.body.appendChild(d);setTimeout(()=>(pre.u?$('#efN'):$('#efU'))?.focus(),50);
-  $('#efC').onclick=()=>d.remove();
+  $('#efC').onclick=()=>d.remove();let efCol='';d.querySelectorAll('[data-efc]').forEach(b=>b.onclick=()=>{efCol=b.dataset.efc;d.querySelectorAll('[data-efc]').forEach(x=>x.classList.toggle('on',x===b))});
   $('#efD').onclick=()=>{const u=urlNeta($('#efU').value);if(!u)return toast('Escriu una adreça web (http o https).');const on=$('#efOn').value;
     const nom=$('#efN').value.trim()||u.replace(/^https?:\/\/(www\.)?/,'').slice(0,40);
-    llistaEnl(on).push({id:uid(),name:nom,url:u,grup:'',icon:'🔗'});save('enllaç nou');d.remove();toast('🔗 Enllaç desat'+(on==='gen'?' als generals.':'.'));render()}}
+    llistaEnl(on).push({id:uid(),name:nom,url:u,grup:'',icon:'🔗',...(efCol?{col:efCol}:{})});save('enllaç nou');d.remove();toast('🔗 Enllaç desat'+(on==='gen'?' als generals.':'.'));render()}}
 async function accioEnllac(k){const [on,id]=k.split('|'),ll=llistaEnl(on),r=ll.find(x=>x.id===id);if(!r)return;
   const a=await pregunta(r.name,r.url,[{t:'Cancel·la',v:null,cls:'sec'},{t:'Treu',v:'treu',cls:'sec'},{t:'Canvia el nom',v:'nom'}]);
   if(a==='nom'){const n=prompt('Nom de l\'enllaç',r.name);if(n&&n.trim()){r.name=n.trim();save('nom d\'enllaç');render()}}
@@ -2534,7 +2561,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Les <b>llistes</b> (sense notes) serveixen per a sortides, autoritzacions… Es creen amb la plantilla «llista».</li></ul>`)+
   sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C), Llistats i Sortides, i els enllaços de recursos.</li>
     <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou.</li>
-    <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta. <b>Caselles:</b> el botó ☐ (o escriure <b>[ ]</b> al principi d'una línia) hi posa una casella; un clic a la casella la marca ☑ o la desmarca, també al mòbil. «Treu els fets» esborra les línies marcades (es pot desfer amb ↶).</li></ul>`)+
+    <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta. <b>Caselles:</b> el botó ☐ (o escriure <b>[ ]</b> al principi d'una línia) hi posa una casella; un clic a la casella la marca ☑ o la desmarca, també al mòbil. «Treu els fets» esborra les línies marcades (es pot desfer amb ↶). Les eines (☐, Treu els fets, Elimina la pestanya) són en una fila a sobre del text; si hi ha moltes pestanyes, s'estrenyen.</li></ul>`)+
   sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
     <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
     <li><b>PDF</b>: d'una llibreta, a Avaluació › «Desa en PDF al Drive»; de totes, a ⚙ › Dades; de les sortides, a Eines › Sortides; de l'arxiu, a la pestanya Arxiu.</li>
@@ -2545,7 +2572,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>Barra negra plegable</b>: el botó ⌃ de la dreta la deixa en una franja fina sense text. A la dreta hi queden només els avisos (sortides de l'aula, temporitzador, pòsits urgents), l'Ammo de l'estat del Drive i el botó ⌄ per tornar-la a obrir; també s'obre clicant en qualsevol lloc buit de la franja. Amb la barra plegada, canvia de llibreta clicant el nom de la llibreta (▾) i passa de Llibreta a Avaluació amb els botons del costat del nom. Cada ordinador recorda si la tens plegada.</li>
     <li>Enganxa una columna de l'Excel o de Google Sheets directament a la primera cel·la.</li>
     <li>A la <b>Vista alumne</b>: ↑ ↓ per passar d'alumne, <b>B</b> tapa la pantalla, <b>Esc</b> surt.</li>
-    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b>: amb <b>＋ Afegeix un enllaç</b> en pots desar de nous (generals o d'una llibreta) i, mantenint-ne premut un, li canvies el nom o el treus. Si tens la llibreta instal·lada com a app a Android, també pots fer <b>Compartir › Llibreta del Profe</b> des de Chrome, el Drive o qualsevol app: s'obre el formulari amb l'adreça posada. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+
+    <li>Al mòbil, la llibreta s'obre en <b>mode consulta</b> (només lectura). A la barra de baix hi ha també el <b>Bloc</b> (s'hi pot escriure i hi ha els pòsits) i els <b>Enllaços</b> (cadascun amb la seva icona i, si vols, un color): amb <b>＋ Afegeix un enllaç</b> en pots desar de nous (generals o d'una llibreta) i, mantenint-ne premut un, li canvies el nom o el treus. Si tens la llibreta instal·lada com a app a Android, també pots fer <b>Compartir › Llibreta del Profe</b> des de Chrome, el Drive o qualsevol app: s'obre el formulari amb l'adreça posada. Des de Chrome, menú ⋮ › «Instal·la l'aplicació» o «Afegeix a la pantalla d'inici».</li></ul>`)+
   sec('Per a companys de l\'institut',`<ol><li>Obre <b>${esc(url)}</b> amb Chrome o Edge.</li><li>Clica <b>Entra amb Google</b> amb el compte del centre.</li>
     <li>El primer cop es crea sola una llibreta <b>EXEMPLE</b> per provar-ho tot. Després en crees de noves amb el <b>＋</b> taronja.</li></ol>
     <p class="aj">Les dades de cadascú són al seu propi Drive: ningú més les veu. A GitHub només hi ha el programa, mai dades d'alumnes.</p>`)+
@@ -2957,7 +2984,7 @@ const EINA={temp:['⏱️','Temporitzador',()=>obreTemp()],atz:['🎲',"Alumne a
 function rEines(){const sub=cur(),E=state.eines;
   const grupsRec=list=>{const g=new Map();list.forEach(r=>{const k=r.grup||'Altres';if(!g.has(k))g.set(k,[]);g.get(k).push(r)});return [...g.entries()]};
   const fitxes=(list,on)=>[['',list]].filter(([,rs])=>rs.length).map(([k,rs])=>`<div class="grupr"><div class="fitxes">${rs.map(r=>`
-    <a class="fitxa fitxar" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer"><span>${esc(r.name)}</span>
+    <a class="fitxa fitxar" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" style="${r.col?'background:'+r.col:''}">${ricSvg(ricDe(r))}<span>${esc(r.name)}</span>
       <span class="acc"><button data-rmv="-1" data-rid="${r.id}" data-on="${on}" title="Mou">◀</button><button data-rmv="1" data-rid="${r.id}" data-on="${on}" title="Mou">▶</button><button data-red="${r.id}" data-on="${on}" title="Edita">✎</button></span></a>`).join('')}</div></div>`).join('')||'<p style="color:var(--suau)">Encara no hi ha enllaços.</p>';
   const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
         <span class="acc"><button data-emv="-1" data-e="${k}" ${i===0?'disabled':''} title="Mou">◀</button><button data-emv="1" data-e="${k}" ${i===a.length-1?'disabled':''} title="Mou">▶</button></span></div>`).join('')}</div>`},
@@ -3171,10 +3198,10 @@ function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
   if(!B.pestanyes.some(p=>p.id===B.actiu))B.actiu=B.pestanyes[0].id;const act=B.pestanyes.find(p=>p.id===B.actiu);
   const pos=positsDe(sub,tots),vistAra=new Set(pos.filter(p=>nivPosit(p)==='avui'&&p.vist!==avui()).map(p=>p.id)),nAl=pos.filter(p=>nivPosit(p)).length;
   $('#main').innerHTML=`<div class="blocw">
-    <section class="blocn"><div class="blpt">${B.pestanyes.map(p=>`<button class="blp ${p.id===B.actiu?'on':''}" data-blp="${p.id}" draggable="true" title="Doble clic per canviar el nom · arrossega per moure">${esc(p.nom)}</button>`).join('')}
+    <section class="blocn"><div class="blpt">${B.pestanyes.map(p=>`<button class="blp ${p.id===B.actiu?'on':''}" data-blp="${p.id}" draggable="true" title="${esc(p.nom)} · doble clic per canviar el nom · arrossega per moure" ${B.pestanyes.length>6?'style="max-width:130px"':''}>${esc(p.nom)}</button>`).join('')}
       <button class="blp nou" id="blNou" title="Pestanya nova">＋</button><span style="flex:1"></span>
-      <button class="blx blck" id="blChk" title="Casella a la línia (o escriu [ ] al principi)">☐</button><button class="blx" id="blFets" title="Esborra les línies marcades ☑">Treu els fets</button>
-      ${B.pestanyes.length>1?`<button class="blx" id="blDel" title="Elimina aquesta pestanya">Elimina</button>`:''}${esMobil()?'':'<button class="blx" id="blTanca" title="Torna (Esc)">✕</button>'}</div>
+      ${esMobil()?'':'<button class="blx" id="blTanca" title="Torna (Esc)">✕</button>'}</div>
+      <div class="bleines"><button class="blx blck" id="blChk" title="Casella a la línia (o escriu [ ] al principi)">☐</button><button class="blx" id="blFets" title="Esborra les línies marcades ☑">Treu els fets</button><span style="flex:1"></span>${B.pestanyes.length>1?`<button class="blx" id="blDel" title="Elimina aquesta pestanya">Elimina la pestanya</button>`:''}</div>
       <textarea id="blTxt" spellcheck="true" placeholder="Materials, dades, recordatoris…">${esc(act.text)}</textarea></section>
     <section class="blocp"><h2>Pòsits <span class="ebn">${pos.length}${nAl?` · <b class="${pos.some(p=>['avui','vermell','vencut'].includes(nivPosit(p)))?'r':'t'}">${nAl} en alerta</b>`:''}</span>
       <span style="flex:1"></span><select id="blFil" title="Quins pòsits es veuen"><option value="0">Aquesta llibreta</option><option value="1" ${tots?'selected':''}>Tots</option></select>
@@ -3206,17 +3233,22 @@ function rBloc(){const sub=cur(),B=state.bloc,tots=blocTots();
   $('#blFil').onchange=e=>{try{localStorage.setItem('llibreta-bloc-tots',e.target.value)}catch{}rBloc()};
   lligaPosits(pos,sub,vistAra,()=>esMobil()?rMobil():rBloc())}
 addEventListener('keydown',e=>{if(e.key!=='Escape'||tab!=='bloc'||document.querySelector('dialog[open]'))return;e.preventDefault();tab=tabPrincipal;render()});
-let recEd=null,recOn='ll';
+let recEd=null,recOn='ll',RECX={ic:'',col:''};
+function pintaRecX(){const auto=ricAuto($('#rUrl').value);
+  $('#rIcs').innerHTML=`<button type="button" class="ricb ${RECX.ic?'':'on'}" data-ric="" title="Automàtica segons l'adreça">${ricSvg(auto,18)}<small>auto</small></button>`+Object.entries(RIC).map(([k,[t]])=>`<button type="button" class="ricb ${RECX.ic===k?'on':''}" data-ric="${k}" title="${t}">${ricSvg(k,18)}</button>`).join('');
+  $('#rCols').innerHTML=['',...PCOL].map(c=>`<button type="button" class="rcol ${RECX.col===c?'on':''}" data-rcol="${c}" title="${c?'':'Sense color'}" style="background:${c||'#fff'}">${c?'':'✕'}</button>`).join('')}
+document.addEventListener('click',e=>{const b=e.target.closest('#rIcs [data-ric],#rCols [data-rcol]');if(!b)return;if(b.dataset.ric!==undefined)RECX.ic=b.dataset.ric;else RECX.col=b.dataset.rcol;pintaRecX()});
+document.addEventListener('input',e=>{if(e.target.id==='rUrl'&&$('#dlgRec').open&&!RECX.ic)pintaRecX()});
 function obreRec(id,on){recOn=on;const a=on==='ll'?cur().recursos:state.recursos;recEd=id?a.find(r=>r.id===id):null;
-  $('#rTit').textContent=recEd?'Edita l\'enllaç':'Nou enllaç';$('#rNom').value=recEd?.name||'';$('#rUrl').value=recEd?.url||'';$('#rGrup').value=recEd?.grup||'';$('#rIc').value=recEd?.icon||'';
+  $('#rTit').textContent=recEd?'Edita l\'enllaç':'Nou enllaç';$('#rNom').value=recEd?.name||'';$('#rUrl').value=recEd?.url||'';$('#rGrup').value=recEd?.grup||'';$('#rIc').value=recEd?.icon||'';RECX={ic:recEd?.ic||'',col:recEd?.col||''};pintaRecX();
   $('#rOn').value=on;$('#rDel').style.visibility=recEd?'visible':'hidden';
   $('#rGrups').innerHTML=[...new Set([...state.recursos,...(cur()?.recursos||[])].map(r=>r.grup).filter(Boolean))].map(g=>`<option value="${esc(g)}">`).join('');
   $('#dlgRec').showModal();$('#rNom').focus()}
 $('#rCanc').onclick=()=>$('#dlgRec').close();
 $('#rOk').onclick=()=>{let url=$('#rUrl').value.trim();const name=$('#rNom').value.trim();if(!name||!url)return toast('Cal un nom i una adreça.');
-  if(!/^https?:\/\//i.test(url))url='https://'+url;const o={name,url,grup:'',icon:$('#rIc').value.trim()};
+  if(!/^https?:\/\//i.test(url))url='https://'+url;const o={name,url,grup:'',icon:$('#rIc').value.trim(),ic:RECX.ic,col:RECX.col};if(!o.ic)delete o.ic;if(!o.col)delete o.col;
   const desti=$('#rOn').value==='ll'?cur().recursos:state.recursos;const orig=recOn==='ll'?cur().recursos:state.recursos;
-  if(recEd){Object.assign(recEd,o);if(desti!==orig){orig.splice(orig.indexOf(recEd),1);desti.push(recEd)}}else desti.push({id:uid(),...o});
+  if(recEd){Object.assign(recEd,o);if(!o.ic)delete recEd.ic;if(!o.col)delete recEd.col;if(desti!==orig){orig.splice(orig.indexOf(recEd),1);desti.push(recEd)}}else desti.push({id:uid(),...o});
   save();$('#dlgRec').close();rEines()};
 $('#rDel').onclick=async()=>{if(!await confirma('Eliminar aquest enllaç?','Elimina'))return;const a=recOn==='ll'?cur().recursos:state.recursos;a.splice(a.indexOf(recEd),1);save();$('#dlgRec').close();rEines()};
 
