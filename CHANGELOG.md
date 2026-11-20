@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.7 · ammonite · novembre 2026
+- ⚙ › Calculadora: la casella es diu «Calculadora amb animacions».
+
 ## 2.5.6 · ammonite · novembre 2026
 - Treta l'animació de la closca mentre es renova la sessió de Google: torna a ser com abans. L'Ammo de la calculadora es queda.
 
