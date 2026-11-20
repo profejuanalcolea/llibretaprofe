@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.4 · ammonite · novembre 2026
+- **Ammo a la calculadora:** la cara i un tros de closca a la barra. Treu el cap en obrir-la, mira la tecla que prems, parpelleja i mou els tentacles amb =, mig tanca l'ull i arronsa els tentacles en un error, obre molt l'ull en dividir per zero, escombra amb C i fa una espurna en copiar; un parpelleig de tant en tant. No impedeix arrossegar-la. Quiet si el sistema demana reduir el moviment.
+- **Renovant la sessió de Google:** mentre surt la finestreta de Google, l'Ammo es fica a la closca i la closca dona voltes (mínim 0,8 s, no fa més lenta la càrrega).
+
 ## 2.5.3 · ammonite · novembre 2026
 - Copiar la proposta: casella «També els enllaços» sota «També les marques P · MA · PI», desmarcada per defecte (no repeteix enllaços que l'alumne ja té).
 

@@ -591,6 +591,31 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 .cpll{max-height:220px;overflow:auto;border:1px solid #eee;border-radius:8px;padding:4px 6px}
 .cpst{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:13px;cursor:pointer}.cpst small{font-size:11px;color:#777;border:1px solid #ddd;border-radius:6px;padding:0 5px}.cpst small.te{color:#b45309;border-color:#f5c58a}.cpst.mx span{font-weight:700}
 #cpOk,#pnCp{display:flex;align-items:center;gap:5px}
+
+/* 2.5.4 · Ammo a la calculadora */
+#calcAm{width:36px;height:34px;margin:-6px 10px -6px auto;flex:0 0 auto;pointer-events:none;overflow:hidden;display:block}
+#calcAm *{transform-box:fill-box}#calcAm .mir{transform-box:view-box}#calcAm .mig,#calcAm .lid{opacity:0}#calcAm .pu{transition:transform .15s}
+#calcAm .tent{transform-origin:0% 50%}#calcAm .body{transform-origin:0% 0%}#calcAm .eye{transform-origin:50% 50%}#calcAm .spark{transform-origin:50% 50%}
+#calcAm.ca-surt .body{animation:amSurt .6s cubic-bezier(.3,1.5,.5,1)}
+#calcAm.ca-par .eye{animation:caUll .35s}#calcAm.ca-par .lid{animation:caLid .35s}
+@keyframes caUll{0%,100%{opacity:1}25%,70%{opacity:0}}@keyframes caLid{0%,100%{opacity:0}25%,70%{opacity:1}}
+#calcAm.ca-onada .tent{animation:amTent .25s ease-in-out 2 alternate}#calcAm.ca-onada .tent:nth-of-type(2){animation-delay:.05s}#calcAm.ca-onada .tent:nth-of-type(3){animation-delay:.1s}
+#calcAm.ca-error .tent{animation:caCau 1.1s ease-in-out}#calcAm.ca-error .mig{animation:caMig 1.1s}
+@keyframes caCau{0%,100%{transform:none}20%,80%{transform:rotate(30deg) translateY(1.5px)}}@keyframes caMig{0%,100%{opacity:0}12%,88%{opacity:1}}
+#calcAm.ca-sorpres .eye{animation:caGran .9s}@keyframes caGran{0%,100%{transform:none}15%,75%{transform:scale(1.4)}}
+#calcAm.ca-escombra .tent{animation:caEsc .45s ease-in-out}@keyframes caEsc{0%,100%{transform:none}35%{transform:rotate(-24deg)}70%{transform:rotate(20deg)}}
+#calcAm.ca-espurna .spark{animation:amSpark .75s ease-out}
+@media(prefers-reduced-motion:reduce){#calcAm *{animation:none!important;transition:none!important}}
+/* 2.5.4 · renovant la sessió de Google */
+#renova{position:fixed;inset:0;z-index:2000;background:rgba(17,17,17,.38);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;transition:opacity .12s;pointer-events:none}
+#renova.vis{opacity:1}#renova[hidden]{display:none}#renova p{color:#fff;font-size:14px;margin:0;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+#renova .rnc{width:104px;height:104px;border-radius:50%;background:#FFE8D8;display:flex;align-items:center;justify-content:center}
+#renova .rnc svg{width:86px;height:auto;margin-left:4px;overflow:visible}
+#renova .rnc svg *{transform-box:fill-box}#renova .body{transform-origin:0% 0%}#renova .shellg{transform-origin:52% 46%}
+#renova.on .body{animation:rnDins .25s ease-in forwards}#renova.on .shellg{animation:rnGira .42s linear .18s infinite}
+#renova.fora .body{animation:amSurt .4s cubic-bezier(.3,1.5,.5,1)}
+@keyframes rnDins{to{transform:translate(-3px,-5px) scale(.08);opacity:0}}@keyframes rnGira{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#renova *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -647,6 +672,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
   <div class="kp" id="calcKp"></div>
 </div>
 
+<div id="renova" hidden aria-live="polite"></div>
 <div id="login">
   <div id="lgAmmo" class="amb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="70" height="67" aria-hidden="true"><g class="jump"><g class="bob">
  <g class="body">
@@ -852,7 +878,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.3 · ammonite · novembre 2026',COMPILACIO='20/11 07:23';
+const VERSIO='2.5.4 · ammonite · novembre 2026',COMPILACIO='20/11 10:01';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1258,11 +1284,17 @@ const CLS_SCOPES=['classroom.courses.readonly','classroom.rosters.readonly','cla
 const ALIES={'classroom.courses.readonly':['classroom.courses'],'classroom.rosters.readonly':['classroom.rosters'],'classroom.coursework.students.readonly':['classroom.student-submissions.students.readonly','classroom.coursework.students']};
 const teScope=x=>{const sc=(G.scope||'').split(/\s+/).map(y=>y.split('/').pop()),k=x.split('/').pop();return sc.includes(k)||(ALIES[k]||[]).some(a=>sc.includes(a))};
 const ambCls=()=>{try{return localStorage.getItem('llibreta-cls')==='1'}catch{return false}};
-function demanaToken(prompt=''){return new Promise((res,rej)=>{
+function demanaToken(prompt=''){if(!prompt)renovaMostra();return new Promise((res,rej)=>{
   const tc=google.accounts.oauth2.initTokenClient({client_id:G.clientId,scope:['https://www.googleapis.com/auth/drive.file',...(ambCls()?CLS_SCOPES:[])].join(' '),include_granted_scopes:true,hint:G.email||undefined,
-    callback:r=>{if(r.error)return rej(new Error(r.error_description||r.error));G.scope=r.scope||'';G.token=r.access_token;G.exp=Date.now()+((+r.expires_in||3600)-60)*1000;G.need=false;res()},
-    error_callback:e=>rej(new Error(e?.message||e?.type||'Entrada cancel·lada'))});
+    callback:r=>{renovaAmaga();if(r.error)return rej(new Error(r.error_description||r.error));G.scope=r.scope||'';G.token=r.access_token;G.exp=Date.now()+((+r.expires_in||3600)-60)*1000;G.need=false;res()},
+    error_callback:e=>{renovaAmaga();rej(new Error(e?.message||e?.type||'Entrada cancel·lada'))}});
   tc.requestAccessToken({prompt})})}
+/* 2.5.4 · mentre Google renova la sessió (la finestreta que surt i marxa), l'Ammo es fica a la closca i la closca dona voltes */
+const RN={t0:0,tt:null};
+function renovaMostra(){const d=$('#renova');if(!d)return;if(!d.firstElementChild){const s=$('#lgAmmo svg');d.innerHTML=`<div class="rnc">${s?s.outerHTML:''}</div><p>Renovant la sessió de Google…</p>`}
+  clearTimeout(RN.tt);RN.t0=Date.now();d.hidden=false;d.classList.remove('fora');requestAnimationFrame(()=>d.classList.add('on','vis'))}
+function renovaAmaga(){const d=$('#renova');if(!d||d.hidden)return;const fal=Math.max(0,800-(Date.now()-RN.t0));clearTimeout(RN.tt);
+  RN.tt=setTimeout(()=>{d.classList.remove('on');d.classList.add('fora');RN.tt=setTimeout(()=>{d.classList.remove('vis');RN.tt=setTimeout(()=>{d.hidden=true;d.classList.remove('fora')},160)},380)},fal)}
 const caducaAviat=()=>!G.token||Date.now()>G.exp-5*60*1000;
 /* Renovació: el navegador només deixa obrir la finestreta de Google després d'un clic o una tecla,
    així que es renova en la primera acció que facis quan falten menys de 5 minuts. */
@@ -2602,7 +2634,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>La <b>classe</b> ve dels Llistats: si un alumne canvia de grup (als Llistats o des de qualsevol llibreta), es canvia a totes les llibretes actives. Les arxivades conserven la que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.</li>
     <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
     <li>Les <b>llistes</b> (sense notes) serveixen per a sortides, autoritzacions… Es creen amb la plantilla «llista».</li></ul>`)+
-  sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C), Llistats i Sortides, i els enllaços de recursos.</li>
+  sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C; l'Ammo de la barra mira les tecles que prems, parpelleja amb =, arronsa els tentacles si hi ha un error i fa una espurna en copiar), Llistats i Sortides, i els enllaços de recursos.</li>
     <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou.</li>
     <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta. <b>Caselles:</b> el botó ☐ (o escriure <b>[ ]</b> al principi d'una línia) hi posa una casella; un clic a la casella la marca ☑ o la desmarca, també al mòbil. «Treu els fets» esborra les línies marcades (es pot desfer amb ↶). Les eines (☐, Treu els fets, Elimina la pestanya) són en una fila a sobre del text; si hi ha moltes pestanyes, s'estrenyen.</li></ul>`)+
   sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
@@ -3428,7 +3460,20 @@ window.addEventListener('keydown',e=>{
 /* ----- Calculadora ----- */
 const calc=$('#calc'),cin=$('#calcIn');
 $('#calcKp').innerHTML=['C','(',')','←','7','8','9','÷','4','5','6','×','1','2','3','−','0',',','%','+','='].map(k=>`<button class="${'÷×−+()←C%'.includes(k)?'op':k==='='?'eq':''}">${k}</button>`).join('');
-function calcObre(forca){const vis=calc.style.display==='block';calc.style.display=forca||!vis?'block':'none';if(calc.style.display==='block')cin.focus()}
+function calcObre(forca){const vis=calc.style.display==='block';calc.style.display=forca||!vis?'block':'none';if(calc.style.display==='block'){cin.focus();if(!vis){caPrepara();caFes('ca-surt',650);caDorm()}}}
+/* 2.5.4 · la cara de l'Ammo (i un tros de closca) a la barra de la calculadora; reacciona al que fas */
+function caPrepara(){if($('#calcAm'))return;const s=$('#lgAmmo svg');if(!s)return;const t=document.createElement('div');t.innerHTML=s.outerHTML;const v=t.firstElementChild;
+  v.id='calcAm';v.setAttribute('viewBox','32 52 44 41');v.removeAttribute('width');v.removeAttribute('height');
+  const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.setAttribute('transform','translate(110 0) scale(-1 1)');g.setAttribute('class','mir');while(v.firstChild)g.appendChild(v.firstChild);v.appendChild(g);
+  v.querySelectorAll('.tent').forEach(p=>p.setAttribute('stroke','#fff'));const el=v.querySelector('.body ellipse');if(el){el.setAttribute('stroke','#fff');el.setAttribute('stroke-width','2.4')}
+  const ey=v.querySelector('.eye');if(ey){ey.querySelectorAll('circle')[1]?.classList.add('pu');const m=document.createElementNS('http://www.w3.org/2000/svg','path');m.setAttribute('class','mig');m.setAttribute('d','M51.2 74.2 a4.8 4.8 0 0 1 9.6 0z');m.setAttribute('fill','#111');m.setAttribute('stroke','#fff');m.setAttribute('stroke-width','1.2');ey.after(m)}
+  $('#calcX').before(v)}
+const caQuiet=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+function caFes(k,ms){const v=$('#calcAm');if(!v||caQuiet())return;v.classList.remove(k);void v.getBoundingClientRect();v.classList.add(k);clearTimeout(v['_'+k]);v['_'+k]=setTimeout(()=>v.classList.remove(k),ms);caDorm()}
+function caMira(el){const v=$('#calcAm'),pu=v?.querySelector('.pu'),ey=v?.querySelector('.eye');if(!pu||!el||caQuiet())return;
+  const a=ey.getBoundingClientRect(),b=el.getBoundingClientRect(),dx=b.left+b.width/2-(a.left+a.width/2),dy=b.top+b.height/2-(a.top+a.height/2),l=Math.hypot(dx,dy)||1;
+  pu.style.transform=`translate(${(-dx/l*1.3).toFixed(2)}px,${(dy/l*1.3).toFixed(2)}px)`;clearTimeout(pu._t);pu._t=setTimeout(()=>pu.style.transform='',1100)}
+function caDorm(){clearTimeout(caDorm.t);caDorm.t=setTimeout(()=>{if(calc.style.display==='block')caFes('ca-par',400);else return;caDorm()},20000+Math.random()*20000)}
 /* Càlcul propi: només entén números (coma o punt decimal), + − × ÷, % i parèntesis. No executa mai el text com a codi.
    Percentatges com al mòbil: 200+10% = 220 · 200-15% = 170 · 50×20% = 10 · 15% = 0,15. «2(3+1)» és 2×(3+1). */
 function calcula(txt){
@@ -3459,13 +3504,15 @@ function calcula(txt){
   const v=expr();if(p<t.length)throw new Error(mira()===')'?'Sobra un parèntesi':'Expressió incompleta');
   if(!isFinite(v))throw new Error('Resultat massa gran');return Math.round(v*1e10)/1e10}
 function calcAvalua(){const e=cin.value.trim();if(!e)return;
-  try{const r=calcula(e);$('#calcHist').textContent=cin.value+' =';cin.value=String(r).replace('.',',')}catch(err){$('#calcHist').textContent=err.message}}
-$('#calcKp').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.textContent;
-  if(k==='C'){cin.value='';$('#calcHist').textContent=''}else if(k==='←')cin.value=cin.value.slice(0,-1);else if(k==='=')calcAvalua();else cin.value+=k;cin.focus()};
+  try{const r=calcula(e);$('#calcHist').textContent=cin.value+' =';cin.value=String(r).replace('.',',');caFes('ca-par',400);caFes('ca-onada',600)}
+  catch(err){$('#calcHist').textContent=err.message;/zero/.test(err.message)?caFes('ca-sorpres',1000):caFes('ca-error',1200)}}
+$('#calcKp').onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.textContent;caMira(b);
+  if(k==='C'){cin.value='';$('#calcHist').textContent='';caFes('ca-escombra',500)}else if(k==='←')cin.value=cin.value.slice(0,-1);else if(k==='=')calcAvalua();else cin.value+=k;cin.focus()};
 async function calcCopia(){const v=cin.value.trim();if(!v)return;let ok=true;
   try{await navigator.clipboard.writeText(v)}catch{try{const t=document.createElement('textarea');t.value=v;document.body.appendChild(t);t.select();ok=document.execCommand('copy');t.remove()}catch{ok=false}}
-  const b=$('#calcCp');if(ok){b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='⧉';b.classList.remove('ok')},1200)}else toast('No s\'ha pogut copiar');cin.focus()}
+  const b=$('#calcCp');if(ok){caFes('ca-espurna',800);b.textContent='✓';b.classList.add('ok');clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent='⧉';b.classList.remove('ok')},1200)}else toast('No s\'ha pogut copiar');cin.focus()}
 $('#calcCp').onclick=calcCopia;
+cin.addEventListener('input',()=>caMira(cin));
 cin.onkeydown=e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&!e.altKey&&e.key.toLowerCase()==='c'&&cin.selectionStart===cin.selectionEnd){e.preventDefault();calcCopia();return}
   if(e.key==='Enter'){e.preventDefault();calcAvalua()}if(e.key==='Escape')calc.style.display='none'};
 $('#btnCalc').onclick=()=>calcObre(false);$('#btnMob').onclick=()=>{try{sessionStorage.removeItem('llibreta-mobil-off')}catch{}render()};$('#calcX').onclick=()=>calc.style.display='none';
