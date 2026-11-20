@@ -1308,7 +1308,7 @@ def p_div_copia(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Ammo a la calculadora (reacciona a =, errors i copiar) i animació en renovar la sessió de Google')
+@prova('Ammo a la calculadora (reacciona a =, errors i copiar) i es pot treure a ⚙')
 def p_ammo_calc(b):
     ctx, pg = pagina_local(b)
     pg.evaluate("calcObre(true)"); pg.wait_for_timeout(300)
@@ -1328,11 +1328,6 @@ def p_ammo_calc(b):
     comprova(not pg.is_visible('#calcAm') and pg.evaluate("getComputedStyle($('#calcH')).backgroundColor") == 'rgb(17, 17, 17)', 'sense l\'Ammo la barra ha de tornar a ser negra')
     pg.wait_for_timeout(1300); pg.fill('#calcIn', '(2'); pg.keyboard.press('Enter'); pg.wait_for_timeout(100)
     comprova(not pg.evaluate("$('#calcAm').classList.contains('ca-error')"), 'sense l\'Ammo no hi ha d\'haver animacions')
-    pg.click('#calcX')
-    pg.evaluate("renovaMostra()"); pg.wait_for_timeout(200)
-    comprova(pg.is_visible('#renova .shellg'), 'no surt l\'animació de renovar la sessió')
-    pg.evaluate("renovaAmaga()"); pg.wait_for_timeout(1700)
-    comprova(pg.evaluate("$('#renova').hidden"), 'l\'animació de renovar no s\'amaga')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 

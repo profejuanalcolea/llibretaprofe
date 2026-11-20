@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.6 · ammonite · novembre 2026
+- Treta l'animació de la closca mentre es renova la sessió de Google: torna a ser com abans. L'Ammo de la calculadora es queda.
+
 ## 2.5.5 · ammonite · novembre 2026
 - ⚙ › Calculadora: casella per treure l'Ammo de la calculadora (torna a la barra negra i sense animacions). Marcada per defecte; es desa amb la llibreta i val a tots els ordinadors.
 

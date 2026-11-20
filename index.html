@@ -606,16 +606,6 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 #calcAm.ca-escombra .tent{animation:caEsc .45s ease-in-out}@keyframes caEsc{0%,100%{transform:none}35%{transform:rotate(-24deg)}70%{transform:rotate(20deg)}}
 #calcAm.ca-espurna .spark{animation:amSpark .75s ease-out}
 @media(prefers-reduced-motion:reduce){#calcAm *{animation:none!important;transition:none!important}}
-/* 2.5.4 · renovant la sessió de Google */
-#renova{position:fixed;inset:0;z-index:2000;background:rgba(17,17,17,.38);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;opacity:0;transition:opacity .12s;pointer-events:none}
-#renova.vis{opacity:1}#renova[hidden]{display:none}#renova p{color:#fff;font-size:14px;margin:0;text-shadow:0 1px 3px rgba(0,0,0,.5)}
-#renova .rnc{width:104px;height:104px;border-radius:50%;background:#FFE8D8;display:flex;align-items:center;justify-content:center}
-#renova .rnc svg{width:86px;height:auto;margin-left:4px;overflow:visible}
-#renova .rnc svg *{transform-box:fill-box}#renova .body{transform-origin:0% 0%}#renova .shellg{transform-origin:52% 46%}
-#renova.on .body{animation:rnDins .25s ease-in forwards}#renova.on .shellg{animation:rnGira .42s linear .18s infinite}
-#renova.fora .body{animation:amSurt .4s cubic-bezier(.3,1.5,.5,1)}
-@keyframes rnDins{to{transform:translate(-3px,-5px) scale(.08);opacity:0}}@keyframes rnGira{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){#renova *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -672,7 +662,6 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
   <div class="kp" id="calcKp"></div>
 </div>
 
-<div id="renova" hidden aria-live="polite"></div>
 <div id="login">
   <div id="lgAmmo" class="amb"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 6 96 92" width="70" height="67" aria-hidden="true"><g class="jump"><g class="bob">
  <g class="body">
@@ -878,7 +867,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.5 · ammonite · novembre 2026',COMPILACIO='20/11 10:40';
+const VERSIO='2.5.6 · ammonite · novembre 2026',COMPILACIO='20/11 11:12';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1284,17 +1273,11 @@ const CLS_SCOPES=['classroom.courses.readonly','classroom.rosters.readonly','cla
 const ALIES={'classroom.courses.readonly':['classroom.courses'],'classroom.rosters.readonly':['classroom.rosters'],'classroom.coursework.students.readonly':['classroom.student-submissions.students.readonly','classroom.coursework.students']};
 const teScope=x=>{const sc=(G.scope||'').split(/\s+/).map(y=>y.split('/').pop()),k=x.split('/').pop();return sc.includes(k)||(ALIES[k]||[]).some(a=>sc.includes(a))};
 const ambCls=()=>{try{return localStorage.getItem('llibreta-cls')==='1'}catch{return false}};
-function demanaToken(prompt=''){if(!prompt)renovaMostra();return new Promise((res,rej)=>{
+function demanaToken(prompt=''){return new Promise((res,rej)=>{
   const tc=google.accounts.oauth2.initTokenClient({client_id:G.clientId,scope:['https://www.googleapis.com/auth/drive.file',...(ambCls()?CLS_SCOPES:[])].join(' '),include_granted_scopes:true,hint:G.email||undefined,
-    callback:r=>{renovaAmaga();if(r.error)return rej(new Error(r.error_description||r.error));G.scope=r.scope||'';G.token=r.access_token;G.exp=Date.now()+((+r.expires_in||3600)-60)*1000;G.need=false;res()},
-    error_callback:e=>{renovaAmaga();rej(new Error(e?.message||e?.type||'Entrada cancel·lada'))}});
+    callback:r=>{if(r.error)return rej(new Error(r.error_description||r.error));G.scope=r.scope||'';G.token=r.access_token;G.exp=Date.now()+((+r.expires_in||3600)-60)*1000;G.need=false;res()},
+    error_callback:e=>rej(new Error(e?.message||e?.type||'Entrada cancel·lada'))});
   tc.requestAccessToken({prompt})})}
-/* 2.5.4 · mentre Google renova la sessió (la finestreta que surt i marxa), l'Ammo es fica a la closca i la closca dona voltes */
-const RN={t0:0,tt:null};
-function renovaMostra(){const d=$('#renova');if(!d)return;if(!d.firstElementChild){const s=$('#lgAmmo svg');d.innerHTML=`<div class="rnc">${s?s.outerHTML:''}</div><p>Renovant la sessió de Google…</p>`}
-  clearTimeout(RN.tt);RN.t0=Date.now();d.hidden=false;d.classList.remove('fora');requestAnimationFrame(()=>d.classList.add('on','vis'))}
-function renovaAmaga(){const d=$('#renova');if(!d||d.hidden)return;const fal=Math.max(0,800-(Date.now()-RN.t0));clearTimeout(RN.tt);
-  RN.tt=setTimeout(()=>{d.classList.remove('on');d.classList.add('fora');RN.tt=setTimeout(()=>{d.classList.remove('vis');RN.tt=setTimeout(()=>{d.hidden=true;d.classList.remove('fora')},160)},380)},fal)}
 const caducaAviat=()=>!G.token||Date.now()>G.exp-5*60*1000;
 /* Renovació: el navegador només deixa obrir la finestreta de Google després d'un clic o una tecla,
    així que es renova en la primera acció que facis quan falten menys de 5 minuts. */
