@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.5 · ammonite · novembre 2026
+- ⚙ › Calculadora: casella per treure l'Ammo de la calculadora (torna a la barra negra i sense animacions). Marcada per defecte; es desa amb la llibreta i val a tots els ordinadors.
+
 ## 2.5.4 · ammonite · novembre 2026
 - **Ammo a la calculadora:** la barra passa a ser granat, com el fons de la icona, amb la cara de l'Ammo (negre, com sempre) i un tros de closca. Treu el cap en obrir-la, mira la tecla que prems, parpelleja i mou els tentacles amb =, mig tanca l'ull i arronsa els tentacles en un error, obre molt l'ull en dividir per zero, escombra amb C i fa una espurna en copiar; un parpelleig de tant en tant. No impedeix arrossegar-la. Quiet si el sistema demana reduir el moviment.
 - **Renovant la sessió de Google:** mentre surt la finestreta de Google, l'Ammo es fica a la closca i la closca dona voltes (mínim 0,8 s, no fa més lenta la càrrega).
