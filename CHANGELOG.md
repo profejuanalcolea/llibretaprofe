@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.3 · ammonite · novembre 2026
+- Copiar la proposta: casella «També els enllaços» sota «També les marques P · MA · PI», desmarcada per defecte (no repeteix enllaços que l'alumne ja té).
+
 ## 2.5.2 · ammonite · novembre 2026
 - **Copiar la proposta educativa** des del panell de diversitat (plegat, al final): a altres alumnes de la mateixa llibreta o d'una altra (el mateix alumne surt marcat sol), amb les marques P · MA · PI si es vol. Si ja en tenen, «Substitueix» o «Afegeix a sota». No copia els enllaços; es desfà amb ↶.
 - El botó de copiar al porta-retalls del panell de diversitat passa a dir «Copia el text».
