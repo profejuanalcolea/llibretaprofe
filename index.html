@@ -585,6 +585,12 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 .ricw{display:flex;flex-wrap:wrap;gap:5px}.ricb{border:1.5px solid #ddd;background:#fff;border-radius:8px;padding:5px 6px;cursor:pointer;display:flex;align-items:center;gap:3px}.ricb small{font-size:11px;color:#777}.ricb.on{border-color:#111;box-shadow:0 0 0 1px #111}
 .rcol{width:26px;height:26px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer;font-size:11px;color:#999;padding:0}.rcol.on{border-color:#111;box-shadow:0 0 0 2px #111}
 .bleines{display:flex;gap:6px;align-items:center;padding:6px 0 2px}.mob .bleines .blx{padding:6px 12px}
+
+/* 2.5.2 · copiar la proposta educativa */
+#pnCop .dvlld>summary{display:flex;align-items:center;gap:5px}#pnCop .dvlld>summary::before{margin-right:-2px}
+.cpll{max-height:220px;overflow:auto;border:1px solid #eee;border-radius:8px;padding:4px 6px}
+.cpst{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:13px;cursor:pointer}.cpst small{font-size:11px;color:#777;border:1px solid #ddd;border-radius:6px;padding:0 5px}.cpst small.te{color:#b45309;border-color:#f5c58a}.cpst.mx span{font-weight:700}
+#cpOk,#pnCp{display:flex;align-items:center;gap:5px}
 </style>
 </head>
 <body>
@@ -631,6 +637,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
   <input type="text" id="pnCerca" placeholder="🔍 Cerca al banc…" style="width:100%;margin-top:6px">
   <div id="pnBanc"></div>
   <div id="pnLl" hidden></div>
+  <div id="pnCop" hidden></div>
 </aside>
 
 <div id="calc">
@@ -845,7 +852,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.1 · ammonite · novembre 2026',COMPILACIO='19/11 22:23';
+const VERSIO='2.5.2 · ammonite · novembre 2026',COMPILACIO='20/11 07:20';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1772,12 +1779,12 @@ function tancaPanell(){PN.st=null;const p=$('#pnl');if(p)p.hidden=true;document.
 function pintaPanell(){const sub=cur(),st=sub?.students.find(x=>x.id===PN.st);if(!st){tancaPanell();return}
   $$('td.com.sel,td.dvc.sel').forEach(t=>t.classList.remove('sel'));const dvm=PN.mode==='div';
   if(dvm)$$(`td[data-dvm="${st.id}"],td[data-dvp="${st.id}"]`).forEach(t=>t.classList.add('sel'));else document.querySelector(`td[data-com="${st.id}"]`)?.classList.add('sel');
-  $('#pnTit').hidden=!dvm;$('#pnLl').hidden=!dvm;$('#pnCp').textContent=dvm?'📋 Copia':'📋 Copia per a l\'Esfera';$('#pnTxt').placeholder=dvm?'Proposta educativa: escriu-la o tria frases del banc de sota…':'Escriu el comentari o tria\'n del banc de sota…';
+  $('#pnTit').hidden=!dvm;$('#pnLl').hidden=!dvm;$('#pnCop').hidden=!dvm;$('#pnCp').innerHTML=dvm?ICOP+' Copia el text':'📋 Copia per a l\'Esfera';$('#pnCp').title=dvm?'Copia la proposta al porta-retalls':'';$('#pnTxt').placeholder=dvm?'Proposta educativa: escriu-la o tria frases del banc de sota…':'Escriu el comentari o tria\'n del banc de sota…';
   const sts=alumnesAval(sub),i=sts.findIndex(x=>x.id===st.id),f=finalDe(sub,st),fc=colFinal(sub),vf=fc?getG(sub,fc.id,st.id):undefined,lv=nivellAlumne(sub,st);
   $('#pnNom').textContent=(st.cognoms?st.cognoms+', ':'')+st.nom;$('#pnPos').textContent=`${i+1}/${sts.length}`;
   if(dvm){const d=dvDe(sub,st.id);$('#pnTit').innerHTML='🧩 Atenció a la diversitat';
     $('#pnInfo').innerHTML=`<div class="dvop"><button data-dvn="p" class="p ${d.p?'on':''}" title="Mesures universals">Personalització</button><button data-dvn="ma" class="ma ${d.ma?'on':''}">Mesures addicionals</button><button data-dvpi class="pi ${d.pi?'on':''}" title="Pla de suport individualitzat">PI</button></div>`;
-    const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=d.t||'';pintaLlPanell(sub,st);$('#pnCerca').value=PN.cerca;pintaBancPanell(sub,0);return}
+    const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=d.t||'';pintaLlPanell(sub,st);pintaCopPanell(sub,st);$('#pnCerca').value=PN.cerca;pintaBancPanell(sub,0);return}
   $('#pnInfo').innerHTML=`<span class="chip">Càlcul: <b>${esc(calcTxt(sub,f))}</b></span>${fc?`<span class="chip ${vf!==undefined?'l'+lvlFinal(vf,sub.settings):''}">${esc(fc.name)}: <b>${vf!==undefined?esc(String(vf).replace('.',',')):'—'}</b></span>`:''}`;
   const ta=$('#pnTxt');if(document.activeElement!==ta)ta.value=sub.comentaris[st.id]||'';
   $('#pnCerca').value=PN.cerca;pintaBancPanell(sub,lv)}
@@ -1791,7 +1798,7 @@ function pintaBancPanell(sub,lv){const b=bancPN(),q=norm(PN.cerca),w=$('#pnBanc'
     cats.map(c=>{const its=b.items.filter(it=>(it.cat||'')===c.id&&(c.id||!b.cats.some(k=>k.id===it.cat)));if(!its.length)return '';
       return `<details class="bcat" ${PN.obertes?.has(c.id)?'open':''} data-bc="${c.id}"><summary>${esc(c.nom)} <span class="aj">(${its.length})</span></summary>${its.map(item).join('')}</details>`}).join('')}
 function afegeixComentari(text){const sub=cur(),st=PN.st;if(!sub||!st)return;const ta=$('#pnTxt');let v=ta.value.trim();v=v?(v+(/[.!?…]$/.test(v)?' ':'. ')+text):text;ta.value=v;PN.mode==='div'?desaProposta(v):desaComentari(v)}
-function desaProposta(v){const sub=cur(),st=PN.st;if(!sub||!st)return;dvSet(sub,st,'t',v.trim()?v:'');clearTimeout(desaProposta.h);desaProposta.h=setTimeout(()=>save('proposta educativa'),500);
+function desaProposta(v){const sub=cur(),st=PN.st;if(!sub||!st)return;const abans=!!(dvDe(sub,st).t||'').trim();dvSet(sub,st,'t',v.trim()?v:'');if(abans!==!!v.trim()){const o=sub.students.find(x=>x.id===st);if(o)pintaCopPanell(sub,o)}clearTimeout(desaProposta.h);desaProposta.h=setTimeout(()=>save('proposta educativa'),500);
   const td=document.querySelector(`td[data-dvp="${st}"]`);if(td){const t=v.trim();td.innerHTML=td.classList.contains('pl')?(t?'📝':'<span class="buida">·</span>'):(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>');td.title=td.classList.contains('pl')?t||'Sense proposta educativa':'Clica per veure-ho tot o escriure'}}
 function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
   $('#pnLl').innerHTML=`<details class="dvlld" ${PN.llOb?'open':''}><summary>🔗 Enllaços${ll.length?` (${ll.length})`:''}</summary>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
@@ -1801,6 +1808,39 @@ function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
     dvSet(sub,st.id,'ll',[...ll,{n:$('#pnLlN').value.trim(),u}]);save('enllaç de diversitat');pintaLlPanell(sub,st)};
   $('#pnLlU').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#pnLlAf').click()}};
   $$('#pnLl [data-llx]').forEach(b=>b.onclick=()=>{const n=ll.filter((_,i)=>i!==+b.dataset.llx);dvSet(sub,st.id,'ll',n);save('treure enllaç de diversitat');pintaLlPanell(sub,st)})}
+/* 2.5.2 · Copia la proposta educativa a altres alumnes (d'aquesta llibreta o d'una altra) */
+const ICOP='<svg class="ric" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.3"/><path d="M10.5 5.5V3.3c0-.7-.6-1.3-1.3-1.3H3.3C2.6 2 2 2.6 2 3.3v5.9c0 .7.6 1.3 1.3 1.3h2.2"/></svg>';
+const mateixAlumne=(a,b)=>a&&b&&((a.aid&&a.aid===b.aid)||norm(nomComplet(a))===norm(nomComplet(b)));
+function pintaCopPanell(sub,st){const W=$('#pnCop');if(!W)return;PN.cop??={sub:sub.id,sel:new Set(),mes:true};
+  if(PN.cop.st!==st.id||PN.cop.de!==sub.id){PN.cop.st=st.id;PN.cop.de=sub.id;PN.cop.sel=new Set();if(!state.subjects.some(x=>x.id===PN.cop.sub&&!x.archived))PN.cop.sub=sub.id}
+  const t=(dvDe(sub,st.id).t||'').trim(),dst=state.subjects.find(x=>x.id===PN.cop.sub)||sub;
+  const sts=alumnesAval(dst).filter(x=>!(dst.id===sub.id&&x.id===st.id));
+  const llista=sts.map(x=>{const d=dvDe(dst,x.id),mx=dst.id!==sub.id&&mateixAlumne(x,st);
+    return `<label class="cpst ${mx?'mx':''}"><input type="checkbox" data-cpst="${x.id}" ${PN.cop.sel.has(x.id)?'checked':''}> <span>${esc((x.cognoms?x.cognoms+', ':'')+x.nom)}</span>${mx?'<small>mateix alumne</small>':''}${(d.t||'').trim()?'<small class="te">ja en té</small>':''}</label>`}).join('');
+  W.innerHTML=`<details class="dvlld" ${PN.copOb?'open':''}><summary>${ICOP} Copia la proposta a altres alumnes</summary>
+    ${t?`<div class="fl" style="margin:6px 0"><label class="lb" style="min-width:0">Llibreta</label><select id="cpSub" style="flex:1;min-width:0">${actives().map(x=>`<option value="${x.id}" ${x.id===dst.id?'selected':''}>${esc(x.name)}${x.id===sub.id?' (aquesta)':''}</option>`).join('')}</select></div>
+    <label class="aj" style="display:flex;gap:6px;align-items:center;margin:2px 0 6px"><input type="checkbox" id="cpMes" ${PN.cop.mes?'checked':''}> També les marques P · MA · PI</label>
+    <div class="cpll">${llista||'<p class="aj">No hi ha cap altre alumne en aquesta llibreta.</p>'}</div>
+    <div class="fl" style="margin-top:6px"><button class="btn sec" id="cpTots" style="padding:4px 10px">Tots / cap</button><span style="flex:1"></span><button class="btn" id="cpOk" ${PN.cop.sel.size?'':'disabled'}>${ICOP} Copia${PN.cop.sel.size?' ('+PN.cop.sel.size+')':''}</button></div>
+    <p class="aj" style="margin:4px 0 0">No copia els enllaços. Es pot desfer amb ↶.</p>`:'<p class="aj" style="margin:4px 0">Escriu primer la proposta educativa d\'aquest alumne.</p>'}</details>`;
+  W.querySelector('details').ontoggle=e=>{PN.copOb=e.target.open};
+  if(!t)return;
+  $('#cpSub').onchange=e=>{PN.cop.sub=e.target.value;PN.cop.sel=new Set();const n=state.subjects.find(x=>x.id===e.target.value);
+    if(n&&n.id!==sub.id){const m=n.students.find(x=>mateixAlumne(x,st));if(m)PN.cop.sel.add(m.id)}pintaCopPanell(sub,st)};
+  $('#cpMes').onchange=e=>{PN.cop.mes=e.target.checked};
+  $$('#pnCop [data-cpst]').forEach(c=>c.onchange=()=>{c.checked?PN.cop.sel.add(c.dataset.cpst):PN.cop.sel.delete(c.dataset.cpst);pintaCopPanell(sub,st)});
+  $('#cpTots').onclick=()=>{PN.cop.sel=PN.cop.sel.size===sts.length?new Set():new Set(sts.map(x=>x.id));pintaCopPanell(sub,st)};
+  $('#cpOk').onclick=()=>copiaProposta(sub,st,dst)}
+async function copiaProposta(sub,st,dst){if(dst.archived)return toast('Llibreta arxivada: només lectura.');
+  const o=dvDe(sub,st.id),t=(o.t||'').trim(),ids=[...PN.cop.sel].filter(id=>dst.students.some(x=>x.id===id));if(!t||!ids.length)return;
+  const amb=ids.filter(id=>(dvDe(dst,id).t||'').trim());let mode='subs';
+  if(amb.length){mode=await pregunta('Ja tenen proposta',`${amb.length===1?'1 dels alumnes triats ja té':amb.length+' dels alumnes triats ja tenen'} proposta educativa. Què vols fer amb ${amb.length===1?'la seva':'les seves'}?`,
+    [{t:'Cancel·la',v:null,cls:'sec'},{t:'Afegeix a sota',v:'afeg',cls:'sec'},{t:'Substitueix',v:'subs'}]);if(!mode)return}
+  ids.forEach(id=>{const v=(dvDe(dst,id).t||'').trim();dvSet(dst,id,'t',mode==='afeg'&&v?v+'\n\n'+t:t);
+    if(PN.cop.mes)['p','ma','pi'].forEach(k=>dvSet(dst,id,k,!!o[k]))});
+  save('copiar proposta educativa');PN.cop.sel=new Set();
+  toast(`Proposta copiada a ${ids.length===1?'1 alumne':ids.length+' alumnes'}${dst.id!==sub.id?' de «'+dst.name+'»':''}.`);
+  if(dst.id===sub.id)render();else pintaPanell()}
 function triaDiv(sub,st,k){if(RO())return toast('Llibreta arxivada: només lectura.');const d=dvDe(sub,st);
   dvSet(sub,st,k,!d[k]);
   save('mesures de diversitat');rResum()}
@@ -2551,6 +2591,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los. Només es veuen al panell.</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
+    <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. No copia els enllaços i es desfà amb ↶.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals, <b>meitat groga i meitat blava</b> = totes dues. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
     <li><b>Amaga 🧩</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. No surten mai a la Vista alumne ni al mòbil.</li>
     <li>En exportar (PDF, full de càlcul o CSV), la llibreta pregunta si les vols incloure; per defecte, no. Cada llibreta té les seves mesures.</li>

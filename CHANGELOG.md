@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.2 · ammonite · novembre 2026
+- **Copiar la proposta educativa** des del panell de diversitat (plegat, al final): a altres alumnes de la mateixa llibreta o d'una altra (el mateix alumne surt marcat sol), amb les marques P · MA · PI si es vol. Si ja en tenen, «Substitueix» o «Afegeix a sota». No copia els enllaços; es desfà amb ↶.
+- El botó de copiar al porta-retalls del panell de diversitat passa a dir «Copia el text».
+
 ## 2.5.1 · ammonite · novembre 2026
 - **Bloc:** caselles ☐ que es marquen ☑ amb un clic (també al mòbil). Botó ☐ o escriure «[ ]» al principi de la línia; «Treu els fets» esborra les línies marcades (es pot desfer amb ↶). Les eines del Bloc van en una fila a part, sobre el text (al mòbil no s'amaguen amb moltes pestanyes).
 - **Enllaços amb icona i color:** icones minimalistes de línia negra (document, full, presentació, carpeta, calendari, vídeo, formulari…), triades soles segons l'adreça o a mà, i un color opcional. A Eines i al mòbil.

@@ -73,6 +73,7 @@ python3 proves/proves.py
 | Columna bloquejada | Candau a la capçalera, cel·les no editables i avís; es desbloqueja des de Propietats sense tocar les notes |
 | Caselles al Bloc | [ ] i el botó ☐ fan caselles, un clic les marca ☑, el text no; «Treu els fets» |
 | Icones i colors dels enllaços | Icona automàtica per adreça, triar icona i color, es veuen a Eines i es poden treure |
+| Copiar la proposta educativa | A altres alumnes de la llibreta o d'una altra (el mateix alumne surt marcat), «Afegeix a sota» / «Substitueix», sense enllaços, es desfà amb ↶ |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 
 El programa acaba amb codi 0 si tot és correcte i 1 si alguna prova falla.

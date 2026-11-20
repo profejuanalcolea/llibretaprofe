@@ -1270,6 +1270,39 @@ def p_enl_icones(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Diversitat: copiar la proposta a altres alumnes (aquesta llibreta i una altra), amb «Afegeix a sota» i desfer')
+def p_div_copia(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    ids = pg.evaluate("alumnesAval(cur()).map(x=>x.id)")
+    a, b1, b2 = ids[0], ids[1], ids[2]
+    pg.evaluate("dvSet(cur(),%r,'t','Proposta antiga');save('x')" % b2)
+    pg.click(f'td[data-dvm="{a}"]'); pg.wait_for_timeout(200)
+    pg.click('[data-dvn=ma]'); pg.fill('#pnTxt', 'Més temps als exàmens.'); pg.wait_for_timeout(700)
+    pg.click('#pnCop summary'); pg.wait_for_timeout(100)
+    comprova(pg.locator(f'#pnCop [data-cpst="{a}"]').count() == 0, 'l\'alumne mateix no ha de sortir a la llista')
+    pg.check(f'#pnCop [data-cpst="{b1}"]'); pg.wait_for_timeout(100); pg.check(f'#pnCop [data-cpst="{b2}"]'); pg.wait_for_timeout(100)
+    pg.click('#cpOk'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#dlgQ'), 'ha de preguntar si un alumne ja té proposta')
+    pg.click('#qBtns button:has-text("Afegeix a sota")'); pg.wait_for_timeout(300)
+    d1, d2 = pg.evaluate("[cur().div[%r], cur().div[%r]]" % (b1, b2))
+    comprova(d1.get('t') == 'Més temps als exàmens.' and d1.get('ma') is True, f'còpia a b1: {d1}')
+    comprova(d2.get('t') == 'Proposta antiga\n\nMés temps als exàmens.', f'«Afegeix a sota»: {d2}')
+    comprova('ll' not in d1, 'no ha de copiar enllaços')
+    pg.evaluate("desfes()"); pg.wait_for_timeout(300)
+    comprova(not pg.evaluate("(cur().div||{})[%r]" % b1), 'no es desfà amb ↶')
+    # una altra llibreta: el mateix alumne surt marcat sol
+    pg.evaluate("""const o=cur(),n=JSON.parse(JSON.stringify(o));n.id='ll2';n.name='Grup flexible';n.div={};n.students.forEach(x=>x.id='z'+x.id);state.subjects.push(n);save('x')""")
+    pg.evaluate("obrePanell(%r,'div')" % a); pg.wait_for_timeout(200)
+    if not pg.is_visible('#cpSub'): pg.click('#pnCop summary'); pg.wait_for_timeout(100)
+    pg.select_option('#cpSub', 'll2'); pg.wait_for_timeout(200)
+    comprova(pg.locator('#pnCop [data-cpst="z%s"]' % a).is_checked(), 'el mateix alumne de l\'altra llibreta hauria de sortir marcat')
+    pg.click('#cpOk'); pg.wait_for_timeout(300)
+    d = pg.evaluate("state.subjects.find(x=>x.id==='ll2').div['z%s']" % a)
+    comprova(d.get('t') == 'Més temps als exàmens.' and d.get('ma') is True, f'còpia a l\'altra llibreta: {d}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1349,7 +1382,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
