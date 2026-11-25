@@ -371,7 +371,7 @@ body.redim,body.redim *{cursor:col-resize!important;user-select:none!important}
 td input.g,td select.g{text-align:center;text-align-last:center}
 td input.lliure{text-align:left;text-align-last:left}
 #tw tbody tr:nth-child(even)>td{background:#f6f6f6}
-#tw tbody tr.sepc>td{background:#f4f1ec!important}
+#tw tbody tr.sepc>td{background:#f4f1ec!important}#tw tbody tr.sepc.sepg>td{background:color-mix(in srgb,var(--gc,#B0BEC5) 30%,#fff)!important;border-left-color:var(--gc,#B0BEC5)}
 .vF,td.vF input.g,td.vF select.g{color:#c00000!important;font-weight:800!important}
 .vFJ,td.vFJ input.g,td.vFJ select.g{color:#0b4fb3!important;font-weight:800!important}
  td.opcc select.g{background:transparent;font-weight:600}
@@ -871,7 +871,7 @@ table.rsc th.catini,table.rsc td.catini{border-left:2px solid #8a8a8a}
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.8 · ammonite · novembre 2026',COMPILACIO='25/11 19:21';
+const VERSIO='2.5.9 · ammonite · novembre 2026',COMPILACIO='25/11 19:51';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1467,7 +1467,7 @@ function senseLlibretes(){$('#main').innerHTML=`<div class="buit">No tens cap ll
 const sigHtml=c=>`<span class="sig" style="background:${c.color};color:${textSobre(c.color)}">${esc(c.sigla||'')}</span>`;
 function llegenda(sub){if(sub.tipus==='llista'){const x=ocultesXip(sub);return x?`<div class="llegenda">${x}</div>`:''}const tot=sub.categories.reduce((a,c)=>a+(+c.weight||0),0);
   if(!sub.categories.length)return `<div class="llegenda">Sense categories. Crea-les a <b>⚙ Configuració</b> perquè la llibreta calculi la nota de referència.${ocultesXip(sub)}</div>`;
-  return `<div class="llegenda"><b>Ponderació:</b>${sub.categories.map(c=>{const m=c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana*':METODE[c.method];
+  return `<div class="llegenda"><b>Ponderació:</b>${sub.categories.filter(c=>!c.noPct).map(c=>{const m=c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana*':METODE[c.method];
     return `<span class="chip">${sigHtml(c)}${esc(c.name)}${c.noPct?'':` · <b>${c.weight}%</b>`} · ${m}</span>`}).join('')}
     ${tot!==100?`<span class="avis">⚠ Els pesos sumen ${tot}%, no 100%</span>`:''}
     ${sub.categories.some(c=>c.method==='mean'&&!mitjanaPermesa(sub,c))?'<span class="avis" style="font-weight:500" title="Hi ha escales ordinals o assoliments en aquesta categoria: no es pot fer mitjana i es fa servir la mediana. Ho pots canviar a Configuració › Conversions.">* mediana: hi ha escales o assoliments</span>':''}
@@ -1666,7 +1666,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       return `<th class="colh ${c.type==='ext'?'extc':''} ${np?'nopond':''} ${gi&&!i?'catini':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
-  h+=files.map(r=>{if(r.sep)return `<tr class="sepc"><td colspan="${ncol}"><span>${r.sh?`<i class="grsh" style="background:${r.col}">${r.sh}</i>`:''}${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
+  h+=files.map(r=>{if(r.sep)return `<tr class="sepc ${r.sh?'sepg':''}"><td colspan="${ncol}" ${r.col?`style="--gc:${r.col}"`:''}><span>${r.sh?`<i class="grsh" style="background:${r.col}">${r.sh}</i>`:''}${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
     return `<tr data-s="${st.id}">`+fix.map((f,fi)=>f.k==='cognoms'?`<td class="fx ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.cognoms||'')}</td>`
       :f.k==='nom'?`<td class="fx nomc ${f.last?'fxlast':''}" style="${stf(f)}" title="${esc(nomComplet(st))}">${fi===0?dvSpan(sub,st):''}${esc(st.nom)}</td>`
       :cella(sub,f.c,st,'fx cl '+(f.last?'fxlast':''),stf(f))).join('')+
@@ -2473,7 +2473,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
       <input type="text" class="sigin" maxlength="3" value="${esc(c.sigla||'')}" data-k="sigla" data-cat="${c.id}" title="Sigla (fins a 3 lletres)">
       <input type="text" value="${esc(c.name)}" data-k="name" data-cat="${c.id}">
       ${esLl?'':`<input type="number" class="mini" value="${c.weight}" min="0" max="100" data-k="weight" data-cat="${c.id}">%
-      <label class="cpct" title="Mostra el percentatge a la capçalera, a Avaluació, a la Vista alumne i als PDF"><input type="checkbox" data-cpct="${c.id}" ${c.noPct?'':'checked'}> Mostra el %</label>
+      <label class="cpct" title="Desmarcada, la categoria no surt a la línia «Ponderació» i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF"><input type="checkbox" data-cpct="${c.id}" ${c.noPct?'':'checked'}> Surt a la ponderació</label>
       <select data-k="method" data-cat="${c.id}">${['mean','median','mode'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>`}
       <span class="pal">${PAL.map(([hx,n])=>`<button type="button" style="background:${hx}" class="${c.color.toUpperCase()===hx?'on':''}" data-col="${hx}" data-cat="${c.id}" title="${n}"></button>`).join('')}</span>
       ${!esLl&&c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
@@ -2509,7 +2509,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     state.subjects=state.subjects.filter(x=>x!==sub);state.cur=cur().id;save();tab='llibreta';render()});
   $$('[data-k][data-cat]').forEach(i=>i.onchange=()=>{const c=sub.categories.find(x=>x.id===i.dataset.cat),k=i.dataset.k;
     c[k]=k==='weight'?(+i.value||0):k==='sigla'?i.value.trim().toUpperCase().slice(0,3):i.value;save();rConfig()});
-  $$('[data-cpct]').forEach(i=>i.onchange=()=>{const c=sub.categories.find(x=>x.id===i.dataset.cpct);if(i.checked)delete c.noPct;else c.noPct=true;save(i.checked?'mostra el %':'amaga el %');rConfig()});
+  $$('[data-cpct]').forEach(i=>i.onchange=()=>{const c=sub.categories.find(x=>x.id===i.dataset.cpct);if(i.checked)delete c.noPct;else c.noPct=true;save(i.checked?'categoria a la ponderació':'categoria fora de la ponderació');rConfig()});
   on('#kRsc','onchange',e=>{s.ressaltaCats=e.target.checked;save(e.target.checked?'ressalta les categories':'treu el ressaltat de les categories')});
   $$('.pal button').forEach(b=>b.onclick=()=>{sub.categories.find(x=>x.id===b.dataset.cat).color=b.dataset.col;save();rConfig()});
   $$('[data-cmv]').forEach(b=>b.onclick=()=>{mouCat(sub,b.dataset.cat,+b.dataset.cmv);rConfig()});
@@ -2613,7 +2613,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>A les columnes <b>estretes</b>, els desplegables no mostren la fletxeta (no tapa la icona ni el valor): surt en passar-hi el ratolí. Es despleguen igual clicant la cel·la.</li>
     <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
   sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
-    <li>A ⚙ › Categories, <b>Mostra el %</b> (a cada categoria): desmarcat, el percentatge no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF (útil per a les categories al 0%; les noves hi vénen desmarcades). <b>Ressalta la separació entre categories</b>: posa una ratlla més gruixuda a l'inici de cada categoria.</li>
+    <li>A ⚙ › Categories, <b>Surt a la ponderació</b> (a cada categoria): desmarcada, la categoria no surt a la línia «Ponderació» de dalt i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF (pensat per a les categories al 0%; les noves hi vénen desmarcades). Compte: si la desmarques en una categoria que pesa, la línia de ponderació no sumarà 100%. <b>Ressalta la separació entre categories</b>: posa una ratlla més gruixuda a l'inici de cada categoria.</li>
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+

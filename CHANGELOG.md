@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.9 · ammonite · novembre 2026
+- ⚙ › Categories: la casella passa a ser **«Surt a la ponderació»**: desmarcada, la categoria desapareix de la línia «Ponderació» de dalt (i el seu % de la capçalera, Avaluació, Vista alumne i PDF).
+- Franges de grup amb el color de cada grup (fons clar i ratlla del color del grup). Les de classe es queden amb el taronja.
+
 ## 2.5.8 · ammonite · novembre 2026
 - ⚙ › Categories: casella **Mostra el %** a cada categoria (desmarcada, el % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF; les categories noves al 0% hi vénen desmarcades) i casella **Ressalta la separació entre categories** (ratlla gris de 2 px a l'inici de cada categoria).
 - Franges de classe i de grup en gris clar amb una ratlla taronja a l'esquerra (abans negres).

@@ -1361,6 +1361,7 @@ def p_cat_pct_rsc(b):
     comprova(pg.evaluate("cur().categories.at(-1).noPct") is True, 'una categoria nova (0%) ha de venir amb el % amagat')
     pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
     comprova(pct not in pg.locator('th.grup', has_text=nom).first.inner_text(), 'el % encara surt a la capçalera')
+    comprova(nom not in pg.inner_text('.llegenda'), 'la categoria encara surt a la línia «Ponderació»')
     comprova(pg.locator('table.rsc').count() == 1 and pg.locator('td.catini').count() > 0, 'no hi ha la separació ressaltada')
     w = pg.evaluate("getComputedStyle(document.querySelector('td.catini')).borderLeftWidth")
     comprova(w == '2px', f'la ratlla de separació hauria de fer 2 px: {w}')
