@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.5.8 · ammonite · novembre 2026
+- La casella «Amaga 🧩» surt sempre (Llibreta i Avaluació), encara que la llibreta no tingui cap dada de diversitat: així es poden amagar les columnes 🧩 i Proposta educativa en qualsevol llibreta.
+
 ## 2.5.7 · ammonite · novembre 2026
 - ⚙ › Calculadora: la casella es diu «Calculadora amb animacions».
 

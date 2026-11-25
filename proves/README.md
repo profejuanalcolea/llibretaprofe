@@ -74,6 +74,7 @@ python3 proves/proves.py
 | Caselles al Bloc | [ ] i el botó ☐ fan caselles, un clic les marca ☑, el text no; «Treu els fets» |
 | Icones i colors dels enllaços | Icona automàtica per adreça, triar icona i color, es veuen a Eines i es poden treure |
 | Copiar la proposta educativa | A altres alumnes de la llibreta o d'una altra (el mateix alumne surt marcat), «Afegeix a sota» / «Substitueix», sense enllaços, es desfà amb ↶ |
+| Amaga 🧩 sense dades | La casella hi és encara que la llibreta no tingui dades de diversitat, i amaga les columnes |
 | Ammo a la calculadora | Cara de l'Ammo a la barra (no impedeix arrossegar), reacciona a error, ÷0 i =; es pot treure a ⚙ (barra negra) |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 

@@ -867,7 +867,7 @@ td.bloq{cursor:not-allowed}td.bloq select.g:disabled,td.bloq input.g:disabled{co
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.5.7 · ammonite · novembre 2026',COMPILACIO='20/11 13:27';
+const VERSIO='2.5.8 · ammonite · novembre 2026',COMPILACIO='25/11 18:52';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1626,7 +1626,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     ${ordH}</div><div class="cbr2">
     <label><input type="checkbox" id="bHCg" ${sub.ocult.cognoms?'checked':''}> Amaga cognoms</label>
     ${cls.length?`<label><input type="checkbox" id="bHCl" ${sub.ocult.classe?'checked':''}> Amaga classe</label>`:''}
-    <label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label>${teDiv(sub)||amagaDiv()?`<label title="Amaga les marques d'atenció a la diversitat (per quan projectes)"><input type="checkbox" id="bDvAm" ${amagaDiv()?'checked':''}> Amaga 🧩</label>`:''}</div>
+    <label><input type="checkbox" id="bCmp" ${sub.compacte?'checked':''}> Vista compacta</label><label title="Amaga les marques d'atenció a la diversitat (per quan projectes)"><input type="checkbox" id="bDvAm" ${amagaDiv()?'checked':''}> Amaga 🧩</label></div>
   `;let h=capcalera(sub,barra,capPlegada()?'':llegenda(sub));
   if(!sub.students.length){m.innerHTML=h+`<div class="buit">Encara no hi ha alumnes en aquesta llibreta.<div style="margin-top:12px"><button class="btn" id="bAfAl">👥 Afegeix alumnes</button></div></div>`;lligaBarra(sub);$('#bAfAl').onclick=()=>{tab='config';alObert=true;render();$('#detAl')?.scrollIntoView({block:'start'})};return}
   /* columnes fixes a l'esquerra */
@@ -1698,7 +1698,7 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
   const ro=RO(),finals=sub.columns.filter(c=>c.type==='final'),fc=colFinal(sub),pleg=!!sub.aval.comPleg;
   const barra=`<div class="cbr1"><button class="btn" id="aVA">👤 Vista alumne</button>
     ${finals.length>1?`<label>Nota final <select id="aFin">${finals.map(c=>`<option value="${c.id}" ${c===fc?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label>`:''}
-    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button>${teDiv(sub)||amagaDiv()?`<label class="dvamg" title="Amaga les marques d'atenció a la diversitat (per quan projectes)"><input type="checkbox" id="aDvAm" ${amagaDiv()?'checked':''}> Amaga 🧩</label>`:''}<button class="btn sec" id="bExp">Exporta</button></div>`;
+    <span class="sep"></span><button class="btn ${DIST.on?'':'sec'}" id="aDist" title="Nombre d'alumnes per franja i per grup">📊 Distribució</button><button class="btn sec" id="aPdf" title="Resum, detall i distribució d'aquesta llibreta, a la carpeta «Llibreta del Profe · PDF» del teu Drive">📄 Desa en PDF al Drive</button><button class="btn sec" id="aMarq" title="Treu les marques ✔ dels comentaris ja copiats">Esborra les marques ✔</button><label class="dvamg" title="Amaga les columnes i les marques d'atenció a la diversitat (per quan projectes)"><input type="checkbox" id="aDvAm" ${amagaDiv()?'checked':''}> Amaga 🧩</label><button class="btn sec" id="bExp">Exporta</button></div>`;
   let h=capcalera(sub,barra,llegenda(sub));
   if(!sub.students.length){$('#main').innerHTML=h+'<div class="buit">Sense alumnes.</div>';lligaAval(sub);return}
   const sts=alumnesAval(sub),dvOn=!amagaDiv();if(DIST.on)h+=distHtml(sub);
@@ -2611,7 +2611,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals, <b>meitat groga i meitat blava</b> = totes dues. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
-    <li><b>Amaga 🧩</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. No surten mai a la Vista alumne ni al mòbil.</li>
+    <li><b>Amaga 🧩</b> (a sota de Mostra i a la barra d'Avaluació): per quan projectes. Hi és sempre, encara que la llibreta no tingui cap dada de diversitat, i amaga les columnes 🧩 i Proposta educativa. No surten mai a la Vista alumne ni al mòbil.</li>
     <li>En exportar (PDF, full de càlcul o CSV), la llibreta pregunta si les vols incloure; per defecte, no. Cada llibreta té les seves mesures.</li>
     <li>Les frases i les categories es creen a <b>⚙ › Banc d'atenció a la diversitat</b>. Escriu-hi <b>mesures</b>, no diagnòstics: són dades sensibles.</li></ul>`)+
   sec('Alumnes i classes',`<ul><li>Els <b>Llistats del curs</b> (⚙ › Llistats del curs) són la llista oficial de grups. Les llibretes hi agafen els alumnes amb «📇 Afegeix des dels llistats del curs».</li>

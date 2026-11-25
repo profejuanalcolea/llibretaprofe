@@ -1331,6 +1331,20 @@ def p_ammo_calc(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Amaga 🧩 surt sempre, també en una llibreta sense dades de diversitat, i amaga les columnes')
+def p_div_amaga_buida(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("cur().div={};save('x');tab='resum';render()"); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#aDvAm'), 'a Avaluació hi ha de ser la casella Amaga 🧩 encara que no hi hagi dades')
+    comprova(pg.locator('td[data-dvm]').count() > 0, 'sense amagar, les columnes 🧩 hi han de ser')
+    pg.check('#aDvAm'); pg.wait_for_timeout(200)
+    comprova(pg.locator('td[data-dvm]').count() == 0 and pg.locator('td[data-dvp]').count() == 0, 'no s\'amaguen les columnes 🧩 i Proposta')
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#bDvAm') and pg.is_checked('#bDvAm'), 'a la Llibreta també hi ha de ser, marcada')
+    pg.uncheck('#bDvAm'); pg.wait_for_timeout(100)
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1410,7 +1424,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
