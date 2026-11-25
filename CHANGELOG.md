@@ -1,6 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.5.8 · ammonite · novembre 2026
+- ⚙ › Categories: casella **Mostra el %** a cada categoria (desmarcada, el % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF; les categories noves al 0% hi vénen desmarcades) i casella **Ressalta la separació entre categories** (ratlla gris de 2 px a l'inici de cada categoria).
+- Franges de classe i de grup en gris clar amb una ratlla taronja a l'esquerra (abans negres).
+- «No compta» passa a **«No entra al càlcul»** (rètol del ⊘, Vista alumne, PDF, quadre de la columna, Ajuda).
 - La casella «Amaga 🧩» surt sempre (Llibreta i Avaluació), encara que la llibreta no tingui cap dada de diversitat: així es poden amagar les columnes 🧩 i Proposta educativa en qualsevol llibreta.
 
 ## 2.5.7 · ammonite · novembre 2026

@@ -487,7 +487,7 @@ def p_nocompta(b):
     # sense Ex2: Ada EX 6 · TR 6 → 6 · Bru EX 8 · TR 10 → 8.8 · Cesc EX 9 → 9
     comprova(pg.evaluate(FINALS_JS) == [6, 8.8, 9], f'finals amb Ex2 exclosa: {pg.evaluate(FINALS_JS)}')
     th = pg.locator('th.colh[data-col=c2]')
-    comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No compta' in th.locator('.npx').get_attribute('title'), 'la capçalera no porta el signe ⊘ (amb el rètol «No compta» al símbol)')
+    comprova('nopond' in th.get_attribute('class') and '⊘' in th.inner_text() and 'No entra al càlcul' in th.locator('.npx').get_attribute('title'), 'la capçalera no porta el signe ⊘ (amb el rètol «No compta» al símbol)')
     comprova(th.locator('.hn').evaluate("e=>getComputedStyle(e).fontStyle") == 'normal' and th.evaluate("e=>getComputedStyle(e).backgroundColor") != 'rgb(236, 236, 236)', 'la capçalera encara surt grisa o en cursiva')
     comprova(th.locator('.npx').evaluate("e=>getComputedStyle(e).color") == 'rgb(153, 153, 153)', 'el símbol ⊘ no és gris')
     comprova(pg.evaluate("cur().columns.find(c=>c.id==='c2').cat") == 'kA', 'la columna ha sortit de la categoria')
@@ -503,7 +503,7 @@ def p_nocompta(b):
     # vista alumne en detall
     pg.evaluate("cur().columns.find(c=>c.id==='c2').noCompta=true;tab='resum';render()"); pg.wait_for_timeout(150)
     pg.click('#aVA'); pg.select_option('#vaMode', 'detall'); pg.wait_for_timeout(150)
-    comprova('no compta' in pg.inner_text('.vacard'), 'la vista alumne no marca la columna que no compta')
+    comprova('no entra al càlcul' in pg.inner_text('.vacard'), 'la vista alumne no marca la columna que no compta')
     if NPM:
         n = pg.evaluate("(async()=>{const d=await fesPDF([cur()],false);return d.output('arraybuffer').byteLength})()")
         comprova(n > 5000, 'el PDF falla amb una columna que no compta')
@@ -1345,6 +1345,36 @@ def p_div_amaga_buida(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Categories: amagar el % (capçalera, Avaluació, Vista alumne), ressaltar la separació i franges de classe clares')
+def p_cat_pct_rsc(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    c0 = pg.evaluate("cur().categories[0]")
+    nom = c0['name']; pct = '%d%%' % c0['weight']
+    comprova(pct in pg.locator('th.grup', has_text=nom).first.inner_text(), 'per defecte el % es veu a la capçalera')
+    pg.click('.tabic[data-t=config]'); pg.wait_for_timeout(150); pg.locator('details[data-cfg=cats] > summary').click(); pg.wait_for_timeout(100)
+    pg.uncheck(f'[data-cpct="{c0["id"]}"]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().categories[0].noPct") is True, 'no es desa «Mostra el %»')
+    pg.check('#kRsc'); pg.wait_for_timeout(100)
+    comprova(pg.evaluate("cur().settings.ressaltaCats") is True, 'no es desa «Ressalta la separació»')
+    pg.click('#kCatAf'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().categories.at(-1).noPct") is True, 'una categoria nova (0%) ha de venir amb el % amagat')
+    pg.evaluate("tab='llibreta';render()"); pg.wait_for_timeout(200)
+    comprova(pct not in pg.locator('th.grup', has_text=nom).first.inner_text(), 'el % encara surt a la capçalera')
+    comprova(pg.locator('table.rsc').count() == 1 and pg.locator('td.catini').count() > 0, 'no hi ha la separació ressaltada')
+    w = pg.evaluate("getComputedStyle(document.querySelector('td.catini')).borderLeftWidth")
+    comprova(w == '2px', f'la ratlla de separació hauria de fer 2 px: {w}')
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    comprova(not pg.locator('thead th', has_text=nom).first.inner_text().strip().endswith(pct), 'el % encara surt a Avaluació')
+    # franges de classe: clares
+    pg.evaluate("cur().mostra='classes';tab='llibreta';render()"); pg.wait_for_timeout(200)
+    comprova(pg.locator('tr.sepc td').count() > 0, 'no surten franges de classe')
+    if True:
+        bg = pg.evaluate("getComputedStyle(document.querySelector('tr.sepc td')).backgroundColor")
+        comprova(bg == 'rgb(244, 241, 236)', f'la franja de classe hauria de ser clara: {bg}')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1424,7 +1454,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
