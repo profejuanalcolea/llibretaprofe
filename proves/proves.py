@@ -510,6 +510,55 @@ def p_nocompta(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Suma: suma columnes (F i FJ valen 0, buida deixa «…»), passa-la a, check amb valor, entra al càlcul de la categoria')
+def p_suma(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    antes = pg.evaluate(FINALS_JS)
+    pg.evaluate("""const s=cur();s.columns.push({id:'p1',name:'P1',type:'num',cat:'kA',max:3},{id:'p2',name:'P2',type:'num',cat:'kA',max:4},{id:'p3',name:'P3',type:'num',cat:'kA',max:3},{id:'ch',name:'Bata',type:'check',cat:'',compta:false,vals:{}});
+      setG(s,'p1','a1',2.5,1);setG(s,'p2','a1',3,1);setG(s,'p3','a1',1.5,1);setG(s,'p1','a2',3,1);setG(s,'p2','a2','F',1);setG(s,'p3','a2',2,1);setG(s,'p1','a3',1,1);setG(s,'ch','a1','fet',1);save();render()""")
+    pg.wait_for_timeout(200)
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100)
+    pg.select_option('#cTipus', 'suma'); pg.wait_for_timeout(100)
+    comprova(pg.is_visible('#cSumF') and not pg.is_visible('#cMaxF'), 'no surt el quadre de la Suma')
+    pg.fill('#cNom', 'Examen per parts'); pg.select_option('#cCat', 'kA')
+    for c in ['p1', 'p2', 'p3']:
+        pg.check(f'#cSumL [data-sumc={c}]'); pg.wait_for_timeout(50)
+    comprova('10' in pg.inner_text('#cSumTotA'), 'el total automàtic hauria de ser 10 (3+4+3)')
+    pg.click('#cSumNC'); pg.wait_for_timeout(100)
+    comprova(pg.evaluate("['p1','p2','p3'].every(id=>cur().columns.find(c=>c.id===id).noCompta)"), '«Marca les sumades» no les treu del càlcul')
+    pg.click('#cOk'); pg.wait_for_timeout(250)
+    sid = pg.evaluate("cur().columns.find(c=>c.type==='suma').id")
+    r = pg.evaluate("cur().students.map(st=>{const r=resolveSuma(cur(),cur().columns.find(c=>c.type==='suma'),st);return r?(r.k==='falta'?'…':Math.round(r.v*100)/100):null})")
+    comprova(r == [7, 5, '…'], f'sumes: {r} (esperat 7, 5 amb F=0, i «…» si falta una part)')
+    comprova(pg.locator(f'td[data-c="{sid}"][data-s=a3]').inner_text().strip() == '…', 'la cel·la pendent hauria de mostrar «…»')
+    comprova('P2' in pg.locator(f'td[data-c="{sid}"][data-s=a3] .buida').get_attribute('title'), 'el rètol hauria de dir quina part falta')
+    f = pg.evaluate(FINALS_JS)
+    # Ada EX (6,8,7)=7 · TR 6 → 6.6 · Bru EX (8,0,5)=4.333 · TR 10 → 6.6 · Cesc EX 9 → 9
+    comprova(f == [6.6, 6.6, 9], f'finals amb la suma dins d\'Exàmens: {f}')
+    # FJ val 0 i desbloqueja; i en escriure la cel·la s'actualitza sola
+    pg.fill(f'td[data-c=p2][data-s=a3] input', 'FJ'); pg.keyboard.press('Enter'); pg.wait_for_timeout(200)
+    pg.wait_for_timeout(300); pg.click(f'td[data-c=p3][data-s=a3] input'); pg.keyboard.type('2'); pg.keyboard.press('Tab'); pg.wait_for_timeout(300)
+    dbg = pg.evaluate("[getG(cur(),'p2','a3'),getG(cur(),'p3','a3'),JSON.stringify(resolveSuma(cur(),cur().columns.find(c=>c.type==='suma'),cur().students[2]))]")
+    comprova(pg.locator(f'td[data-c="{sid}"][data-s=a3]').inner_text().strip() == '3', f'la suma no s\'actualitza en escriure (FJ=0 → 1+0+2=3): {dbg} · cel·la «{pg.locator(f"td[data-c=\"{sid}\"][data-s=a3]").inner_text()}»')
+    comprova(pg.evaluate(FINALS_JS)[2] == 6, 'Cesc: EX (9,3)=6 → 6')
+    # passa-la a 1 i un check amb valor
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.select_option('#cTipus', 'suma'); pg.wait_for_timeout(50)
+    pg.fill('#cNom', 'Bata'); pg.select_option('#cCat', ''); pg.check('#cSumL [data-sumc=ch]'); pg.wait_for_timeout(50)
+    pg.fill('#cSumL [data-sumv="ch|fet"]', '2'); pg.fill('#cSumA', '0,5'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    r2 = pg.evaluate("cur().students.map(st=>{const r=resolveSuma(cur(),cur().columns.filter(c=>c.type==='suma')[1],st);return r?Math.round(r.v*100)/100:null})")
+    comprova(r2 == [0.5, None, None], f'check sumat i passat a 0,5: {r2}')
+    comprova(pg.evaluate(FINALS_JS)[:2] == [6.6, 6.6], 'una suma sense categoria no ha de canviar la nota')
+    comprova(pg.evaluate("cur().columns.find(c=>c.type==='suma').max") == 10, 'el «sobre» de la suma hauria de ser 10')
+    # PDF, vista alumne i exportació no peten
+    pg.evaluate("tab='resum';render()"); pg.wait_for_timeout(200)
+    pg.evaluate("VA.on=true;VA.idx=0;rVistaAlumne(cur())"); pg.wait_for_timeout(150)
+    r = pg.evaluate("(async()=>{try{const d=await fesPDF([cur()],false);return d.output('arraybuffer').byteLength}catch(e){return e.message}})()")
+    comprova(isinstance(r, int) or 'segura' in str(r) or 'carreg' in str(r), f'el PDF amb sumes falla: {r}')
+    comprova(len(pg.evaluate("cur().students.map(st=>textCella(cur(),cur().columns.find(c=>c.type==='suma'),st))")) == 3, 'textCella amb suma')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('«No ava»: s\'escriu com nav/noava/no ava, es veu taronja i no compta a la mitjana')
 def p_noava(b):
     ctx, pg = pagina_local(b)
@@ -1455,7 +1504,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
