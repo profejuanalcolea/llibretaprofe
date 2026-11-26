@@ -1487,6 +1487,53 @@ def p_cat_pct_rsc(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Sortides: esborrar-ne una (✕) o les de les dates triades; es pot desfer amb ↶')
+def p_sortides_esborra(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("""const s=cur();const t=Date.now();s.sortides=[0,1,2].map(i=>({id:'so'+i,st:s.students[i].id,tipus:'wc',ini:t-3600e3*(i+1),fi:t-3600e3*(i+1)+300e3}));save('x')""")
+    pg.evaluate("obreSortides()"); pg.wait_for_timeout(200)
+    comprova(pg.locator('#soW [data-sox]').count() == 3, 'hi ha d\'haver una ✕ per sortida')
+    pg.click('#soW [data-sox=so1]'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().sortides.map(x=>x.id)") == ['so0', 'so2'], 'no s\'esborra la sortida')
+    pg.click('#soDel'); pg.wait_for_timeout(150)
+    pg.click('#qBtns button:has-text("Només esborra")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().sortides.length") == 0, 'no s\'esborren les sortides de les dates')
+    pg.click('#soX'); pg.evaluate("desfes()"); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().sortides.length") == 2, 'no es desfà amb ↶')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Diversitat a Eines: llistat per llibreta i per alumne, cerca, s\'amaga amb «Amaga 🧩» i esborrar la d\'una llibreta amb confirmació')
+def p_div_eines(b):
+    ctx, pg = pagina_local(b)
+    ids = pg.evaluate("cur().students.slice(0,2).map(x=>x.id)")
+    pg.evaluate("""([a,b])=>{const s=cur();dvSet(s,a,'ma',true);dvSet(s,a,'t','Més temps als exàmens.');dvSet(s,a,'ll',[{n:'PI',u:'https://example.org/pi'}]);dvSet(s,b,'p',true);
+      const n=JSON.parse(JSON.stringify(s));n.id='ll2';n.name='Mates flexible';n.div={};n.div[a]={pi:true,t:'Material de reforç.'};state.subjects.push(n);save('x')}""", ids)
+    pg.click('.tabic[data-t=eines]'); pg.wait_for_timeout(200)
+    comprova(pg.locator('[data-eina=div]').count() == 1, 'no hi ha la fitxa d\'atenció a la diversitat a Eines')
+    pg.click('[data-eina=div]'); pg.wait_for_timeout(200)
+    comprova(pg.locator('#dvtW tr').count() == 2 + 3, f'per llibreta: 2 taules amb 3 alumnes ({pg.locator("#dvtW tr").count()} files)')
+    pg.click('#dvtW [data-dvtv=al]'); pg.wait_for_timeout(150)
+    comprova(pg.locator('#dvtW tr.dvtg').count() == 2, 'per alumne: 2 alumnes')
+    pg.fill('#dvtQ', pg.evaluate("soNom(cur().students[1])")[:5]); pg.wait_for_timeout(150)
+    comprova(pg.locator('#dvtW tr').count() >= 2, 'la cerca no troba l\'alumne')
+    pg.fill('#dvtQ', ''); pg.click('#dvtW [data-dvtv=ll]'); pg.wait_for_timeout(150)
+    # esborrar: nom equivocat → no esborra; nom bo → esborra
+    pg.click('#dvtW [data-dvtdel=ll2]'); pg.wait_for_timeout(150); pg.click('#qBtns button:has-text("Només esborra")'); pg.wait_for_timeout(150)
+    pg.fill('#qIn', 'una altra'); pg.click('#qBtns button:has-text("Esborra per sempre")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("Object.keys(state.subjects.find(z=>z.id==='ll2').div).length") == 1, 'amb el nom equivocat no ha d\'esborrar res')
+    pg.click('#dvtW [data-dvtdel=ll2]'); pg.wait_for_timeout(150); pg.click('#qBtns button:has-text("Només esborra")'); pg.wait_for_timeout(150)
+    pg.fill('#qIn', 'Mates flexible'); pg.click('#qBtns button:has-text("Esborra per sempre")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("Object.keys(state.subjects.find(z=>z.id==='ll2').div).length") == 0, 'no s\'esborra la diversitat de la llibreta')
+    comprova(pg.evaluate("Object.keys(cur().div).length") == 2, 'no s\'han de tocar les altres llibretes')
+    comprova(pg.evaluate("HIST.und.length") == 0, 'després d\'esborrar la diversitat no s\'ha de poder desfer')
+    pg.click('#dvtX')
+    pg.evaluate("localStorage.setItem('llibreta-amaga-div','1');rEines()"); pg.wait_for_timeout(150)
+    comprova(pg.locator('[data-eina=div]').count() == 0, 'amb «Amaga 🧩» la fitxa no ha de sortir')
+    pg.evaluate("localStorage.removeItem('llibreta-amaga-div')")
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1566,7 +1613,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

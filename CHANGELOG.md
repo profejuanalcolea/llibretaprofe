@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.6.4 · ammonite · novembre 2026
+- **Sortides:** esborrar una sortida (✕) o totes les de les dates triades (pregunta si vols el PDF abans). Es desfà amb ↶.
+- **🧰 Eines › 🧩 Atenció a la diversitat:** llistat de tota la diversitat (mesures, proposta, enllaços amb botó de copiar), totes les llibretes o una, amb arxivades opcionals, per llibreta o per alumne, cercador i PDF al Drive. Botó «Esborra la diversitat d'aquesta llibreta» amb PDF opcional i confirmació escrivint el nom (no es pot desfer). No surt amb «Amaga 🧩».
+
 ## 2.6.3 · ammonite · novembre 2026
 - **Categories amb suma:** dos mètodes nous al costat de mitjana, mediana i moda. «Suma (punts fets)»: punts de l'alumne / punts possibles de les columnes on té nota. «Suma (total fix)»: punts acumulats sobre un total que poses tu (o la suma dels «sobre»), cel·la sense nota = 0, màxim 10. Només amb columnes numèriques (si no, mediana*). Punts al rètol de la nota de categoria a Avaluació.
 

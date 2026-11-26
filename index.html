@@ -618,6 +618,13 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 .sumv{display:flex;flex-wrap:wrap;gap:4px 10px;margin:2px 0 4px 24px;font-size:13px}.sumv input{width:48px;padding:2px 4px}
 
 .sumt{display:inline-flex;align-items:center;gap:4px;font-size:13px}.sumt input{width:56px}
+
+/* 2.6.4 · llistat de diversitat */
+.dvconf{margin:0 0 8px;font-size:12.5px;color:#9a3412;background:#fff4ec;border-radius:6px;padding:4px 8px;display:inline-block}
+.dvtcos{max-height:60vh;overflow:auto;margin-top:8px}.dvth{display:flex;align-items:center;gap:6px;margin:12px 0 4px}
+table.dvtt-t{width:100%;border-collapse:collapse;font-size:13px}table.dvtt-t th{text-align:left;background:#f4f4f4;padding:4px 6px}table.dvtt-t td{border-top:1px solid #eee;padding:5px 6px;vertical-align:top}
+table.dvtt-t tr.dvtg td{border-top:2px solid #bbb}td.dvtt{max-width:380px}.dvtl{display:inline-flex;align-items:center;gap:2px;margin-right:6px}.dvtl .llcp{border:0;background:none;padding:2px;cursor:pointer;color:#555;display:inline-flex}
+.seg{display:inline-flex;border:1px solid #ccc;border-radius:8px;overflow:hidden}.seg button{border:0;background:#fff;padding:5px 10px;cursor:pointer}.seg button.on{background:#111;color:#fff}
 </style>
 </head>
 <body>
@@ -778,8 +785,10 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 <!-- Nova llibreta -->
 <div id="anMenu" class="anmenu" role="menu"></div>
 <div id="soMenu" class="anmenu" role="menu"></div><div id="hMenu" class="anmenu" role="menu"></div><div id="soAvis"></div>
+<dialog id="dlgDvT" style="width:min(900px,96vw)"><h3 style="margin:0 0 4px">🧩 Atenció a la diversitat</h3><p class="dvconf">Informació confidencial: no la projectis ni la deixis oberta.</p><div id="dvtW"></div>
+  <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="dvtX">Tanca</button><button class="btn" id="dvtPdf">PDF al Drive</button></div></dialog>
 <dialog id="dlgSo" style="width:min(760px,95vw)"><h3 style="margin:0 0 8px">🚻 Sortides de l'aula</h3><div id="soW"></div>
-  <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="soX">Tanca</button><button class="btn sec" id="soCopia">📋 Copia</button><button class="btn" id="soPdf">PDF</button></div></dialog>
+  <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec perill" id="soDel" style="margin-right:auto">Esborra les d'aquestes dates</button><button class="btn sec" id="soX">Tanca</button><button class="btn sec" id="soCopia">📋 Copia</button><button class="btn" id="soPdf">PDF</button></div></dialog>
 <dialog id="dlgCls" style="width:min(720px,94vw)"><h3>🎓 Classroom</h3><div id="clsW"></div><div class="fl" id="clsBtns" style="margin-top:12px"></div></dialog>
 <dialog id="dlgAfAl" style="width:min(640px,94vw)"><h3>Afegeix alumnes</h3>
   <div class="aftabs"><button class="aftab" data-m="alumnat">📇 Dels llistats del curs</button><button class="aftab" data-m="llib">📋 D'una altra llibreta</button></div>
@@ -886,7 +895,7 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.6.3 · ammonite · novembre 2026',COMPILACIO='27/11 00:19';
+const VERSIO='2.6.4 · ammonite · novembre 2026',COMPILACIO='27/11 00:31';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1006,7 +1015,7 @@ function demo(){
 }
 
 function migra(d){
-  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','recll','recgen'];d.eines.ordre=d.eines.ordre.filter(k=>k!=='posits');d.bloc??={pestanyes:[],actiu:null};if(!d.bloc.pestanyes.length)d.bloc.pestanyes.push({id:uid(),nom:'Notes',text:''});d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.sortidesMin??=7;if(!d.eines.aula.includes('sort'))d.eines.aula.push('sort');d.banc??={cats:[],items:[]};d.bancDiv??={cats:[],items:[]};d.bancDiv.cats??=[];d.bancDiv.items??=[];d.banc.cats??=[];d.banc.items??=[];
+  d.recursos??=[];d.posits??=[];d.colors??={joc:'pal'};d.eines??={};d.eines.ordre??=['aula','recll','recgen'];d.eines.ordre=d.eines.ordre.filter(k=>k!=='posits');d.bloc??={pestanyes:[],actiu:null};if(!d.bloc.pestanyes.length)d.bloc.pestanyes.push({id:uid(),nom:'Notes',text:''});d.eines.pleg??={};d.eines.aula??=['temp','atz','par','calc'];if(!d.eines.aula.includes('llist'))d.eines.aula.push('llist');d.alumnat??=[];d.sortidesMin??=7;if(!d.eines.aula.includes('sort'))d.eines.aula.push('sort');if(!d.eines.divAf){d.eines.divAf=1;if(!d.eines.aula.includes('div'))d.eines.aula.push('div')}d.banc??={cats:[],items:[]};d.bancDiv??={cats:[],items:[]};d.bancDiv.cats??=[];d.bancDiv.items??=[];d.banc.cats??=[];d.banc.items??=[];
   for(const s of d.subjects){
     s.students=(s.students||[]).map(st=>st.nom!==undefined?st:{id:st.id,nom:st.name||'',cognoms:''});
     s.columns=(s.columns||[]).map(c=>{if(c.type==='text')c.type='lliure';delete c.tema;return c});
@@ -2687,6 +2696,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
+    <li><b>🧰 Eines › 🧩 Atenció a la diversitat</b>: el llistat de tots els alumnes amb dades de diversitat (mesures, proposta i enllaços), de totes les llibretes o d'una, amb les arxivades si vols, <b>per llibreta</b> o <b>per alumne</b> (cada alumne amb el que té a cada llibreta), i un cercador. <b>PDF al Drive</b> desa el que estàs veient. <b>Esborra la diversitat d'aquesta llibreta</b> (vista per llibreta) esborra mesures, proposta i enllaços de diversitat d'aquella llibreta (no toca notes ni comentaris): pregunta si vols el PDF abans i demana escriure el nom de la llibreta; no es pot desfer. La fitxa no surt si tens marcat «Amaga 🧩».</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals, <b>meitat groga i meitat blava</b> = totes dues. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>
@@ -2698,7 +2708,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
     <li>Les <b>llistes</b> (sense notes) serveixen per a sortides, autoritzacions… Es creen amb la plantilla «llista».</li></ul>`)+
   sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C; l'Ammo de la barra granat, com a la icona (es pot treure a ⚙ › Calculadora › «Calculadora amb animacions»), mira les tecles que prems, parpelleja amb =, arronsa els tentacles si hi ha un error i fa una espurna en copiar), Llistats i Sortides, i els enllaços de recursos.</li>
-    <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides. El registre del curs anterior s'esborra en començar el curs nou.</li>
+    <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides; allà pots esborrar una sortida amb ✕ o totes les de les dates triades (es pot desfer amb ↶). El registre del curs anterior s'esborra en començar el curs nou.</li>
     <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta. <b>Caselles:</b> el botó ☐ (o escriure <b>[ ]</b> al principi d'una línia) hi posa una casella; un clic a la casella la marca ☑ o la desmarca, també al mòbil. «Treu els fets» esborra les línies marcades (es pot desfer amb ↶). Les eines (☐, Treu els fets, Elimina la pestanya) són en una fila a sobre del text; si hi ha moltes pestanyes, s'estrenyen.</li></ul>`)+
   sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
     <li>Cada 1 de setembre canvia el curs de la barra i et proposa arxivar les llibretes de l'anterior.</li>
@@ -3142,13 +3152,13 @@ function nivPosit(p){if(!p.data||p.fet)return '';const d=Math.round((new Date(p.
   return d<0?'vencut':d===0?'avui':d<=2?'vermell':d<=7?'taronja':''}
 function diesPosit(p){return Math.round((new Date(p.data+'T12:00')-new Date(avui()+'T12:00'))/864e5)}
 function textAvis(p){const n=nivPosit(p),d=diesPosit(p);return n==='vencut'?`⚠ Vençut fa ${-d} ${d===-1?'dia':'dies'}`:n==='avui'?'⚠ És avui':d===1?'⚠ Demà':`⚠ D'aquí a ${d} dies`}
-const EINA={temp:['⏱️','Temporitzador',()=>obreTemp()],atz:['🎲',"Alumne a l'atzar",()=>obreAtzar()],par:['👥','Fer parelles',()=>obreParelles()],calc:['🧮','Calculadora',()=>calcObre(true)],llist:['📇','Llistats',()=>obreLlistats()],sort:['🚻','Sortides',()=>obreSortides()]};
+const EINA={temp:['⏱️','Temporitzador',()=>obreTemp()],atz:['🎲',"Alumne a l'atzar",()=>obreAtzar()],par:['👥','Fer parelles',()=>obreParelles()],calc:['🧮','Calculadora',()=>calcObre(true)],llist:['📇','Llistats',()=>obreLlistats()],sort:['🚻','Sortides',()=>obreSortides()],div:['🧩','Atenció a la diversitat',()=>obreDvTot()]};
 function rEines(){const sub=cur(),E=state.eines;
   const grupsRec=list=>{const g=new Map();list.forEach(r=>{const k=r.grup||'Altres';if(!g.has(k))g.set(k,[]);g.get(k).push(r)});return [...g.entries()]};
   const fitxes=(list,on)=>[['',list]].filter(([,rs])=>rs.length).map(([k,rs])=>`<div class="grupr"><div class="fitxes">${rs.map(r=>`
     <a class="fitxa fitxar" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer" style="${r.col?'background:'+r.col:''}">${ricSvg(ricDe(r))}<span>${esc(r.name)}</span>
       <span class="acc"><button data-rmv="-1" data-rid="${r.id}" data-on="${on}" title="Mou">◀</button><button data-rmv="1" data-rid="${r.id}" data-on="${on}" title="Mou">▶</button><button data-red="${r.id}" data-on="${on}" title="Edita">✎</button></span></a>`).join('')}</div></div>`).join('')||'<p style="color:var(--suau)">Encara no hi ha enllaços.</p>';
-  const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
+  const B={aula:{t:"🧑‍🏫 Eines d'aula",h:`<div class="tiles">${E.aula.filter(k=>EINA[k]&&!(k==='div'&&amagaDiv())).map((k,i,a)=>`<div class="tilew"><button class="tile" data-eina="${k}"><span>${EINA[k][0]}</span>${EINA[k][1]}</button>
         <span class="acc"><button data-emv="-1" data-e="${k}" ${i===0?'disabled':''} title="Mou">◀</button><button data-emv="1" data-e="${k}" ${i===a.length-1?'disabled':''} title="Mou">▶</button></span></div>`).join('')}</div>`},
     recll:{t:`Recursos de la llibreta <span class="ebn">${sub?sub.recursos.length:0}</span>`,x:`<button class="btn sec" id="eNouRL" style="padding:4px 10px" ${sub?'':'disabled'}>＋ Enllaç</button>`,h:sub?fitxes(sub.recursos,'ll'):''},
     recgen:{t:`Recursos generals <span class="ebn">${state.recursos.length}</span>`,x:'<button class="btn sec" id="eNouRG" style="padding:4px 10px">＋ Enllaç</button>',h:fitxes(state.recursos,'gen')}};
@@ -3246,15 +3256,65 @@ function soResum(sub,llista){const m=new Map();llista.forEach(x=>{const r=m.get(
   return [...m.entries()].map(([id,r])=>({st:sub.students.find(z=>z.id===id),...r})).sort((a,b)=>b.n-a.n||b.t-a.t)}
 const soNom=st=>st?(st.cognoms?st.cognoms+', ':'')+st.nom:'(alumne eliminat)';
 const soDur=x=>x.fi?soMin(x.fi-x.ini)+' min':'fora';
+/* 2.6.4 · Llistat de tota l'atenció a la diversitat (Eines): per llibreta o per alumne, PDF i esborrar la d'una llibreta */
+const DVT={sub:'',arx:false,vista:'ll',q:''};
+const dvAlguna=d=>!!(d&&(dvTe(d)||(d.t||'').trim()||d.ll?.length));
+function dvFiles(){const subs=state.subjects.filter(z=>z.tipus!=='llista'&&(DVT.arx||!z.archived)&&(!DVT.sub||z.id===DVT.sub)),q=norm(DVT.q.trim()),f=[];
+  subs.forEach(sub=>sub.students.forEach(st=>{const d=dvDe(sub,st.id);if(!dvAlguna(d))return;const nom=soNom(st);if(q&&!norm(nom).includes(q))return;f.push({sub,st,d,nom,cl:classeDe(sub,st)||''})}));
+  return f.sort((a,b)=>a.nom.localeCompare(b.nom,'ca'))}
+function obreDvTot(){if(amagaDiv())return toast('Tens marcat «Amaga 🧩».');DVT.q='';pintaDvTot();$('#dlgDvT').showModal()}
+function pintaDvTot(){const f=dvFiles(),subs=state.subjects.filter(z=>z.tipus!=='llista'&&(DVT.arx||!z.archived));if(DVT.sub&&!subs.some(z=>z.id===DVT.sub))DVT.sub='';
+  const enl=d=>(d.ll||[]).map((l,i)=>`<span class="dvtl"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,40))}</a><button class="llcp" data-dvtcp="${esc(l.u)}" title="Copia l'enllaç">${ICOP}</button></span>`).join('');
+  const fila=(x,ambLl)=>`<tr><td><b>${esc(x.nom)}</b>${x.cl?`<br><small>${esc(x.cl)}</small>`:''}${ambLl?`<br><small>${esc(x.sub.name)}${x.sub.archived?' · arxivada':''}</small>`:''}</td><td>${dvChips(x.d)||''}</td><td class="dvtt">${esc((x.d.t||'').trim()).replace(/\n/g,'<br>')}</td><td>${enl(x.d)}</td></tr>`;
+  const cap='<tr><th>Alumne</th><th>Mesures</th><th>Proposta educativa</th><th>Enllaços</th></tr>';
+  let cos='';
+  if(!f.length)cos='<p class="aj">No hi ha cap alumne amb dades d\'atenció a la diversitat'+(DVT.q?' amb aquest nom':'')+'.</p>';
+  else if(DVT.vista==='al'){const g=new Map();f.forEach(x=>{const k=x.st.aid||norm(x.nom);if(!g.has(k))g.set(k,[]);g.get(k).push(x)});
+    cos=`<table class="dvtt-t">${cap}${[...g.values()].map(xs=>xs.map((x,i)=>fila(x,true).replace('<tr>',`<tr class="${i?'':'dvtg'}">`)).join('')).join('')}</table>`}
+  else{const per=new Map();f.forEach(x=>{if(!per.has(x.sub.id))per.set(x.sub.id,[]);per.get(x.sub.id).push(x)});
+    cos=[...per.entries()].map(([id,xs])=>{const sub=xs[0].sub;return `<div class="dvth"><b>${sub.icon||''} ${esc(sub.name)}</b>${sub.archived?' <small>· arxivada</small>':''} <small>· ${xs.length} ${xs.length===1?'alumne':'alumnes'}</small><span style="flex:1"></span><button class="btn sec perill" data-dvtdel="${id}">Esborra la diversitat d'aquesta llibreta</button></div><table class="dvtt-t">${cap}${xs.map(x=>fila(x,false)).join('')}</table>`}).join('')}
+  $('#dvtW').innerHTML=`<div class="sofil"><select id="dvtSub"><option value="">Totes les llibretes${DVT.arx?'':' actives'}</option>${subs.map(z=>`<option value="${z.id}" ${z.id===DVT.sub?'selected':''}>${z.icon||''} ${esc(z.name)}${z.archived?' (arxivada)':''}</option>`).join('')}</select>
+    <label><input type="checkbox" id="dvtArx" ${DVT.arx?'checked':''}> Inclou les arxivades</label>
+    <span class="seg"><button class="${DVT.vista==='ll'?'on':''}" data-dvtv="ll">Per llibreta</button><button class="${DVT.vista==='al'?'on':''}" data-dvtv="al">Per alumne</button></span>
+    <input type="search" id="dvtQ" placeholder="Cerca un alumne" value="${esc(DVT.q)}" style="flex:1;min-width:140px"></div><div class="dvtcos">${cos}</div>`;
+  $('#dvtSub').onchange=e=>{DVT.sub=e.target.value;pintaDvTot()};$('#dvtArx').onchange=e=>{DVT.arx=e.target.checked;pintaDvTot()};
+  $$('#dvtW [data-dvtv]').forEach(b=>b.onclick=()=>{DVT.vista=b.dataset.dvtv;pintaDvTot()});
+  $('#dvtQ').oninput=e=>{DVT.q=e.target.value;const p=e.target.selectionStart;pintaDvTot();const i=$('#dvtQ');i.focus();i.setSelectionRange(p,p)};
+  $$('#dvtW [data-dvtcp]').forEach(b=>b.onclick=async()=>{const ok=await copiaText(b.dataset.dvtcp);toast(ok?'Enllaç copiat.':'No s\'ha pogut copiar.')});
+  $$('#dvtW [data-dvtdel]').forEach(b=>b.onclick=()=>esborraDivLl(state.subjects.find(z=>z.id===b.dataset.dvtdel)))}
+async function pdfDvTot(f,titol){await carregaPDF();const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  doc.setFontSize(14);doc.text(pt(titol),10,14);doc.setFontSize(9);doc.text(pt('Informació confidencial · generat: '+new Date().toLocaleString('ca-ES',{dateStyle:'short',timeStyle:'short'})),10,20);
+  doc.autoTable({startY:25,margin:{left:10,right:10},styles:{fontSize:8.5,cellPadding:1.6,valign:'top'},headStyles:{fillColor:[17,17,17]},columnStyles:{0:{cellWidth:44},1:{cellWidth:40},2:{cellWidth:32},3:{cellWidth:'auto'},4:{cellWidth:62}},
+    head:[['Alumne','Llibreta','Mesures','Proposta educativa','Enllaços']].map(r=>r.map(pt)),
+    body:f.map(x=>[x.nom+(x.cl?'\n'+x.cl:''),x.sub.name+(x.sub.archived?' (arxivada)':''),dvEtiq(x.d),(x.d.t||'').trim(),(x.d.ll||[]).map(l=>(l.n?l.n+': ':'')+l.u).join('\n')].map(pt))});
+  return doc}
+async function desaPdfDv(f,titol){if(!f.length){toast('No hi ha res per exportar.');return false}toast('⏳ Generant el PDF…',2000);
+  const nom=nomFitxer(`${avui()} · Diversitat · ${titol}.pdf`);
+  try{const doc=await pdfDvTot(f,'Atenció a la diversitat · '+titol);
+    if(mode==='drive'){try{await pujaPDF(doc,nom);toast(`PDF desat al Drive: «${CARPDF}» › ${nom}`,6000);return true}catch(e){if(e.message!=='offline'&&e.message!=='reauth')console.error(e);doc.save(nom);toast('No s\'ha pogut desar al Drive: s\'ha descarregat.',6000);return true}}
+    doc.save(nom);toast('PDF descarregat.');return true}
+  catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000);return false}}
+async function esborraDivLl(sub){if(!sub)return;const n=sub.students.filter(st=>dvAlguna(dvDe(sub,st.id))).length;if(!n)return;
+  const r=await pregunta('Esborrar la diversitat',`S'esborraran les mesures, la proposta educativa i els enllaços de diversitat de ${n===1?'1 alumne':n+' alumnes'} de «${sub.name}». No es toquen les notes ni els comentaris. No es podrà desfer. Vols desar-ne el PDF abans?`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Només esborra',v:'nomes',cls:'sec'},{t:'Exporta el PDF i esborra',v:'pdf'}]);
+  if(!r)return;
+  if(r==='pdf'){const f=sub.students.map(st=>({sub,st,d:dvDe(sub,st.id),nom:soNom(st),cl:classeDe(sub,st)||''})).filter(x=>dvAlguna(x.d)).sort((a,b)=>a.nom.localeCompare(b.nom,'ca'));if(!await desaPdfDv(f,sub.name))return}
+  const t=await pregunta('Confirma l\'esborrat',`Per confirmar-ho, escriu el nom de la llibreta: ${sub.name}`,[{t:'Cancel·la',v:false,cls:'sec'},{t:'Esborra per sempre',v:true,cls:'perill'}],'');
+  if(t===false||t===null||t===undefined)return;if(norm(String(t).trim())!==norm(sub.name))return toast('El nom no coincideix: no s\'ha esborrat res.',5000);
+  sub.div={};save('esborrar la diversitat de «'+sub.name+'»');iniciaHist();render();if($('#dlgDvT').open)pintaDvTot();
+  toast('Dades de diversitat esborrades. Les còpies setmanals del Drive les conserven unes setmanes.',7000)}
+$('#dvtX').onclick=()=>$('#dlgDvT').close();
+$('#dvtPdf').onclick=()=>{const f=dvFiles();const s=DVT.sub?state.subjects.find(z=>z.id===DVT.sub)?.name:'totes les llibretes';desaPdfDv(f,s||'totes les llibretes')};
 function obreSortides(){SOF.sub=cur()?.id||'';pintaSoDlg();$('#dlgSo').showModal()}
 function pintaSoDlg(){const {sub,llista}=soFiltrades(),res=soResum(sub,llista),ll=state.subjects.filter(z=>!z.archived&&z.tipus!=='llista'||z.id===sub.id);
   $('#soW').innerHTML=`<div class="sofil"><select id="soSub">${ll.map(z=>`<option value="${z.id}" ${z.id===sub.id?'selected':''}>${z.icon||''} ${esc(z.name)}</option>`).join('')}</select>
     <label>Des de <input type="date" id="soDes" value="${SOF.des}"></label><label>fins a <input type="date" id="soFins" value="${SOF.fins}"></label></div>
     ${llista.length?`<h4 class="soh">Per alumne</h4><table class="sotab"><tr><th>Alumne</th><th>Classe</th><th class="n">Sortides</th><th class="n">🚻 WC</th><th class="n">🚪 Sortida</th><th class="n">Temps total</th></tr>
       ${res.map(r=>`<tr><td>${esc(soNom(r.st))}</td><td>${esc(r.st?classeDe(sub,r.st)||'':'')}</td><td class="n">${r.n}</td><td class="n">${r.wc}</td><td class="n">${r.so}</td><td class="n">${soMin(r.t)} min</td></tr>`).join('')}</table>
-    <h4 class="soh">Per data</h4><table class="sotab"><tr><th>Data</th><th>Alumne</th><th>Tipus</th><th>Sortida</th><th>Tornada</th><th class="n">Durada</th></tr>
-      ${llista.map(x=>{const st=sub.students.find(z=>z.id===x.st);return `<tr><td>${soData(x.ini).split('-').reverse().join('/')}</td><td>${esc(soNom(st))}</td><td>${SO_TIPUS[x.tipus].join(' ')}</td><td>${soHora(x.ini)}</td><td>${x.fi?soHora(x.fi):'—'}</td><td class="n">${soDur(x)}</td></tr>`}).join('')}</table>`
+    <h4 class="soh">Per data</h4><table class="sotab"><tr><th>Data</th><th>Alumne</th><th>Tipus</th><th>Sortida</th><th>Tornada</th><th class="n">Durada</th><th></th></tr>
+      ${llista.map(x=>{const st=sub.students.find(z=>z.id===x.st);return `<tr><td>${soData(x.ini).split('-').reverse().join('/')}</td><td>${esc(soNom(st))}</td><td>${SO_TIPUS[x.tipus].join(' ')}</td><td>${soHora(x.ini)}</td><td>${x.fi?soHora(x.fi):'—'}</td><td class="n">${soDur(x)}</td><td>${sub.archived?'':`<button class="x" data-sox="${x.id}" title="Esborra aquesta sortida (es pot desfer amb ↶)">✕</button>`}</td></tr>`}).join('')}</table>`
     :'<p style="color:var(--suau)">No hi ha cap sortida registrada en aquestes dates. Per registrar-ne una: clic dret o doble clic sobre el nom de l\'alumne.</p>'}`;
+  $$('#soW [data-sox]').forEach(b=>b.onclick=()=>{sub.sortides=(sub.sortides||[]).filter(z=>z.id!==b.dataset.sox);save('esborrar una sortida');pintaSoDlg();pintaSortides()});
+  $('#soDel').hidden=!llista.length||!!sub.archived;
   $('#soSub').onchange=e=>{SOF.sub=e.target.value;pintaSoDlg()};$('#soDes').onchange=e=>{SOF.des=e.target.value;pintaSoDlg()};$('#soFins').onchange=e=>{SOF.fins=e.target.value;pintaSoDlg()}}
 function textSortides(){const {sub,llista}=soFiltrades();const r=soResum(sub,llista);
   return `Sortides · ${sub.name}${SOF.des||SOF.fins?` · ${SOF.des||'…'} — ${SOF.fins||'…'}`:''}\n\nAlumne\tClasse\tSortides\tWC\tSortida\tTemps total (min)\n`+r.map(x=>[soNom(x.st),x.st?classeDe(sub,x.st)||'':'',x.n,x.wc,x.so,soMin(x.t)].join('\t')).join('\n')+
@@ -3268,6 +3328,10 @@ async function pdfSortides(sub,llista,titol){await carregaPDF();const doc=new wi
     body:llista.map(x=>[soData(x.ini).split('-').reverse().join('/'),soNom(sub.students.find(z=>z.id===x.st)),SO_TIPUS[x.tipus][1],soHora(x.ini),x.fi?soHora(x.fi):'',soDur(x)])});
   return doc}
 $('#soX').onclick=()=>$('#dlgSo').close();
+$('#soDel').onclick=async()=>{const {sub,llista}=soFiltrades();if(!llista.length)return;
+  const r=await pregunta('Esborrar sortides',`S'esborraran ${llista.length===1?'1 sortida':llista.length+' sortides'} de «${sub.name}»${SOF.des||SOF.fins?' entre aquestes dates':''}. Les vols exportar en PDF abans?`,[{t:'Cancel·la',v:0,cls:'sec'},{t:'Només esborra',v:'nomes',cls:'sec'},{t:'Exporta i esborra',v:'pdf'}]);
+  if(!r)return;if(r==='pdf'){try{const d=await pdfSortides(sub,llista);d.save(nomFitxer('sortides-'+sub.name)+'.pdf')}catch(e){return toast(e.message)}}
+  const ids=new Set(llista.map(x=>x.id));sub.sortides=(sub.sortides||[]).filter(z=>!ids.has(z.id));save('esborrar sortides');pintaSoDlg();pintaSortides();toast(`${ids.size===1?'1 sortida esborrada':ids.size+' sortides esborrades'}. Es pot desfer amb ↶.`)};
 $('#soCopia').onclick=()=>copiaText(textSortides());
 $('#soPdf').onclick=async()=>{const {sub,llista}=soFiltrades();if(!llista.length)return toast('No hi ha sortides per exportar.');
   try{const d=await pdfSortides(sub,llista);d.save(nomFitxer('sortides-'+sub.name)+'.pdf')}catch(e){toast(e.message)}};
