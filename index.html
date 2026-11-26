@@ -522,7 +522,7 @@ td.dvc{cursor:pointer;text-align:left;white-space:nowrap}td.dvp.pl{text-align:ce
 .dvop button.p.on{background:#E0A800;border-color:#E0A800;color:#111}.dvop button.ma.on,.dvop button.pi.on{background:#1F5FD1;border-color:#1F5FD1;color:#fff}.dvop button.pi{margin-left:8px}
 .dvlld{margin:14px 0 2px;border-top:1px solid #eee;padding-top:8px}.dvlld>summary{cursor:pointer;font-size:12.5px;color:#777;font-weight:600;list-style:none}.dvlld>summary::-webkit-details-marker{display:none}.dvlld>summary::before{content:'▸ ';}.dvlld[open]>summary::before{content:'▾ '}.dvlld[open]>summary{color:#111;margin-bottom:4px}
 .pntit{font-weight:700;font-size:13px;color:#555;margin:2px 0 4px}.pnsec{font-weight:700;font-size:13px;margin:10px 0 4px}
-.dvll{display:flex;align-items:center;gap:6px;padding:2px 0}.dvll a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dvll{display:flex;align-items:center;gap:6px;padding:2px 0}.dvll .llcp{border:0;background:none;padding:3px;cursor:pointer;color:#555;display:flex;border-radius:5px}.dvll .llcp:hover{background:#eee;color:#111}.dvll .llcp.ok{color:#1a7f37}.dvll a{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dvamg{display:inline-flex;align-items:center;gap:5px;font-size:13px;margin-left:6px}
 
 /* 2.3.2 · escut d'entrada */
@@ -884,7 +884,7 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.6.1 · ammonite · novembre 2026',COMPILACIO='26/11 21:42';
+const VERSIO='2.6.2 · ammonite · novembre 2026',COMPILACIO='26/11 22:55';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1872,12 +1872,13 @@ function afegeixComentari(text){const sub=cur(),st=PN.st;if(!sub||!st)return;con
 function desaProposta(v){const sub=cur(),st=PN.st;if(!sub||!st)return;const abans=!!(dvDe(sub,st).t||'').trim();dvSet(sub,st,'t',v.trim()?v:'');if(abans!==!!v.trim()){const o=sub.students.find(x=>x.id===st);if(o)pintaCopPanell(sub,o)}clearTimeout(desaProposta.h);desaProposta.h=setTimeout(()=>save('proposta educativa'),500);
   const td=document.querySelector(`td[data-dvp="${st}"]`);if(td){const t=v.trim();td.innerHTML=td.classList.contains('pl')?(t?'📝':'<span class="buida">·</span>'):(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>');td.title=td.classList.contains('pl')?t||'Sense proposta educativa':'Clica per veure-ho tot o escriure'}}
 function pintaLlPanell(sub,st){const ll=dvDe(sub,st.id).ll||[];
-  $('#pnLl').innerHTML=`<details class="dvlld" ${PN.llOb?'open':''}><summary>🔗 Enllaços${ll.length?` (${ll.length})`:''}</summary>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
+  $('#pnLl').innerHTML=`<details class="dvlld" ${PN.llOb?'open':''}><summary>🔗 Enllaços${ll.length?` (${ll.length})`:''}</summary>${ll.map((l,i)=>`<div class="dvll"><a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer" title="${esc(l.u)}">${esc(l.n||l.u.replace(/^https?:\/\//,'').slice(0,50))}</a><button class="llcp" data-llcp="${i}" title="Copia l'enllaç" aria-label="Copia l'enllaç">${ICOP}</button><button class="x" data-llx="${i}" title="Treu l'enllaç">✕</button></div>`).join('')||'<p class="aj" style="margin:2px 0 6px">Cap enllaç.</p>'}
     <div class="fl dvlla"><input type="text" id="pnLlN" placeholder="Nom (opcional)" style="width:34%"><input type="text" id="pnLlU" placeholder="Enganxa l'adreça (https://…)" style="flex:1;min-width:0"><button class="btn sec" id="pnLlAf">Afegeix</button></div></details>`;
   $('#pnLl details').ontoggle=e=>{PN.llOb=e.target.open};
   $('#pnLlAf').onclick=()=>{let u=$('#pnLlU').value.trim();if(!u)return toast('Enganxa l\'adreça de l\'enllaç.');if(!/^https?:\/\//i.test(u)){if(/^[a-z]+:/i.test(u))return toast('Només es poden desar enllaços web (http o https).');u='https://'+u}
     dvSet(sub,st.id,'ll',[...ll,{n:$('#pnLlN').value.trim(),u}]);save('enllaç de diversitat');pintaLlPanell(sub,st)};
   $('#pnLlU').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#pnLlAf').click()}};
+  $$('#pnLl [data-llcp]').forEach(b=>b.onclick=async()=>{const ok=await copiaText(ll[+b.dataset.llcp].u);if(ok){b.classList.add('ok');setTimeout(()=>b.classList.remove('ok'),900)}toast(ok?'Enllaç copiat.':'No s\'ha pogut copiar.')});
   $$('#pnLl [data-llx]').forEach(b=>b.onclick=()=>{const n=ll.filter((_,i)=>i!==+b.dataset.llx);dvSet(sub,st.id,'ll',n);save('treure enllaç de diversitat');pintaLlPanell(sub,st)})}
 /* 2.5.2 · Copia la proposta educativa a altres alumnes (d'aquesta llibreta o d'una altra) */
 const ICOP='<svg class="ric" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5.5" y="5.5" width="8.5" height="8.5" rx="1.3"/><path d="M10.5 5.5V3.3c0-.7-.6-1.3-1.3-1.3H3.3C2.6 2 2 2.6 2 3.3v5.9c0 .7.6 1.3 1.3 1.3h2.2"/></svg>';
@@ -2671,7 +2672,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
-    <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los. Només es veuen al panell.</li>
+    <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
     <li>A la llista, una <b>ratlla a l'esquerra del nom</b>: <b>groga</b> = personalització, <b>blava</b> = mesures addicionals, <b>meitat groga i meitat blava</b> = totes dues. Partida per una línia blanca: sense PI; <b>plena</b>: amb PI (gris si només hi ha PI). En passar-hi el ratolí, en surt el nom.</li>

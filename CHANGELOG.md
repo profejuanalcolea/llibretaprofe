@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.6.2 · ammonite · novembre 2026
+- Panell de diversitat: botó minimalista per copiar cada enllaç (a més de poder-lo obrir clicant el nom).
+
 ## 2.6.1 · ammonite · novembre 2026
 - **Icones, Check i Opcions amb nota:** a «Cada opció val» es pot triar un assoliment (com fins ara, per defecte) o una nota sobre 10 per a cada opció. Amb notes, compten com una numèrica i la categoria pot fer la mitjana. Una cel·la sense marcar no compta. La Suma fa servir aquestes notes directament.
 
