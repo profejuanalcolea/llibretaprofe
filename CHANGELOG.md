@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.7 · ammonite · novembre 2026
+- **🗓️ Horari:** graella de dilluns a divendres (8:30–18:00 amb el pati d'11:30 a 12:00 per defecte; hores editables, afegir/treure franges, marcar pati). Cada espai: matèria, curs, aula, color i llibreta lligada (opcional), «Copia a altres espais». Bloqueig de tota la graella; bloquejat, clicar una classe lligada obre la llibreta. Franja d'ara marcada. S'obre amb la icona del calendari al costat del nom de la llibreta, Alt+H o Eines. Al mòbil, botó Horari a la barra de baix amb el dia d'avui.
+
 ## 2.6.4 · ammonite · novembre 2026
 - **Sortides:** esborrar una sortida (✕) o totes les de les dates triades (pregunta si vols el PDF abans). Es desfà amb ↶.
 - **🧰 Eines › 🧩 Atenció a la diversitat:** llistat de tota la diversitat (mesures, proposta, enllaços amb botó de copiar), totes les llibretes o una, amb arxivades opcionals, per llibreta o per alumne, cercador i PDF al Drive. Botó «Esborra la diversitat d'aquesta llibreta» amb PDF opcional i confirmació escrivint el nom (no es pot desfer). No surt amb «Amaga 🧩».

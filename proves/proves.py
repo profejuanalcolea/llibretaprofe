@@ -1534,6 +1534,54 @@ def p_div_eines(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Horari: icona al costat del nom, omplir un espai, copiar-lo, bloquejar, obrir la llibreta lligada, hores editables i horari del dia al mòbil')
+def p_horari(b):
+    ctx, pg = pagina_local(b)
+    pg.click('[data-hor]'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#dlgHor') and pg.locator('#horW td.hc').count() == 45, 'l\'horari hauria de tenir 9 franges de classe x 5 dies (més el pati)')
+    f = pg.evaluate("horari().files.map(x=>x.id)")
+    comprova(pg.evaluate("horari().files.map(x=>x.ini+'-'+x.fi).join(' ')") == '8:30-9:30 9:30-10:30 10:30-11:30 11:30-12:00 12:00-13:00 13:00-14:00 14:00-15:00 15:00-16:00 16:00-17:00 17:00-18:00', 'franges per defecte')
+    pg.click(f'[data-hc="0|{f[0]}"]'); pg.wait_for_timeout(100)
+    pg.fill('#hM', 'Biologia'); pg.fill('#hC', '4t B'); pg.fill('#hA', 'Aula 12'); pg.click('[data-hcol="#E3F5EC"]'); pg.wait_for_timeout(100)
+    pg.select_option('#hS', pg.evaluate("cur().id")); pg.wait_for_timeout(100)
+    c = pg.evaluate(f"horari().cel['0|{f[0]}']")
+    comprova(c['m'] == 'Biologia' and c['c'] == '4t B' and c['a'] == 'Aula 12' and c['col'] == '#E3F5EC' and c['sub'], f'espai: {c}')
+    pg.click('#hCopia'); pg.wait_for_timeout(100); pg.click(f'[data-hc="2|{f[0]}"]'); pg.wait_for_timeout(100); pg.click('#hCopiaFi'); pg.wait_for_timeout(100)
+    comprova(pg.evaluate(f"horari().cel['2|{f[0]}']?.m") == 'Biologia', 'no es copia l\'espai')
+    # hores editables
+    pg.fill(f'[data-hfi="{f[9]}"]', '18.30'); pg.locator(f'[data-hfi="{f[9]}"]').dispatch_event('change'); pg.wait_for_timeout(100)
+    comprova(pg.evaluate("horari().files.at(-1).fi") == '18:30', 'no es pot canviar l\'hora')
+    # bloquejar: ja no s'edita; clicar obre la llibreta
+    pg.click('#horBloq'); pg.wait_for_timeout(100)
+    comprova(pg.evaluate("horari().bloq") is True and pg.locator('#horW input').count() == 0, 'bloquejat no hauria de deixar editar')
+    pg.evaluate("tab='eines';render()")
+    pg.click(f'[data-hc="0|{f[0]}"]'); pg.wait_for_timeout(200)
+    comprova(not pg.is_visible('#dlgHor') and pg.evaluate("tab") == 'llibreta', 'clicar una classe lligada hauria d\'obrir la llibreta')
+    pg.keyboard.press('Alt+h'); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#dlgHor'), 'Alt+H no obre l\'horari'); pg.click('#horX')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
+@prova('Horari al mòbil: botó a la barra de baix, dia a dia, i tocar una classe obre la llibreta')
+def p_horari_mobil(b):
+    FILES = {}
+    ctx = b.new_context(**p_mobil.dev); ctx.add_init_script(INIT_BASE); ctx.route('**/*', google_amb(FILES))
+    pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(300)
+    if pg.is_visible('#dlgQ'): pg.click('#qBtns button:has-text("Sí, és meu")')
+    pg.wait_for_timeout(2500)
+    pg.evaluate("const H=horari();H.cel['0|'+H.files[0].id]={m:'Biologia',c:'4t B',a:'Aula 12',sub:cur().id};save()")
+    pg.click('#mbBar [data-mbsec=hor]'); pg.wait_for_timeout(200)
+    pg.evaluate("MB.hd=0;rMobilHor()"); pg.wait_for_timeout(100)
+    comprova('Dilluns' in pg.inner_text('.mhdia') and pg.locator('.mhf').count() == 9, 'l\'horari del dia al mòbil hauria de tenir 9 franges')
+    comprova('Biologia' in pg.inner_text('#main'), 'no surt la classe')
+    pg.click('#mhSeg'); pg.wait_for_timeout(100)
+    comprova('Dimarts' in pg.inner_text('.mhdia'), 'la fletxa no passa al dia següent')
+    pg.click('#mhAnt'); pg.wait_for_timeout(100); pg.click('[data-mhsub]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("MB.sec") == 'll', 'tocar la classe hauria d\'obrir la llibreta')
+    comprova(not errs, 'errors JS: %s' % errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1585,7 +1633,7 @@ def p_capcalera(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
-@prova('Mòbil: barra amb Llibreta, Bloc i Enllaços; el Bloc es pot editar; «És el teu mòbil?»')
+@prova('Mòbil: barra amb Llibreta, Bloc, Horari i Enllaços; el Bloc es pot editar; «És el teu mòbil?»')
 def p_mobil2(b):
     FILES = {}
     ctx = b.new_context(**p_mobil.dev); ctx.add_init_script(INIT_BASE); ctx.route('**/*', google_amb(FILES))
@@ -1593,7 +1641,7 @@ def p_mobil2(b):
     pg.goto(URL); pg.wait_for_timeout(400); pg.click('#lgEntra'); pg.wait_for_timeout(300)
     comprova(pg.is_visible('#dlgQ') and 'És el teu mòbil' in pg.inner_text('#qTit'), 'al mòbil no pregunta «És el teu mòbil?»')
     pg.click('#qBtns button:has-text("Sí, és meu")'); pg.wait_for_timeout(1500)
-    comprova(pg.locator('#mbBar button').count() == 3, 'no surt la barra de baix')
+    comprova(pg.locator('#mbBar button').count() == 4, 'no surt la barra de baix (Llibreta, Bloc, Horari, Enllaços)')
     pg.click('#mbBar [data-mbsec=bloc]'); pg.wait_for_timeout(200)
     comprova(pg.is_visible('#blTxt') and pg.locator('#blTanca').count() == 0, 'el Bloc no s\'obre al mòbil')
     pg.fill('#blTxt', 'Apunt des del mòbil'); pg.wait_for_timeout(900)
@@ -1613,7 +1661,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)
