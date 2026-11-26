@@ -585,6 +585,39 @@ def p_icones_num(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Categoria amb suma: punts fets (punts/possibles) i total fix (acumula, buida = 0, màxim 10)')
+def p_cat_suma(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    antes = pg.evaluate(FINALS_JS)
+    # TR: c3 (sobre 20: Ada 10, Bru 20) i c4 (sobre 10: Ada 7, Bru buit, Cesc 8)
+    pg.evaluate("cur().categories[1].method='sump';save();render()"); pg.wait_for_timeout(100)
+    tr = pg.evaluate("cur().students.map(st=>{const r=catResult(cur(),cur().categories[1],st);return r?Math.round(r.num*1000)/1000:null})")
+    # Ada 17/30*10=5.667 · Bru 20/20=10 · Cesc sense notes a TR
+    comprova(tr == [5.667, 10, None], f'suma (punts fets): {tr}')
+    pg.evaluate("cur().categories[1].method='sumf';cur().categories[1].sumT=20;save();render()"); pg.wait_for_timeout(100)
+    tr = pg.evaluate("cur().students.map(st=>{const r=catResult(cur(),cur().categories[1],st);return r?Math.round(r.num*1000)/1000:null})")
+    # Ada 17/20=8.5 · Bru 20/20=10 · Cesc cap punt → 0
+    comprova(tr == [8.5, 10, 0], f'suma (total fix 20): {tr}')
+    pg.evaluate("cur().categories[1].sumT=10;save();render()"); pg.wait_for_timeout(100)
+    tr = pg.evaluate("cur().students.map(st=>Math.round(catResult(cur(),cur().categories[1],st).num*1000)/1000)")
+    comprova(tr == [10, 10, 0], f'el total fix no ha de passar de 10: {tr}')
+    # un alumne nou sense cap punt: 0 amb total fix
+    pg.evaluate("cur().students.push({id:'a9',nom:'Nou',cognoms:'Zeta'});save()")
+    r = pg.evaluate("catResult(cur(),cur().categories[1],cur().students.find(s=>s.id==='a9'))")
+    comprova(r and r['num'] == 0, f'amb total fix, qui no té cap punt ha de tenir un 0: {r}')
+    pg.evaluate("cur().categories[1].method='mean';delete cur().categories[1].sumT;cur().students=cur().students.filter(s=>s.id!=='a9');save();render()"); pg.wait_for_timeout(100)
+    comprova(pg.evaluate(FINALS_JS) == antes, 'en tornar a mitjana ha de quedar com abans')
+    # a ⚙ surt el «sobre» amb total fix
+    pg.evaluate("cur().categories[1].method='sumf';save()"); pg.click('.tabic[data-t=config]'); pg.wait_for_timeout(150)
+    pg.locator('details[data-cfg=cats] > summary').click(); pg.wait_for_timeout(100)
+    comprova(pg.locator('[data-k=sumT]').count() == 1, 'no surt el camp «sobre» del total fix')
+    pg.fill('[data-k=sumT]', '5'); pg.locator('[data-k=sumT]').dispatch_event('change'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("cur().categories[1].sumT") == 5, 'no es desa el total')
+    comprova('suma sobre 5' in pg.evaluate("metTxt(cur(),cur().categories[1])"), 'la línia de ponderació hauria de dir «suma sobre 5»')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('«No ava»: s\'escriu com nav/noava/no ava, es veu taronja i no compta a la mitjana')
 def p_noava(b):
     ctx, pg = pagina_local(b)
@@ -1533,7 +1566,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

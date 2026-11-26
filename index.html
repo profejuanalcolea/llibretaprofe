@@ -616,6 +616,8 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 #cSumF{border:1px solid #e3e3e3;border-radius:8px;padding:6px 10px;margin:6px 0}
 .suml{display:flex;flex-direction:column;gap:3px;max-height:230px;overflow:auto;flex:1;min-width:0}.sumi small{color:var(--suau);font-size:11.5px}
 .sumv{display:flex;flex-wrap:wrap;gap:4px 10px;margin:2px 0 4px 24px;font-size:13px}.sumv input{width:48px;padding:2px 4px}
+
+.sumt{display:inline-flex;align-items:center;gap:4px;font-size:13px}.sumt input{width:56px}
 </style>
 </head>
 <body>
@@ -884,7 +886,7 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.6.2 · ammonite · novembre 2026',COMPILACIO='26/11 22:55';
+const VERSIO='2.6.3 · ammonite · novembre 2026',COMPILACIO='27/11 00:19';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -901,7 +903,11 @@ const grTxt=(c,o)=>o?(c.type==='grup'?grSh(c,o)+' '+o.t:o.t):'';
 const CANDAU='<svg class="cand" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 const candau=c=>c.bloq?`<span class="candw" title="Columna bloquejada">${CANDAU}</span>`:'';
 const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",suma:'Suma',final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
-const METODE={mean:'mitjana',median:'mediana',mode:'moda'};
+const METODE={mean:'mitjana',median:'mediana',mode:'moda',sump:'suma (punts fets)',sumf:'suma (total fix)'};
+/* 2.6.3 · la suma només es pot fer amb columnes numèriques (com la mitjana); si no, mediana* */
+const metTxt=(sub,c)=>(c.method==='mean'||c.method==='sump'||c.method==='sumf')&&!mitjanaPermesa(sub,c)?'mediana*':c.method==='sumf'?'suma sobre '+fmt(sumTCat(sub,c)):METODE[c.method];
+const colMax=c=>c.type==='num'?(c.max||10):c.type==='suma'?(c.max||10):10;
+const sumTCat=(sub,cat)=>cat.sumT>0?cat.sumT:colsDeCat(sub,cat).reduce((t,c)=>t+colMax(c),0);
 const PAL=[['#E69F00','taronja'],['#56B4E9','blau cel'],['#009E73','verd blavós'],['#F0E442','groc'],['#0072B2','blau'],['#D55E00','vermelló'],['#CC79A7','rosa'],['#7F7F7F','gris']];
 const ICONGRUPS=[
   ['Geologia',['🪨','🌋','⛰️','🏔️','🔨','⚒️','⛏️','💎','🦴','🦕','🦖','🐚','🌊','💧','🏜️','🧭','🗺️','🌍']],
@@ -1103,23 +1109,29 @@ function catResult(sub,cat,stu,depth=0){
   const s=sub.settings,cols=colsDeCat(sub,cat);if(!cols.length)return null;
   const items=[];
   for(const c of cols){
-    if((c.type==='icones'||c.type==='check'||c.type==='opc')&&c.valMode==='num'){const v=getG(sub,c.id,stu.id),n=v!==undefined?c.nvals?.[v]:undefined;if(typeof n==='number')items.push({k:'num',x:n});continue}
+    if((c.type==='icones'||c.type==='check'||c.type==='opc')&&c.valMode==='num'){const v=getG(sub,c.id,stu.id),n=v!==undefined?c.nvals?.[v]:undefined;if(typeof n==='number')items.push({k:'num',x:n,p:n,mx:10});continue}
     if(c.type==='icones'||c.type==='check'||c.type==='opc'){const v=getG(sub,c.id,stu.id),a=v!==undefined?c.vals?.[v]:null;if(a&&LV.includes(a))items.push({k:'ass',l:LV.indexOf(a)});continue}
     if(calcCol(c)){const r=resolveCalc(sub,c,stu,depth);if(!r||r.k==='text')continue;
       if(r.k==='nav')continue;
-      if(r.k==='fj'){if(s.fjMode==='zero')items.push({k:'num',x:0});continue}
-      items.push(r.k==='num'?{k:'num',x:r.x}:{k:'ass',l:r.l});continue}
+      if(r.k==='fj'){if(s.fjMode==='zero')items.push({k:'num',x:0,p:0,mx:colMax(c)});continue}
+      items.push(r.k==='num'?(c.type==='suma'?{k:'num',x:r.x,p:r.v,mx:sumaSobre(sub,c)}:{k:'num',x:r.x,p:r.x,mx:10}):{k:'ass',l:r.l});continue}
     let v=getG(sub,c.id,stu.id);if(v===undefined||v==='')continue;
     if(v==='NAV')continue;   // no avaluat: no compta
     if(v==='FJ'){if(s.fjMode!=='zero')continue;v='F'}
     if(v==='F')v=c.type==='num'?0:c.type==='ord'?1:'NA';
-    items.push(c.type==='num'?{k:'num',x:v/(c.max||10)*10}:c.type==='ord'?{k:'ord',x:+v}:{k:'ass',l:LV.indexOf(v)})}
-  if(!items.length)return null;
+    items.push(c.type==='num'?{k:'num',x:v/(c.max||10)*10,p:v,mx:c.max||10}:c.type==='ord'?{k:'ord',x:+v}:{k:'ass',l:LV.indexOf(v)})}
+  if(!items.length){
+    /* suma amb total fix: si la categoria ja es fa servir (algú hi té nota), qui no en té cap té un 0 */
+    if(cat.method==='sumf'&&cols.every(esNumC)&&cols.some(c=>Object.keys(sub.grades[c.id]||{}).length))return{num:0,lvl:lvlNum(0,s),label:fmt(0),m:'sumf',warn:false,isNum:true,pts:0,tot:sumTCat(sub,cat)};
+    return null}
   const toN=i=>i.k==='num'?i.x:i.k==='ord'?s.assVals[LV[lvlOrd(i.x,s)]]:s.assVals[LV[i.l]];
   const toL=i=>i.k==='num'?lvlNum(i.x,s):i.k==='ord'?lvlOrd(i.x,s):i.l;
   const allNum=cols.every(esNumC)&&items.every(i=>i.k==='num');
   const allOrd=cols.every(c=>c.type==='ord');
   let m=cat.method,warn=false;
+  if(allNum&&(m==='sump'||m==='sumf')){const pts=items.reduce((t,i)=>t+i.p,0),tot=m==='sumf'?sumTCat(sub,cat):items.reduce((t,i)=>t+i.mx,0),r=tot?Math.min(10,pts/tot*10):0;
+    return{num:r,lvl:lvlNum(r,s),label:fmt(r),m,warn,isNum:true,pts,tot}}
+  if(m==='sump'||m==='sumf'){m='mean'}
   if(allNum){const xs=items.map(i=>i.x);const r=m==='mean'?mean(xs):m==='median'?median(xs):moda(xs.map(Math.round));
     return{num:r,lvl:lvlNum(r,s),label:fmt(r),m,warn,isNum:true}}
   if(m==='mean'&&!s.allowOrdMean){m='median';warn=true}
@@ -1512,7 +1524,7 @@ function senseLlibretes(){$('#main').innerHTML=`<div class="buit">No tens cap ll
 const sigHtml=c=>`<span class="sig" style="background:${c.color};color:${textSobre(c.color)}">${esc(c.sigla||'')}</span>`;
 function llegenda(sub){if(sub.tipus==='llista'){const x=ocultesXip(sub);return x?`<div class="llegenda">${x}</div>`:''}const tot=sub.categories.reduce((a,c)=>a+(+c.weight||0),0);
   if(!sub.categories.length)return `<div class="llegenda">Sense categories. Crea-les a <b>⚙ Configuració</b> perquè la llibreta calculi la nota de referència.${ocultesXip(sub)}</div>`;
-  return `<div class="llegenda"><b>Ponderació:</b>${sub.categories.filter(c=>!c.noPct).map(c=>{const m=c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana*':METODE[c.method];
+  return `<div class="llegenda"><b>Ponderació:</b>${sub.categories.filter(c=>!c.noPct).map(c=>{const m=metTxt(sub,c);
     return `<span class="chip">${sigHtml(c)}${esc(c.name)}${c.noPct?'':` · <b>${c.weight}%</b>`} · ${m}</span>`}).join('')}
     ${tot!==100?`<span class="avis">⚠ Els pesos sumen ${tot}%, no 100%</span>`:''}
     ${sub.categories.some(c=>c.method==='mean'&&!mitjanaPermesa(sub,c))?'<span class="avis" style="font-weight:500" title="Hi ha escales ordinals o assoliments en aquesta categoria: no es pot fer mitjana i es fa servir la mediana. Ho pots canviar a Configuració › Conversions.">* mediana: hi ha escales o assoliments</span>':''}
@@ -1704,7 +1716,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
     return `<th class="grup ${g.folded?'plg':''} ${bi?'catini':''}" colspan="${nC}" style="background:${g.cat.color};color:${textSobre(g.cat.color)}">${mvL}<span class="gtog" data-pleg="${g.cat.id}" title="${g.folded?'Desplega':'Plega'} la categoria">${g.folded?'▸':'▾'} ${esc(g.cat.sigla)}${g.folded?'':` · ${esc(g.cat.name)}`}${sub.tipus==='llista'?'':pctC(g.cat)}</span>${mvR}</th>`}).join('');
   h+=`</tr><tr>`;let zc=1000;
   h+=gs.map((g,gi)=>{
-    if(g.folded){const m=g.cat.method==='mean'&&!mitjanaPermesa(sub,g.cat)?'mediana':METODE[g.cat.method];
+    if(g.folded){const m=metTxt(sub,g.cat).replace('*','');
       return `<th class="colh plegh ${gi?'catini':''}" data-pleg="${g.cat.id}" style="border-top-color:${g.cat.color}" title="Clica per desplegar">${esc(g.cat.name)}<span class="t">Σ ${m} · ${g.cols.length} col.</span></th>`}
     return g.cols.map((c,i)=>{zc--;const top=`border-top-color:${g.cat?g.cat.color:(c.color||'#D9D9D9')}`;
       if(c.amp==='plegada')return `<th class="colh plc ${gi&&!i?'catini':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)} (plegada) · clica per desplegar-la"><button class="ull" data-desplc="${c.id}">👁</button></th>`;
@@ -1759,13 +1771,13 @@ function rResum(){const sub=cur();if(!sub)return senseLlibretes();if(VA.on)retur
   if(!sub.students.length){$('#main').innerHTML=h+'<div class="buit">Sense alumnes.</div>';lligaAval(sub);return}
   const sts=alumnesAval(sub),dvOn=!amagaDiv();if(DIST.on)h+=distHtml(sub);
   h+=`<div class="tw" id="tw"><table class="resum aval"><thead><tr><th class="fx" style="left:0;min-width:170px;text-align:left;padding:6px 10px">Cognoms</th><th class="fx fxlast" style="left:170px;min-width:${sub.nomW||120}px;max-width:${sub.nomW||120}px;width:${sub.nomW||120}px;text-align:left;padding:6px 10px">Nom</th>
-    ${sub.categories.map(c=>`<th style="border-top:5px solid ${c.color};padding:6px 10px">${sigHtml(c)} ${esc(c.name)}${pctC(c)}<span class="metode">${c.method==='mean'&&!mitjanaPermesa(sub,c)?'mediana':METODE[c.method]}</span></th>`).join('')}
+    ${sub.categories.map(c=>`<th style="border-top:5px solid ${c.color};padding:6px 10px">${sigHtml(c)} ${esc(c.name)}${pctC(c)}<span class="metode">${metTxt(sub,c).replace('*','')}</span></th>`).join('')}
     <th style="padding:6px 30px 6px 10px;position:relative" class="calch">Càlcul<span class="cmode">${{ass:'assoliments',num:'numèric',mixt:''}[modeCalc(sub)]}</span><button class="cmdots" data-cmode title="Com es mostra el càlcul">⋯</button></th><th style="padding:6px 10px;min-width:110px">${fc?esc(fc.name):'Nota final'}</th>
     ${dvOn?`<th class="dvh" title="Atenció a la diversitat: P personalització · MA mesures addicionals · PI (clica una cel·la per editar-la)">🧩</th><th class="dvph ${DV.prop?'':'pl'}" id="aDvH" title="Clica per ${DV.prop?'plegar':'desplegar'} la columna">${DV.prop?'Proposta educativa ▾':'📝 ▸'}</th>`:''}
     <th class="comh ${pleg?'pl':''}" id="aComH" title="Clica per ${pleg?'desplegar':'plegar'} la columna">${pleg?'💬 ▸':'💬 Comentari ▾'}</th><th style="padding:6px 8px" title="Copia el comentari per enganxar-lo a l'Esfera">Esfera</th></tr></thead><tbody>`;
   for(const st of sts){const f=finalDe(sub,st),com=sub.comentaris[st.id]||'',marc=sub.aval.marques[st.id];
     h+=`<tr data-s="${st.id}"><td class="fx nomc" style="left:0;text-align:left;font-weight:400">${dvSpan(sub,st)}${esc(st.cognoms||'')}</td><td class="fx fxlast nomc" style="left:170px;text-align:left;max-width:${sub.nomW||120}px" title="${esc(nomComplet(st))}">${esc(st.nom)}</td>
-      ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}">${esc(catTxt(sub,r))}</td>`}).join('')}
+      ${sub.categories.map(c=>{const r=catResult(sub,c,st);return `<td class="${r?'l'+r.lvl:''}" ${r?.tot!==undefined?`title="${fmt(r.pts)} de ${fmt(r.tot)} punts"`:''}>${esc(catTxt(sub,r))}</td>`}).join('')}
       <td class="${f?'l'+f.lvl:''}" style="font-weight:700">${esc(calcTxt(sub,f))}</td>
       ${fc?cella(sub,fc,st):'<td><span class="buida">—</span></td>'}
       ${dvOn?(()=>{const d=dvDe(sub,st.id),t=(d.t||'').trim();return `<td class="dvc dvm" data-dvm="${st.id}" title="${dvTe(d)?esc(dvEtiq(d)):'Clica per marcar mesures'}">${dvChips(d)}</td><td class="dvc dvp ${DV.prop?'':'pl'}" data-dvp="${st.id}" title="${DV.prop?'Clica per veure-ho tot o escriure':esc(t)||'Sense proposta educativa'}">${DV.prop?(t?`<div class="dvt">${esc(t)}</div>`:'<span class="buida">＋ proposta</span>'):(t?'📝':'<span class="buida">·</span>')}</td>`})():''}
@@ -2526,7 +2538,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
       <input type="text" value="${esc(c.name)}" data-k="name" data-cat="${c.id}">
       ${esLl?'':`<input type="number" class="mini" value="${c.weight}" min="0" max="100" data-k="weight" data-cat="${c.id}">%
       <label class="cpct" title="Desmarcada, la categoria no surt a la línia «Ponderació» i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF"><input type="checkbox" data-cpct="${c.id}" ${c.noPct?'':'checked'}> Surt a la ponderació</label>
-      <select data-k="method" data-cat="${c.id}">${['mean','median','mode'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>`}
+      <select data-k="method" data-cat="${c.id}">${['mean','median','mode','sump','sumf'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>${c.method==='sumf'?`<span class="sumt">sobre <input type="text" inputmode="decimal" class="mini" data-k="sumT" data-cat="${c.id}" value="${c.sumT>0?String(c.sumT).replace('.',','):''}" placeholder="${fmt(colsDeCat(sub,c).reduce((t,k)=>t+colMax(k),0))}" title="Total de punts. Buit: la suma dels «sobre» de les columnes"></span>`:''}`}
       <span class="pal">${PAL.map(([hx,n])=>`<button type="button" style="background:${hx}" class="${c.color.toUpperCase()===hx?'on':''}" data-col="${hx}" data-cat="${c.id}" title="${n}"></button>`).join('')}</span>
       ${!esLl&&c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
     <div class="fl"><button class="btn" id="kCatAf">Afegeix categoria</button>${esLl?'':`<span class="${tot!==100?'avis':''}">Total: ${tot}%</span>`}</div>
@@ -2560,6 +2572,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     const t=await demana('Elimina la llibreta',`Per eliminar «${sub.name}» amb totes les notes, escriu ELIMINA. No es pot desfer.`);if((t||'').trim().toUpperCase()!=='ELIMINA'){if(t)toast('No s\'ha eliminat: cal escriure ELIMINA.');return}
     state.subjects=state.subjects.filter(x=>x!==sub);state.cur=cur().id;save();tab='llibreta';render()});
   $$('[data-k][data-cat]').forEach(i=>i.onchange=()=>{const c=sub.categories.find(x=>x.id===i.dataset.cat),k=i.dataset.k;
+    if(k==='sumT'){const n=parseFloat(i.value.replace(',','.'));if(n>0)c.sumT=n;else delete c.sumT;save('total de la suma');rConfig();return}
     c[k]=k==='weight'?(+i.value||0):k==='sigla'?i.value.trim().toUpperCase().slice(0,3):i.value;save();rConfig()});
   $$('[data-cpct]').forEach(i=>i.onchange=()=>{const c=sub.categories.find(x=>x.id===i.dataset.cpct);if(i.checked)delete c.noPct;else c.noPct=true;save(i.checked?'categoria a la ponderació':'categoria fora de la ponderació');rConfig()});
   on('#kRsc','onchange',e=>{s.ressaltaCats=e.target.checked;save(e.target.checked?'ressalta les categories':'treu el ressaltat de les categories')});
@@ -2668,6 +2681,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
   sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
     <li>A ⚙ › Categories, <b>Surt a la ponderació</b> (a cada categoria): desmarcada, la categoria no surt a la línia «Ponderació» de dalt i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF (pensat per a les categories al 0%; les noves hi vénen desmarcades). Compte: si la desmarques en una categoria que pesa, la línia de ponderació no sumarà 100%. <b>Ressalta la separació entre categories</b>: posa una ratlla més gruixuda a l'inici de cada categoria.</li>
+    <li><b>Suma</b> com a mètode d'una categoria (només amb columnes numèriques, icones/check amb nota, Sumes i d'una altra llibreta): <b>suma (punts fets)</b> divideix els punts que té l'alumne pels punts possibles de les columnes on té nota (una tasca sobre 3 pesa el triple que una sobre 1); <b>suma (total fix)</b> acumula els punts sobre el total que poses a «sobre» (buit: la suma dels «sobre» de les columnes), una cel·la sense nota val 0 i la nota no passa de 10. En passar el ratolí per la nota de la categoria a Avaluació, surten els punts.</li>
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+

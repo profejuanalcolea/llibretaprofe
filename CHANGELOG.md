@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.6.3 · ammonite · novembre 2026
+- **Categories amb suma:** dos mètodes nous al costat de mitjana, mediana i moda. «Suma (punts fets)»: punts de l'alumne / punts possibles de les columnes on té nota. «Suma (total fix)»: punts acumulats sobre un total que poses tu (o la suma dels «sobre»), cel·la sense nota = 0, màxim 10. Només amb columnes numèriques (si no, mediana*). Punts al rètol de la nota de categoria a Avaluació.
+
 ## 2.6.2 · ammonite · novembre 2026
 - Panell de diversitat: botó minimalista per copiar cada enllaç (a més de poder-lo obrir clicant el nom).
 
