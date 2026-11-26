@@ -77,6 +77,7 @@ python3 proves/proves.py
 | Amaga 🧩 sense dades | La casella hi és encara que la llibreta no tingui dades de diversitat, i amaga les columnes |
 | Categories: % i separació | Amagar el % d'una categoria (també a Avaluació), categoria nova amb el % amagat, separació de 2 px, franges de classe clares |
 | Columna Suma | F/FJ = 0, buida deixa «…» amb el que falta, «Passa-la a», check amb valor, entra al càlcul de la categoria, s'actualitza en escriure, PDF i Vista alumne |
+| Icones, Check i Opcions amb nota | «Cada opció val una nota», compten i fan mitjana, i tornar a assoliments deixa les notes com abans |
 | Ammo a la calculadora | Cara de l'Ammo a la barra (no impedeix arrossegar), reacciona a error, ÷0 i =; es pot treure a ⚙ (barra negra) |
 | Opcions | Desplegable propi, colors, recompte, comptar per a la nota, treure opcions en ús i llistes |
 

@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.6.1 · ammonite · novembre 2026
+- **Icones, Check i Opcions amb nota:** a «Cada opció val» es pot triar un assoliment (com fins ara, per defecte) o una nota sobre 10 per a cada opció. Amb notes, compten com una numèrica i la categoria pot fer la mitjana. Una cel·la sense marcar no compta. La Suma fa servir aquestes notes directament.
+
 ## 2.6 · ammonite · novembre 2026
 - **Columna Σ Suma:** suma les columnes que triïs (numèriques, d'una altra llibreta, altres sumes, check, icones i opcions amb el valor que vulguis per a cada opció). Total possible automàtic (la suma dels «sobre») o a mà, i «Passa-la a» lliure (10, 4, 1, 0,5…) o la suma tal qual. Una numèrica buida deixa la suma pendent («…», amb el que falta al rètol); F, FJ i «no ava» valen 0; check, icones i opcions sense marcar valen 0. Pot comptar dins d'una categoria com una numèrica; botó per treure les parts del càlcul. Detall de la suma en passar el ratolí. També a Avaluació, Vista alumne, PDF, exportacions, ordenació, totals i «D'una altra llibreta».
 

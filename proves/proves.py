@@ -559,6 +559,32 @@ def p_suma(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Icones, Check i Opcions amb nota numèrica: compten com una nota, fan mitjana i les de sempre no canvien')
+def p_icones_num(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(FINALS_JS) == [6.6, 6.4, 9], 'punt de partida')
+    pg.evaluate("""const s=cur();s.columns.push({id:'ic',name:'Actitud',type:'icones',icons:['😀','😐','😟'],cat:'kB',compta:true,vals:{'😀':'AE','😐':'AS','😟':'NA'}});
+      setG(s,'ic','a1','😀',1);setG(s,'ic','a2','😟',1);save();render()""")
+    pg.wait_for_timeout(200)
+    amb_ass = pg.evaluate(FINALS_JS)
+    pg.locator('th.colh[data-col=ic]').dblclick(); pg.wait_for_timeout(150)
+    comprova(pg.is_visible('#cValMode'), 'no surt el selector «Cada opció val»')
+    pg.select_option('#cValMode', 'num'); pg.wait_for_timeout(100)
+    pg.fill('#cMapa [data-mn="😀"]', '10'); pg.fill('#cMapa [data-mn="😐"]', '6'); pg.fill('#cMapa [data-mn="😟"]', '2')
+    pg.click('#cOk'); pg.wait_for_timeout(200)
+    c = pg.evaluate("cur().columns.find(c=>c.id==='ic')")
+    comprova(c.get('valMode') == 'num' and c['nvals'] == {'😀': 10, '😐': 6, '😟': 2}, f'no es desen les notes: {c}')
+    # TR Ada: (10/20*10=5, 7, 10) → 7.333 · EX 7 → .6*7+.4*7.333=7.133 · Bru: TR (10, 2)=6 → .6*4+.4*6=4.8 · Cesc 9
+    f = pg.evaluate(FINALS_JS)
+    comprova(f == [7.133, 4.8, 9], f'finals amb icones numèriques: {f} (amb assoliments eren {amb_ass})')
+    comprova(pg.evaluate("mitjanaPermesa(cur(),cur().categories[1])"), 'amb icones numèriques la categoria ha de poder fer mitjana')
+    # tornar a assoliments
+    pg.locator('th.colh[data-col=ic]').dblclick(); pg.wait_for_timeout(150); pg.select_option('#cValMode', 'ass'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    comprova('valMode' not in pg.evaluate("cur().columns.find(c=>c.id==='ic')") and pg.evaluate(FINALS_JS) == amb_ass, 'en tornar a assoliments no queda com abans')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('«No ava»: s\'escriu com nav/noava/no ava, es veu taronja i no compta a la mitjana')
 def p_noava(b):
     ctx, pg = pagina_local(b)
@@ -1504,7 +1530,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

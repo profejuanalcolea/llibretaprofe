@@ -756,7 +756,7 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
   </div>
   <div id="cComptaF" style="background:var(--gris);border-radius:8px;padding:8px 10px;margin:6px 0">
     <label id="cComptaL"><input type="checkbox" id="cCompta"> <b>Compta per a la nota</b> <span id="cComptaT">(dins de la seva categoria)</span></label>
-    <div id="cMapaW"><div style="font-size:13px;color:var(--suau);margin:4px 0 0 0">Valor de cada opció:</div><div class="mapa" id="cMapa" style="margin-left:0"></div></div>
+    <div id="cMapaW"><div style="font-size:13px;color:var(--suau);margin:6px 0 0 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap">Cada opció val <select id="cValMode"><option value="ass">un assoliment</option><option value="num">una nota (sobre 10)</option></select></div><div class="mapa" id="cMapa" style="margin-left:0"></div></div>
   </div>
   <div class="fl" id="cCatF"><label class="lb">Categoria</label><select id="cCat"></select></div>
   <div class="fl" id="cColorF"><label class="lb">Color</label><span class="pal" id="cColor"></span><span style="font-size:12.5px;color:var(--suau)">(franja de sobre, per a columnes sense categoria)</span></div>
@@ -884,7 +884,7 @@ td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#88
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.6 · ammonite · novembre 2026',COMPILACIO='26/11 21:25';
+const VERSIO='2.6.1 · ammonite · novembre 2026',COMPILACIO='26/11 21:42';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1045,7 +1045,7 @@ function valorText(c,v){if(v===undefined||v===null||v==='')return '';
 /* 2.6 · Columna Suma: suma columnes (numèriques, d'una altra llibreta, altres sumes, check, icones, opcions).
    Una cel·la buida en una numèrica/ext/suma la deixa pendent («…»); F, FJ i «no ava» valen 0; check/icones/opcions buides valen 0. */
 const SUMABLES=['num','ext','suma','check','icones','opc'];
-function svDe(c,k){const m=c.svals?.[k.id];if(m)return m;
+function svDe(c,k){const m=c.svals?.[k.id];if(m)return m;if(k.valMode==='num'&&k.nvals)return k.nvals;
   if(k.type==='check')return{fet:1,no:0};const ks=k.type==='opc'?(k.opcions||[]).map(o=>o.id):iconesDe(k);const o={};ks.forEach((x,i)=>o[x]=i===0?1:0);return o}
 function sumaMaxCol(sub,c,k,d){switch(k.type){case 'num':return k.max||10;case 'ext':return 10;case 'suma':return d>4?0:sumaSobre(sub,k,d+1);
   default:{const v=Object.values(svDe(c,k)).map(Number).filter(x=>!isNaN(x));return v.length?Math.max(0,...v):0}}}
@@ -1065,6 +1065,7 @@ function resolveSuma(sub,c,st,d=0){if(d>4)return null;const s=sub.settings;let s
 /* ext o suma, per als càlculs (una suma pendent no compta) */
 function resolveCalc(sub,c,st,d=0){if(c.type==='suma'){const r=resolveSuma(sub,c,st,d);return r&&r.k!=='falta'?r:null}return resolveExt(sub,c,st,d)}
 const calcCol=c=>c.type==='ext'||c.type==='suma';
+const esNumC=c=>c.type==='num'||calcCol(c)||(['icones','check','opc'].includes(c.type)&&c.valMode==='num');
 /* sumes que inclouen (directament o no) la columna id: per evitar cercles */
 function sumaInclou(sub,c,id,d=0){if(d>6)return true;return (c.srcs||[]).some(x=>x===id||sumaInclou(sub,sub.columns.find(k=>k.id===x&&k.type==='suma')||{},id,d+1))}
 
@@ -1087,18 +1088,22 @@ function resolveExt(sub,c,st,depth=0){
     case 'num':{const x=v/(col.max||10)*10;return{k:'num',x,label:fmt(v)+((col.max||10)!==10?'/'+col.max:''),lvl:lvlNum(x,s)}}
     case 'ord':{const l=lvlOrd(+v,s);return{k:'ass',l,label:String(v),lvl:l}}
     case 'ass':{const l=LV.indexOf(v);return{k:'ass',l,label:v,lvl:l}}
-    case 'icones':case 'check':{const a=col.compta?col.vals?.[v]:null;if(a){const l=LV.indexOf(a);return{k:'ass',l,label:(col.type==='check'?(v==='fet'?'✔':'✘'):v)+' '+a,lvl:l}}return{k:'text',label:col.type==='check'?(v==='fet'?'✔':'✘'):v}}
+    case 'icones':case 'check':case 'opc':{const et=col.type==='check'?(v==='fet'?'✔':'✘'):col.type==='opc'?((col.opcions||[]).find(o=>o.id===v)?.t||''):v;
+      if(col.compta&&col.valMode==='num'){const x=col.nvals?.[v];if(typeof x==='number')return{k:'num',x,label:et+' '+fmt(x),lvl:lvlNum(x,s)}}
+      if(col.type==='opc')return{k:'text',label:valorText(col,v)};
+      const a=col.compta?col.vals?.[v]:null;if(a){const l=LV.indexOf(a);return{k:'ass',l,label:(col.type==='check'?(v==='fet'?'✔':'✘'):v)+' '+a,lvl:l}}return{k:'text',label:col.type==='check'?(v==='fet'?'✔':'✘'):v}}
     case 'final':return typeof v==='number'?{k:'num',x:v,label:fmt(v),lvl:lvlNum(v,s)}:{k:'ass',l:LV.indexOf(v),label:v,lvl:LV.indexOf(v)};
     default:return{k:'text',label:valorText(col,v)}}
 }
 const AGRUP=['lliure','url','icones','check','opc'];
 const compta=c=>EVAL.includes(c.type)?!c.noCompta:(['icones','check','opc'].includes(c.type)&&!!c.compta);
 function colsDeCat(sub,cat){return sub.columns.filter(c=>c.cat===cat.id&&compta(c))}
-function mitjanaPermesa(sub,cat){return colsDeCat(sub,cat).every(c=>c.type==='num'||calcCol(c))||sub.settings.allowOrdMean}
+function mitjanaPermesa(sub,cat){return colsDeCat(sub,cat).every(esNumC)||sub.settings.allowOrdMean}
 function catResult(sub,cat,stu,depth=0){
   const s=sub.settings,cols=colsDeCat(sub,cat);if(!cols.length)return null;
   const items=[];
   for(const c of cols){
+    if((c.type==='icones'||c.type==='check'||c.type==='opc')&&c.valMode==='num'){const v=getG(sub,c.id,stu.id),n=v!==undefined?c.nvals?.[v]:undefined;if(typeof n==='number')items.push({k:'num',x:n});continue}
     if(c.type==='icones'||c.type==='check'||c.type==='opc'){const v=getG(sub,c.id,stu.id),a=v!==undefined?c.vals?.[v]:null;if(a&&LV.includes(a))items.push({k:'ass',l:LV.indexOf(a)});continue}
     if(calcCol(c)){const r=resolveCalc(sub,c,stu,depth);if(!r||r.k==='text')continue;
       if(r.k==='nav')continue;
@@ -1112,7 +1117,7 @@ function catResult(sub,cat,stu,depth=0){
   if(!items.length)return null;
   const toN=i=>i.k==='num'?i.x:i.k==='ord'?s.assVals[LV[lvlOrd(i.x,s)]]:s.assVals[LV[i.l]];
   const toL=i=>i.k==='num'?lvlNum(i.x,s):i.k==='ord'?lvlOrd(i.x,s):i.l;
-  const allNum=cols.every(c=>c.type==='num'||calcCol(c))&&items.every(i=>i.k==='num');
+  const allNum=cols.every(esNumC)&&items.every(i=>i.k==='num');
   const allOrd=cols.every(c=>c.type==='ord');
   let m=cat.method,warn=false;
   if(allNum){const xs=items.map(i=>i.x);const r=m==='mean'?mean(xs):m==='median'?median(xs):moda(xs.map(Math.round));
@@ -2654,6 +2659,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>En passar el ratolí pel títol d'una columna surt el botó <b>⋯</b>: propietats, ordenar, plegar, moure, duplicar i posar la data d'avui al nom. Les columnes també es mouen <b>arrossegant el títol</b> dins de la seva categoria. Una columna plegada es desplega clicant-la.</li>
     <li>Al nom de la columna: <b>📅</b> hi posa la data d'avui (el nom el pots continuar escrivint). Al quadre d'una columna que ja existeix, <b>⧉ Duplica</b> en fa una còpia buida amb la data d'avui.</li>
     <li><b>Compta per a la nota</b>: si la desmarques, la columna es queda a la seva categoria però no entra al càlcul; al títol surt <b>⊘</b> (en passar-hi el ratolí: «No entra al càlcul»; a la Vista alumne i als PDF, «no entra al càlcul»).</li>
+     <li><b>Icones, Check i Opcions que compten</b>: a «Cada opció val» tries <b>un assoliment</b> (com sempre) o <b>una nota (sobre 10)</b>, i escrius la nota de cada opció. Amb notes, la columna fa mitjana amb les numèriques de la categoria. Una cel·la sense marcar no compta.</li>
     <li>A les cel·les pots escriure <b>F</b> (falta: compta com un 0), <b>FJ</b> (falta justificada: no compta) i <b>nav</b> o <b>no ava</b> (no avaluat: no compta, surt en taronja).</li>
     <li><b>Clic dret</b> en una cel·la (o <b>Alt+M</b>): marcar-la en groc o posar-hi un comentari (triangle taronja). Només ho veus tu.</li>
     <li>La columna <b>Nom</b> es fa més ampla o més estreta arrossegant la vora; doble clic s'ajusta al nom més llarg. Als textos llargs de les columnes Lliure, el text complet surt en passar-hi el ratolí.</li>
@@ -2908,7 +2914,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cNom').value=colEd?.name||'';$('#cTipus').value=colEd?.type||'num';$('#cMax').value=colEd?.max||10;
   $('#cClasses').value=(colEd?.type==='classe'?classesDe(sub,false).concat(colEd.classes||[]):[]).filter((x,i,a)=>x&&a.indexOf(x)===i).sort(grupOrd).join('\n');
   $('#cIcones').value=(colEd?.icons||['😀','😐','😟']).join(' ');
-  $('#cCompta').checked=colEd?(EVAL.includes(colEd.type)?!colEd.noCompta:!!colEd.compta):true;mapaV={...(colEd?.vals||{})};
+  $('#cCompta').checked=colEd?(EVAL.includes(colEd.type)?!colEd.noCompta:!!colEd.compta):true;mapaV={...(colEd?.vals||{})};mapaN={...(colEd?.nvals||{})};$('#cValMode').value=colEd?.valMode==='num'?'num':'ass';
   grEd=colEd?.type==='grup'?colEd.opcions.map(o=>({...o})):[1,2,3,4,5,6].map(i=>({id:uid(),t:'G'+i}));pintaGr();
   opcEd=(colEd?.type==='opc'?colEd.opcions:[{t:'Lliurat',col:OPCOL[1]},{t:'Tard',col:OPCOL[2]},{t:'No lliurat',col:OPCOL[3]}]).map(o=>({id:o.id||uid(),t:o.t,col:o.col||''}));pintaOpc();
   $('#cTipusIc').hidden=!(colEd?.type==='icones');
@@ -2941,7 +2947,7 @@ let colColor='#D9D9D9';const COLPAL=[['#D9D9D9','gris clar'],...PAL];
 function pintaColColor(){$('#cColor').innerHTML=COLPAL.map(([h,n])=>`<button type="button" style="background:${h}" class="${colColor.toUpperCase()===h?'on':''}" data-cc="${h}" title="${n}"></button>`).join('')}
 $('#cColor').onclick=e=>{const b=e.target.closest('[data-cc]');if(!b)return;colColor=b.dataset.cc;pintaColColor()};
 $('#cSrc').onchange=()=>omplItems($('#cSrc').value);
-let mapaV={},opcEd=[],grEd=[],sumEd={srcs:[],svals:{}};
+let mapaV={},mapaN={},opcEd=[],grEd=[],sumEd={srcs:[],svals:{}};
 function pintaSuma(){const sub=cur(),W=$('#cSumL');if(!W||!sub)return;const me=colEd?.id;
   const cs=sub.columns.filter(k=>SUMABLES.includes(k.type)&&k.id!==me&&!(k.type==='suma'&&me&&sumaInclou(sub,k,me)));
   const tmp={srcs:sumEd.srcs,svals:sumEd.svals};
@@ -2980,8 +2986,12 @@ function opcionsMapa(){const t=$('#cTipus').value;if(t==='check')return[['fet','
   const ic=t==='dits'?['👍','👎']:splitIcones($('#cIcones').value);return ic.map(i=>[i,i])}
 function pintaMapa(){const op=opcionsMapa(),t=$('#cTipus').value,def=t==='check'?['AE','NA']:(DEFMAP[op.length]||[]);
   op.forEach(([k],i)=>{if(!mapaV[k])mapaV[k]=def[i]||'AS'});
-  $('#cMapa').innerHTML=op.map(([k,l])=>`<span>${esc(l)}</span><select data-mk="${esc(k)}">${['NA','AS','AN','AE'].map(a=>`<option ${mapaV[k]===a?'selected':''}>${a}</option>`).join('')}</select>`).join('')}
+  const sv=cur()?.settings?.assVals||{NA:3,AS:5,AN:7.5,AE:9.5},nm=$('#cValMode').value==='num';
+  if(nm)op.forEach(([k])=>{if(typeof mapaN[k]!=='number')mapaN[k]=sv[mapaV[k]]??5});
+  $('#cMapa').innerHTML=op.map(([k,l])=>`<span>${esc(l)}</span>`+(nm?`<input type="text" inputmode="decimal" class="mini" data-mn="${esc(k)}" value="${String(mapaN[k]).replace('.',',')}">`:`<select data-mk="${esc(k)}">${['NA','AS','AN','AE'].map(a=>`<option ${mapaV[k]===a?'selected':''}>${a}</option>`).join('')}</select>`)).join('')}
 $('#cMapa').onchange=e=>{const s=e.target.closest('[data-mk]');if(s)mapaV[s.dataset.mk]=s.value};
+$('#cMapa').oninput=e=>{const i=e.target.closest('[data-mn]');if(!i)return;const n=parseFloat(i.value.replace(',','.'));mapaN[i.dataset.mn]=isNaN(n)?0:Math.max(0,Math.min(10,n))};
+$('#cValMode').onchange=()=>pintaMapa();
 $('#cCompta').onchange=()=>tipusUI(false);
 $('#cIcones').oninput=()=>{if(['icones'].includes($('#cTipus').value))pintaMapa()};
 $$('.preset').forEach(b=>b.onclick=()=>{$('#cIcones').value=b.dataset.ic;pintaMapa()});
@@ -3021,7 +3031,8 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
       if(perd&&!await confirma(`${perd} cel·la${perd===1?'':'es'} tenen una opció que has tret i quedaran buides.`,'Continua'))return;
       Object.keys(g).forEach(k=>{if(!ids.has(g[k]))delete g[k]})}
     o.opcions=ops}
-  if(['icones','check','dits','opc'].includes(type)){o.compta=$('#cCompta').checked;const op=opcionsMapa();o.vals={};op.forEach(([k])=>o.vals[k]=mapaV[k]||'AS')}
+  if(['icones','check','dits','opc'].includes(type)){o.compta=$('#cCompta').checked;const op=opcionsMapa();o.vals={};op.forEach(([k])=>o.vals[k]=mapaV[k]||'AS');
+    if($('#cValMode').value==='num'){o.valMode='num';o.nvals={};op.forEach(([k])=>o.nvals[k]=typeof mapaN[k]==='number'?mapaN[k]:0)}}
   if(type==='dits'){o.type='icones';o.icons=['👍','👎']}
   if(type==='icones'){const ic=splitIcones($('#cIcones').value);if(ic.length<2)return toast('Posa com a mínim dues icones (fins a 5).');o.icons=ic}
   if(type==='classe'){o.classes=[...new Set($('#cClasses').value.split('\n').map(x=>x.trim()).filter(Boolean))]}
@@ -3032,7 +3043,7 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;if($('#cBloq').checked)o.bloq=true;else delete o.bloq;o.color=colColor;const fr=$('#cFr').value.trim();if(fr)o.franja=fr;else delete o.franja;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
   /* si una columna surt d'una categoria, es queda al costat d'on era */
   if(colEd&&colEd.cat&&!o.cat&&sub.categories.some(k=>k.id===colEd.cat)){sincBlocs(sub);const i=sub.blocs.findIndex(x=>x.t==='cat'&&x.id===colEd.cat);sub.blocs.splice(i+1,0,{t:'col',id:colEd.id})}
-  if(colEd){Object.assign(colEd,o);if(!o.bloq)delete colEd.bloq;if(!o.franja)delete colEd.franja;if(type==='suma'){if(!o.tot)delete colEd.tot;if(!o.a)delete colEd.a}}else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
+  if(colEd){Object.assign(colEd,o);if(!o.bloq)delete colEd.bloq;if(!o.franja)delete colEd.franja;if(type==='suma'){if(!o.tot)delete colEd.tot;if(!o.a)delete colEd.a}if(!o.valMode){delete colEd.valMode;delete colEd.nvals}}else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
 $('#cDel').onclick=async()=>{const sub=cur();if(!await confirma(`Eliminar la columna «${colEd.name}» i totes les seves dades?`,'Elimina'))return;
   sub.columns=sub.columns.filter(c=>c!==colEd);delete sub.grades[colEd.id];save('eliminar columna');$('#dlgCol').close();rLlibreta()};
 function omple(totes){const sub=cur(),arr=$('#cArr').value;let n=0;snapshot(sub);
