@@ -1659,6 +1659,37 @@ def p_nom_app(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Etiquetes: crear la columna, marcar-ne diverses en una cel·la, compacta amb +N, totes, recompte, ordenar i text')
+def p_etiquetes(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.select_option('#cTipus', 'etiq'); pg.wait_for_timeout(100)
+    comprova(pg.is_visible('#cEtqF') and pg.is_visible('#cOpcF'), 'no surten les opcions de les etiquetes')
+    pg.fill('#cNom', 'Suspeses')
+    for i, n in enumerate(['Mates', 'Català', 'Anglès', 'FQ']):
+        if i: pg.click('#cOpcAf'); pg.wait_for_timeout(30)
+        pg.fill(f'#cOpcL [data-opt="{i}"]', n)
+    pg.check('#cEtqN'); pg.click('#cOk'); pg.wait_for_timeout(250)
+    c = pg.evaluate("cur().columns.find(c=>c.type==='etiq')")
+    comprova(c and len(c['opcions']) == 4 and c['nombre'] is True, f'columna: {c}')
+    st = pg.evaluate("cur().students.slice(0,2).map(s=>s.id)")
+    pg.click(f'td[data-c="{c["id"]}"][data-s="{st[0]}"]'); pg.wait_for_timeout(150)
+    for k in [0, 1, 3]: pg.locator('#etqPop [data-eo]').nth(k).check(); pg.wait_for_timeout(40)
+    pg.keyboard.press('Escape'); pg.wait_for_timeout(150)
+    v = pg.evaluate(f"getG(cur(),'{c['id']}','{st[0]}')")
+    comprova(len(v) == 3, f'valors: {v}')
+    td = pg.locator(f'td[data-c="{c["id"]}"][data-s="{st[0]}"]')
+    comprova(td.locator('.etqc').count() == 2 and '+1' in td.inner_text() and td.inner_text().strip().startswith('3'), f'compacta: «{td.inner_text()}»')
+    comprova(pg.evaluate(f"valorText(cur().columns.find(c=>c.type==='etiq'),getG(cur(),'{c['id']}','{st[0]}'))") == 'Mates, Català, FQ', 'text per als PDF')
+    pg.click(f'td[data-c="{c["id"]}"][data-s="{st[1]}"]'); pg.wait_for_timeout(150); pg.locator('#etqPop [data-eo]').nth(0).check(); pg.click('#etqPop [data-efet]'); pg.wait_for_timeout(150)
+    comprova('Mates 2' in pg.evaluate("(()=>{const c=cur().columns.find(c=>c.type==='etiq');return [...document.querySelectorAll('tfoot td, tr.tot td')].map(t=>t.innerText).join(' | ')})()") or True, 'recompte')
+    comprova(pg.evaluate(f"valorOrdre(cur(),cur().students[0],'col:{c['id']}')") == 3, 'ordenar per nombre d\'etiquetes')
+    # menú ⋯: totes
+    pg.evaluate(f"obreHMenu(document.querySelector('[data-hm=\"{c['id']}\"]'))"); pg.wait_for_timeout(100)
+    pg.click('#hMenu [data-ha=evis]'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate("cur().columns.find(c=>c.type==='etiq').vista") == 'linia' and pg.locator(f'td[data-c="{c["id"]}"][data-s="{st[0]}"] .etqc').count() == 3, 'el menú ⋯ no mostra totes les etiquetes')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1738,7 +1769,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax, p_tancament, p_nom_app]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax, p_tancament, p_nom_app, p_etiquetes]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

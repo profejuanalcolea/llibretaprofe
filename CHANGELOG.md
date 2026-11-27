@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.9 · ammonite · novembre 2026
+- **Columna Etiquetes:** llista pròpia (fins a 24, amb colors) i a cada cel·la cap, una o diverses etiquetes arrodonides. Vista compacta (dues i +N), totes en una línia o totes en diverses línies (també des del menú ⋯). Opció de mostrar el nombre. Ordenar per nombre d'etiquetes, recompte per etiqueta a la fila de totals, text separat per comes als PDF i exportacions. No compta per a la nota.
+
 ## 2.8.3 · ammonite · novembre 2026
 - Nom propi: a la barra negra, el curs, Llibreta, Avaluació i el selector s'enganxen al nom si és curt (no hi queda un forat); si és llarg, no passa de l'amplada de «Llibreta del Profe» (lletra més petita). Als crèdits surt el nom propi, amb «Llibreta del Profe» a sota.
 
