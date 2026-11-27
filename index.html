@@ -637,7 +637,7 @@ table.hort td.hc:hover{border-color:#999}table.hort td.hc.sel{outline:2px solid 
 table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#888;text-align:center;font-size:12px;padding:3px;border-color:#eee}
 .hhed{display:flex;align-items:center;gap:2px;justify-content:flex-end}.hhed input{width:44px;padding:2px 3px;font-size:12.5px;text-align:center}.hhacc{display:flex;gap:3px;justify-content:flex-end;margin-top:2px}.hhacc button{font-size:11px;border:1px solid #ddd;background:#fff;border-radius:5px;padding:0 5px;cursor:pointer}.hhacc button.on{background:#eee}
 .hedt{border:1px solid #ddd;border-radius:10px;padding:8px 10px;margin-top:10px;background:#fafafa}.hedtt{display:flex;align-items:center}.hedtf{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:6px}.hedtf label{display:flex;flex-direction:column;font-size:12px;color:#555;gap:2px}.hedtf input{width:160px}
-.hcols{display:flex;gap:5px}.hcols button{width:24px;height:24px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer}.hcols button.on{border-color:#111;box-shadow:0 0 0 2px #111}
+.hcols{display:flex;gap:5px;flex-wrap:wrap;max-width:560px}.hcols button{width:24px;height:24px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer}.hcols button.on{border-color:#111;box-shadow:0 0 0 2px #111}
 .hcopav{background:#fff4ec;border-radius:8px;padding:6px 10px;margin:0 0 8px;font-size:13px;display:flex;align-items:center;gap:10px}
 .mhdia{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}.mhdia b{font-size:17px}.mhf{display:flex;gap:12px;align-items:center}.mhh{display:flex;flex-direction:column;font-size:12px;color:#666;min-width:46px}.mhh b{font-size:14px;color:#111}.mhc{flex:1}
 .mhf.ara{box-shadow:inset 0 0 0 2px var(--tar)}.mhp{text-align:center;color:#999;font-size:12.5px;padding:4px}
@@ -801,7 +801,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <!-- Nova llibreta -->
 <div id="anMenu" class="anmenu" role="menu"></div>
 <div id="soMenu" class="anmenu" role="menu"></div><div id="hMenu" class="anmenu" role="menu"></div><div id="soAvis"></div>
-<dialog id="dlgHor" style="width:min(1060px,97vw)"><div class="horcap"><h3 style="margin:0">🗓️ Horari</h3><span style="flex:1"></span><button class="btn sec" id="horBloq"></button><button class="btn sec" id="horX">Tanca</button></div><div id="horW"></div></dialog>
+<dialog id="dlgHor" style="width:min(1060px,97vw)"><div class="horcap"><h3 style="margin:0">🗓️ Horari</h3><span style="flex:1"></span><button class="btn sec" id="horPdf" title="Desa l'horari en PDF">PDF</button><button class="btn sec" id="horBloq"></button><button class="btn sec" id="horX">Tanca</button></div><div id="horW"></div></dialog>
 <dialog id="dlgDvT" style="width:min(900px,96vw)"><h3 style="margin:0 0 4px">🧩 Atenció a la diversitat</h3><p class="dvconf">Informació confidencial: no la projectis ni la deixis oberta.</p><div id="dvtW"></div>
   <div class="fl" style="justify-content:flex-end;margin-top:12px"><button class="btn sec" id="dvtX">Tanca</button><button class="btn" id="dvtPdf">PDF al Drive</button></div></dialog>
 <dialog id="dlgSo" style="width:min(760px,95vw)"><h3 style="margin:0 0 8px">🚻 Sortides de l'aula</h3><div id="soW"></div>
@@ -912,7 +912,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.7.1 · ammonite · novembre 2026',COMPILACIO='27/11 01:00';
+const VERSIO='2.7.1 · ammonite · novembre 2026',COMPILACIO='27/11 01:11';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -2714,7 +2714,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
-    <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
+    <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Hi ha 21 colors. <b>PDF</b> desa l'horari al Drive (amb els colors). Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
     <li><b>🧰 Eines › 🧩 Atenció a la diversitat</b>: el llistat de tots els alumnes amb dades de diversitat (mesures, proposta i enllaços), de totes les llibretes o d'una, amb les arxivades si vols, <b>per llibreta</b> o <b>per alumne</b> (cada alumne amb el que té a cada llibreta), i un cercador. <b>PDF al Drive</b> desa el que estàs veient. <b>Esborra la diversitat d'aquesta llibreta</b> (vista per llibreta) esborra mesures, proposta i enllaços de diversitat d'aquella llibreta (no toca notes ni comentaris): pregunta si vols el PDF abans i demana escriure el nom de la llibreta; no es pot desfer. La fitxa no surt si tens marcat «Amaga 🧩».</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
@@ -3327,6 +3327,7 @@ $('#dvtPdf').onclick=()=>{const f=dvFiles();const s=DVT.sub?state.subjects.find(
 /* 2.7 · Horari de classe (state.horari): files {id,ini,fi,pati}, cel['dia|fila']={m,c,a,col,sub}, bloq */
 const ICAL='<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.2"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3M2 10.2h12M6 6.5v7.5M10 6.5v7.5"/></svg>';
 const HDIES=['Dilluns','Dimarts','Dimecres','Dijous','Divendres'];
+const HCOL=[['','blanc'],...LPAL,['#FFE0B2','préssec'],['#D7F0FF','cel'],['#C8F0D8','menta'],['#FFF3A8','llimona'],['#E1D5F5','lavanda'],['#FFD0D0','coral'],['#F8D1E8','xiclet'],['#D9DEE3','pissarra'],['#E6F4C8','pistatxo'],['#CDEFEA','aigua'],['#F3E1CB','sorra'],['#FFE4F0','cotó']];
 const HFR=[['8:30','9:30'],['9:30','10:30'],['10:30','11:30'],['11:30','12:00',1],['12:00','13:00'],['13:00','14:00'],['14:00','15:00'],['15:00','16:00'],['16:00','17:00'],['17:00','18:00']];
 function horari(){state.horari??={files:HFR.map(([ini,fi,pati])=>({id:uid(),ini,fi,...(pati?{pati:true}:{})})),cel:{},bloq:false};return state.horari}
 const hMin=t=>{const m=/^(\d{1,2})[:.,h](\d{2})$/.exec(String(t).trim())||/^(\d{1,2})$/.exec(String(t).trim());return m?(+m[1])*60+(+(m[2]||0)):NaN};
@@ -3347,7 +3348,7 @@ function pintaHorari(){const H=horari(),ara=horAra(),bl=!!H.bloq,ed=!bl;
     edt=`<div class="hedt"><div class="hedtt"><b>${HDIES[+d]} · ${esc(f?.ini||'')}–${esc(f?.fi||'')}</b><span style="flex:1"></span><button class="x" id="hTanca" title="Tanca">✕</button></div>
       <div class="hedtf"><label>Matèria<input id="hM" value="${esc(c.m||'')}"></label><label>Curs<input id="hC" value="${esc(c.c||'')}"></label><label>Aula<input id="hA" value="${esc(c.a||'')}"></label>
       <label>Llibreta<select id="hS"><option value="">Cap</option>${actives().filter(z=>z.tipus!=='llista'||true).map(z=>`<option value="${z.id}" ${c.sub===z.id?'selected':''}>${z.icon||''} ${esc(z.name)}</option>`).join('')}</select></label></div>
-      <div class="hedtf"><span class="hcols">${[['','blanc'],...LPAL].map(([hx,n])=>`<button type="button" class="${(c.col||'')===hx?'on':''}" data-hcol="${hx}" title="${n}" style="background:${hx||'#fff'}"></button>`).join('')}</span><span style="flex:1"></span>
+      <div class="hedtf"><span class="hcols">${HCOL.map(([hx,n])=>`<button type="button" class="${(c.col||'')===hx?'on':''}" data-hcol="${hx}" title="${n}" style="background:${hx||'#fff'}"></button>`).join('')}</span><span style="flex:1"></span>
       <button class="btn sec" id="hCopia" ${horCelTxt(c).length?'':'disabled'}>Copia a altres espais</button><button class="btn sec perill" id="hBuida">Buida</button></div></div>`}
   $('#horW').innerHTML=`${HOR.copia?`<p class="hcopav">Clica els espais on vols copiar «${esc(horCelTxt(H.cel[HOR.copia]).join(' · '))}». <button class="btn sec" id="hCopiaFi">Fet</button></p>`:''}
     <table class="hort ${bl?'blq':''}">${cap}${files}</table>${ed?'<div class="fl" style="margin-top:8px"><button class="btn sec" id="hAfFr">＋ Afegeix una franja</button><span class="aj">Clica un espai per omplir-lo. Quan acabis, bloqueja l\'horari.</span></div>':'<p class="aj" style="margin-top:8px">Clica una classe lligada a una llibreta per obrir-la. Per canviar l\'horari, desbloqueja\'l.</p>'}${edt}`;
@@ -3372,6 +3373,18 @@ function pintaHorari(){const H=horari(),ara=horAra(),bl=!!H.bloq,ed=!bl;
     H.files=H.files.filter(x=>x.id!==id);HDIES.forEach((_,d)=>delete H.cel[d+'|'+id]);if(HOR.sel?.endsWith('|'+id))HOR.sel=null;save('treure una franja de l\'horari');pintaHorari()});
   if($('#hAfFr'))$('#hAfFr').onclick=()=>{const u=H.files.at(-1),ini=u?u.fi:'8:00',fi=hNorm(String(Math.floor((hMin(ini)+60)/60))+':'+String((hMin(ini)+60)%60).padStart(2,'0'))||'9:00';H.files.push({id:uid(),ini,fi});save('afegir una franja a l\'horari');pintaHorari()}}
 $('#horX').onclick=()=>$('#dlgHor').close();
+async function pdfHorari(){const H=horari();await carregaPDF();const doc=new window.jspdf.jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const rgb=h=>{h=(h||'#ffffff').replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))};
+  doc.setFontSize(15);doc.text(pt('Horari'),10,13);doc.setFontSize(8.5);doc.setTextColor(120);doc.text(pt(new Date().toLocaleDateString('ca-ES')),287,13,{align:'right'});doc.setTextColor(0);
+  const ln=xs=>xs.filter(Boolean).map(pt).join('\n');
+  const body=H.files.map(f=>f.pati?[{content:ln([f.ini,f.fi])},{content:'Pati',colSpan:5,styles:{halign:'center',textColor:140,fillColor:[244,244,244],fontSize:8}}]
+    :[ln([f.ini,f.fi]),...HDIES.map((_,d)=>{const c=H.cel[d+'|'+f.id];return{content:c?ln([c.m,c.c,c.a]):'',styles:{fillColor:rgb(c?.col)}}})]);
+  doc.autoTable({startY:18,margin:{left:10,right:10},theme:'grid',styles:{fontSize:9,cellPadding:2,valign:'middle',lineColor:[210,210,210],minCellHeight:13},headStyles:{fillColor:[17,17,17],halign:'center'},
+    columnStyles:{0:{cellWidth:20,fontStyle:'bold',halign:'right'},1:{cellWidth:51.4},2:{cellWidth:51.4},3:{cellWidth:51.4},4:{cellWidth:51.4},5:{cellWidth:51.4}},head:[['',...HDIES]],body});
+  return doc}
+$('#horPdf').onclick=async()=>{toast('⏳ Generant el PDF…',1500);const nom=nomFitxer(`${avui()} · Horari.pdf`);
+  try{const doc=await pdfHorari();if(mode==='drive'){try{await pujaPDF(doc,nom);toast(`PDF desat al Drive: «${CARPDF}» › ${nom}`,6000);return}catch(e){if(e.message!=='offline'&&e.message!=='reauth')console.error(e)}}doc.save(nom);toast('PDF descarregat.')}
+  catch(e){toast('No s\'ha pogut fer el PDF: '+e.message,6000)}};
 $('#dlgHor').addEventListener('close',()=>{HOR.sel=null;HOR.copia=null});
 $('#dlgHor').addEventListener('keydown',e=>{if(e.key==='Escape'&&(HOR.copia||HOR.sel)){e.preventDefault();HOR.copia=null;HOR.sel=null;pintaHorari()}});
 $('#horBloq').onclick=()=>{const H=horari();H.bloq=!H.bloq;HOR.sel=null;HOR.copia=null;save(H.bloq?'bloquejar l\'horari':'desbloquejar l\'horari');pintaHorari()};

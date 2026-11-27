@@ -1,6 +1,7 @@
 # Historial de canvis · Llibreta del Profe
 
 ## 2.7.1 · ammonite · novembre 2026
+- Horari: botó **PDF** (horitzontal, amb els colors, al Drive) i més colors (21).
 - Icones de llibreta: grup nou «Divertides» (superherois, mags, dracs, animals, fantasmes, pirates, pizza…).
 
 ## 2.7 · ammonite · novembre 2026

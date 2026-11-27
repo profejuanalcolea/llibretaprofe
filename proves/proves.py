@@ -1557,6 +1557,8 @@ def p_horari(b):
     pg.evaluate("tab='eines';render()")
     pg.click(f'[data-hc="0|{f[0]}"]'); pg.wait_for_timeout(200)
     comprova(not pg.is_visible('#dlgHor') and pg.evaluate("tab") == 'llibreta', 'clicar una classe lligada hauria d\'obrir la llibreta')
+    r = pg.evaluate("(async()=>{try{const d=await pdfHorari();return d.output('arraybuffer').byteLength}catch(e){return e.message}})()")
+    comprova(isinstance(r, int) or 'segura' in str(r) or 'carreg' in str(r), f'el PDF de l\'horari falla: {r}')
     pg.keyboard.press('Alt+h'); pg.wait_for_timeout(150)
     comprova(pg.is_visible('#dlgHor'), 'Alt+H no obre l\'horari'); pg.click('#horX')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
