@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.7.1 · ammonite · novembre 2026
+- Icones de llibreta: grup nou «Divertides» (superherois, mags, dracs, animals, fantasmes, pirates, pizza…).
+
 ## 2.7 · ammonite · novembre 2026
 - **🗓️ Horari:** graella de dilluns a divendres (8:30–18:00 amb el pati d'11:30 a 12:00 per defecte; hores editables, afegir/treure franges, marcar pati). Cada espai: matèria, curs, aula, color i llibreta lligada (opcional), «Copia a altres espais». Bloqueig de tota la graella; bloquejat, clicar una classe lligada obre la llibreta. Franja d'ara marcada. S'obre amb la icona del calendari al costat del nom de la llibreta, Alt+H o Eines. Al mòbil, botó Horari a la barra de baix amb el dia d'avui.
 
