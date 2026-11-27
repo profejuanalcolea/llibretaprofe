@@ -614,7 +614,7 @@ def p_cat_suma(b):
     comprova(pg.locator('[data-k=sumT]').count() == 1, 'no surt el camp «sobre» del total fix')
     pg.fill('[data-k=sumT]', '5'); pg.locator('[data-k=sumT]').dispatch_event('change'); pg.wait_for_timeout(150)
     comprova(pg.evaluate("cur().categories[1].sumT") == 5, 'no es desa el total')
-    comprova('suma sobre 5' in pg.evaluate("metTxt(cur(),cur().categories[1])"), 'la línia de ponderació hauria de dir «suma sobre 5»')
+    comprova('suma fins a 5' in pg.evaluate("metTxt(cur(),cur().categories[1])"), 'la línia de ponderació hauria de dir «suma fins a 5»')
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 

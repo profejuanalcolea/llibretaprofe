@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.7.2 · ammonite · novembre 2026
+- Noms dels mètodes de suma: «suma fins a un màxim» (abans «suma (total fix)», amb el camp «màxim») i, darrere, «percentatge de punts» (abans «suma (punts fets)»). Funcionen igual.
+
 ## 2.7.1 · ammonite · novembre 2026
 - Horari: botó **PDF** (horitzontal, amb els colors, al Drive) i més colors (21).
 - Icones de llibreta: grup nou «Divertides» (superherois, mags, dracs, animals, fantasmes, pirates, pizza…).

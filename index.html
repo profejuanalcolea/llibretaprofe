@@ -912,7 +912,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.7.1 · ammonite · novembre 2026',COMPILACIO='27/11 01:11';
+const VERSIO='2.7.2 · ammonite · novembre 2026',COMPILACIO='27/11 07:46';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -929,9 +929,9 @@ const grTxt=(c,o)=>o?(c.type==='grup'?grSh(c,o)+' '+o.t:o.t):'';
 const CANDAU='<svg class="cand" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 const candau=c=>c.bloq?`<span class="candw" title="Columna bloquejada">${CANDAU}</span>`:'';
 const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",suma:'Suma',final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
-const METODE={mean:'mitjana',median:'mediana',mode:'moda',sump:'suma (punts fets)',sumf:'suma (total fix)'};
+const METODE={mean:'mitjana',median:'mediana',mode:'moda',sumf:'suma fins a un màxim',sump:'percentatge de punts'};
 /* 2.6.3 · la suma només es pot fer amb columnes numèriques (com la mitjana); si no, mediana* */
-const metTxt=(sub,c)=>(c.method==='mean'||c.method==='sump'||c.method==='sumf')&&!mitjanaPermesa(sub,c)?'mediana*':c.method==='sumf'?'suma sobre '+fmt(sumTCat(sub,c)):METODE[c.method];
+const metTxt=(sub,c)=>(c.method==='mean'||c.method==='sump'||c.method==='sumf')&&!mitjanaPermesa(sub,c)?'mediana*':c.method==='sumf'?'suma fins a '+fmt(sumTCat(sub,c)):METODE[c.method];
 const colMax=c=>c.type==='num'?(c.max||10):c.type==='suma'?(c.max||10):10;
 const sumTCat=(sub,cat)=>cat.sumT>0?cat.sumT:colsDeCat(sub,cat).reduce((t,c)=>t+colMax(c),0);
 const PAL=[['#E69F00','taronja'],['#56B4E9','blau cel'],['#009E73','verd blavós'],['#F0E442','groc'],['#0072B2','blau'],['#D55E00','vermelló'],['#CC79A7','rosa'],['#7F7F7F','gris']];
@@ -2565,7 +2565,7 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
       <input type="text" value="${esc(c.name)}" data-k="name" data-cat="${c.id}">
       ${esLl?'':`<input type="number" class="mini" value="${c.weight}" min="0" max="100" data-k="weight" data-cat="${c.id}">%
       <label class="cpct" title="Desmarcada, la categoria no surt a la línia «Ponderació» i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF"><input type="checkbox" data-cpct="${c.id}" ${c.noPct?'':'checked'}> Surt a la ponderació</label>
-      <select data-k="method" data-cat="${c.id}">${['mean','median','mode','sump','sumf'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>${c.method==='sumf'?`<span class="sumt">sobre <input type="text" inputmode="decimal" class="mini" data-k="sumT" data-cat="${c.id}" value="${c.sumT>0?String(c.sumT).replace('.',','):''}" placeholder="${fmt(colsDeCat(sub,c).reduce((t,k)=>t+colMax(k),0))}" title="Total de punts. Buit: la suma dels «sobre» de les columnes"></span>`:''}`}
+      <select data-k="method" data-cat="${c.id}">${['mean','median','mode','sumf','sump'].map(m=>`<option value="${m}" ${c.method===m?'selected':''}>${METODE[m]}</option>`).join('')}</select>${c.method==='sumf'?`<span class="sumt">màxim <input type="text" inputmode="decimal" class="mini" data-k="sumT" data-cat="${c.id}" value="${c.sumT>0?String(c.sumT).replace('.',','):''}" placeholder="${fmt(colsDeCat(sub,c).reduce((t,k)=>t+colMax(k),0))}" title="Màxim de punts. Buit: la suma dels «sobre» de les columnes"></span>`:''}`}
       <span class="pal">${PAL.map(([hx,n])=>`<button type="button" style="background:${hx}" class="${c.color.toUpperCase()===hx?'on':''}" data-col="${hx}" data-cat="${c.id}" title="${n}"></button>`).join('')}</span>
       ${!esLl&&c.method==='mean'&&!mitjanaPermesa(sub,c)?'<span class="avis">mitjana no permesa: mediana</span>':''}<button class="x" data-cdel="${c.id}" title="Elimina">✕</button></div>`).join('')}</div>
     <div class="fl"><button class="btn" id="kCatAf">Afegeix categoria</button>${esLl?'':`<span class="${tot!==100?'avis':''}">Total: ${tot}%</span>`}</div>
@@ -2708,7 +2708,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>Columnes amagades: el xip «👁 amagades» les torna a mostrar.</li></ul>`)+
   sec('Com es calcula la nota',`<ul><li>Cada <b>categoria</b> té un pes (%). La nota final és la mitjana ponderada de les categories que tenen alguna nota.</li>
     <li>A ⚙ › Categories, <b>Surt a la ponderació</b> (a cada categoria): desmarcada, la categoria no surt a la línia «Ponderació» de dalt i el seu % no surt a la capçalera, a Avaluació, a la Vista alumne ni als PDF (pensat per a les categories al 0%; les noves hi vénen desmarcades). Compte: si la desmarques en una categoria que pesa, la línia de ponderació no sumarà 100%. <b>Ressalta la separació entre categories</b>: posa una ratlla més gruixuda a l'inici de cada categoria.</li>
-    <li><b>Suma</b> com a mètode d'una categoria (només amb columnes numèriques, icones/check amb nota, Sumes i d'una altra llibreta): <b>suma (punts fets)</b> divideix els punts que té l'alumne pels punts possibles de les columnes on té nota (una tasca sobre 3 pesa el triple que una sobre 1); <b>suma (total fix)</b> acumula els punts sobre el total que poses a «sobre» (buit: la suma dels «sobre» de les columnes), una cel·la sense nota val 0 i la nota no passa de 10. En passar el ratolí per la nota de la categoria a Avaluació, surten els punts.</li>
+    <li><b>Sumar en una categoria</b> (només amb columnes numèriques, icones/check amb nota, Sumes i d'una altra llibreta): <b>suma fins a un màxim</b> suma tots els punts de la categoria fins al <b>màxim</b> que poses (buit: la suma dels «sobre» de les columnes); una cel·la sense nota val 0 i la nota no passa de 10 (amb màxim 10, la nota és la suma tal qual). <b>Percentatge de punts</b> divideix els punts que té l'alumne pels punts possibles de les columnes on té nota (una tasca sobre 5 pesa més que una sobre 2; una cel·la buida no compta). En passar el ratolí per la nota de la categoria a Avaluació, surten els punts.</li>
     <li>Dins d'una categoria es fa la <b>mitjana</b> si totes les columnes que compten són numèriques. Si n'hi ha d'escala o d'assoliments, es fa la <b>mediana</b> (a la ponderació surt «mediana*»).</li>
     <li>Si vols fer mitjana amb assoliments i escales, activa-ho a <b>⚙ › Conversions a assoliments</b> i revisa quant val cada assoliment (p. ex. NA 2,5 · AS 5 · AN 7,5 · AE 10). És una decisió de criteri: ha de ser la que expliques a la programació.</li>
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
