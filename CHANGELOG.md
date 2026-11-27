@@ -1,5 +1,8 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.8.3 · ammonite · novembre 2026
+- Nom propi: a la barra negra, el curs, Llibreta, Avaluació i el selector s'enganxen al nom si és curt (no hi queda un forat); si és llarg, no passa de l'amplada de «Llibreta del Profe» (lletra més petita). Als crèdits surt el nom propi, amb «Llibreta del Profe» a sota.
+
 ## 2.8.2 · ammonite · novembre 2026
 - ⚙ › **Aparença** (abans Calculadora): «Calculadora amb animacions» i **Nom propi** de l'app (part blanca i taronja, 12 lletres cada una, opció sense espai), a la barra negra (mateix espai, alineat a l'esquerra, lletra més petita si cal), a l'entrada i al títol de la pestanya.
 - L'avís de versió nova comprova un cop al dia (abans, cada mitja hora).
