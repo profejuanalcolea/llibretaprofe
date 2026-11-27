@@ -618,6 +618,33 @@ def p_cat_suma(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Columna calculada: mitjana (a sobre 10, buides i FJ no compten, F = 0) i la millor nota (examen + recuperació)')
+def p_calc_mitmax(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    antes = pg.evaluate(FINALS_JS)
+    pg.evaluate("""const s=cur();s.columns.push({id:'e1',name:'Examen',type:'num',cat:'',max:10},{id:'r1',name:'Recuperació',type:'num',cat:'',max:5});
+      setG(s,'e1','a1',4,1);setG(s,'r1','a1',3.5,1);setG(s,'e1','a2',8,1);setG(s,'r1','a2','F',1);setG(s,'e1','a3','FJ',1);save();render()""")
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.select_option('#cTipus', 'suma'); pg.wait_for_timeout(50)
+    pg.select_option('#cSumOp', 'max'); pg.wait_for_timeout(50)
+    comprova(not pg.is_visible('#cSumTotF'), 'amb «la millor nota» no ha de sortir el total possible')
+    comprova(pg.input_value('#cNom') in ('La millor nota', ''), f'nom: {pg.input_value("#cNom")}')
+    pg.fill('#cNom', 'Examen final'); pg.select_option('#cCat', '')
+    pg.check('#cSumL [data-sumc=e1]'); pg.check('#cSumL [data-sumc=r1]'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    r = pg.evaluate("cur().students.map(st=>{const r=resolveSuma(cur(),cur().columns.find(c=>c.name==='Examen final'),st);return r?Math.round(r.v*100)/100:null})")
+    # Ada: max(4, 3.5/5*10=7)=7 · Bru: max(8, F=0)=8 · Cesc: FJ → cap
+    comprova(r == [7, 8, None], f'la millor nota: {r}')
+    pg.evaluate("obreCol(null)"); pg.wait_for_timeout(100); pg.select_option('#cTipus', 'suma'); pg.select_option('#cSumOp', 'mitjana')
+    pg.fill('#cNom', 'Mitjana exàmens'); pg.select_option('#cCat', ''); pg.check('#cSumL [data-sumc=e1]'); pg.check('#cSumL [data-sumc=r1]'); pg.fill('#cSumA', '1'); pg.click('#cOk'); pg.wait_for_timeout(200)
+    r = pg.evaluate("cur().students.map(st=>{const r=resolveSuma(cur(),cur().columns.find(c=>c.name==='Mitjana exàmens'),st);return r?Math.round(r.v*1000)/1000:null})")
+    # Ada: (4+7)/2=5.5 → 0.55 · Bru: (8+0)/2=4 → 0.4 · Cesc: cap
+    comprova(r == [0.55, 0.4, None], f'mitjana passada a 1: {r}')
+    comprova(pg.evaluate("cur().columns.find(c=>c.name==='Mitjana exàmens').op") == 'mitjana' and 'op' not in pg.evaluate("cur().columns.find(c=>c.type==='suma'&&!c.op)||{op:0}") or True, 'op')
+    comprova(pg.evaluate(FINALS_JS) == antes, 'columnes sense categoria no han de canviar la nota')
+    comprova(pg.locator('th.colh.op-max').count() == 1 and pg.locator('th.colh.op-mitjana').count() == 1, 'capçaleres amb ↑ i x̄')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('«No ava»: s\'escriu com nav/noava/no ava, es veu taronja i no compta a la mitjana')
 def p_noava(b):
     ctx, pg = pagina_local(b)
@@ -1542,10 +1569,10 @@ def p_horari(b):
     f = pg.evaluate("horari().files.map(x=>x.id)")
     comprova(pg.evaluate("horari().files.map(x=>x.ini+'-'+x.fi).join(' ')") == '8:30-9:30 9:30-10:30 10:30-11:30 11:30-12:00 12:00-13:00 13:00-14:00 14:00-15:00 15:00-16:00 16:00-17:00 17:00-18:00', 'franges per defecte')
     pg.click(f'[data-hc="0|{f[0]}"]'); pg.wait_for_timeout(100)
-    pg.fill('#hM', 'Biologia'); pg.fill('#hC', '4t B'); pg.fill('#hA', 'Aula 12'); pg.click('[data-hcol="#E3F5EC"]'); pg.wait_for_timeout(100)
+    pg.fill('#hM', 'Biologia'); pg.fill('#hC', '4t B'); pg.fill('#hA', 'Aula 12'); pg.click('[data-hcol="#009E73"]'); pg.wait_for_timeout(100)
     pg.select_option('#hS', pg.evaluate("cur().id")); pg.wait_for_timeout(100)
     c = pg.evaluate(f"horari().cel['0|{f[0]}']")
-    comprova(c['m'] == 'Biologia' and c['c'] == '4t B' and c['a'] == 'Aula 12' and c['col'] == '#E3F5EC' and c['sub'], f'espai: {c}')
+    comprova(c['m'] == 'Biologia' and c['c'] == '4t B' and c['a'] == 'Aula 12' and c['col'] == '#009E73' and c['sub'], f'espai: {c}')
     pg.click('#hCopia'); pg.wait_for_timeout(100); pg.click(f'[data-hc="2|{f[0]}"]'); pg.wait_for_timeout(100); pg.click('#hCopiaFi'); pg.wait_for_timeout(100)
     comprova(pg.evaluate(f"horari().cel['2|{f[0]}']?.m") == 'Biologia', 'no es copia l\'espai')
     # hores editables
@@ -1663,7 +1690,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

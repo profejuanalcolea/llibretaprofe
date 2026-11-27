@@ -612,7 +612,7 @@ table.rsc th.catini,table.rsc td.catini{border-left:2px solid #8a8a8a}
 .cpct{font-size:12.5px;white-space:nowrap;display:inline-flex;align-items:center;gap:3px}
 
 /* 2.6 · columna Suma */
-td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#888;font-weight:700}td.sumf .buida{font-weight:700;letter-spacing:1px}
+td.sumc,td.sumf{font-weight:600}th.colh.sumh .hn::before{content:'Σ ';color:#888;font-weight:700}th.colh.sumh.op-mitjana .hn::before{content:'x̄ '}th.colh.sumh.op-max .hn::before{content:'↑ '}td.sumf .buida{font-weight:700;letter-spacing:1px}
 #cSumF{border:1px solid #e3e3e3;border-radius:8px;padding:6px 10px;margin:6px 0}
 .suml{display:flex;flex-direction:column;gap:3px;max-height:230px;overflow:auto;flex:1;min-width:0}.sumi small{color:var(--suau);font-size:11.5px}
 .sumv{display:flex;flex-wrap:wrap;gap:4px 10px;margin:2px 0 4px 24px;font-size:13px}.sumv input{width:48px;padding:2px 4px}
@@ -632,12 +632,12 @@ table.dvtt-t tr.dvtg td{border-top:2px solid #bbb}td.dvtt{max-width:380px}.dvtl{
 table.hort{width:100%;border-collapse:separate;border-spacing:3px;table-layout:fixed}table.hort th{font-size:13px;padding:4px;background:#f2f2f2;border-radius:6px}table.hort th.avui{background:#111;color:#fff}table.hort th.hh{background:none;border:0;width:118px}
 table.hort td{border:1px solid #e2e2e2;border-radius:8px;height:52px;padding:4px 6px;vertical-align:top;font-size:12.5px;line-height:1.25;background:#fff;overflow:hidden}
 table.hort td.hh{border:0;background:none;font-size:12.5px;text-align:right;color:#555;padding:4px 4px 0 0}table.hort td.hh b{display:block;color:#111;font-size:13.5px}
-table.hort td.hc{cursor:pointer}table.hort td.hc b{display:block;font-size:13px}table.hort td.hc span{display:block;color:#444}table.hort td.hc .hau{color:#777;font-size:11.5px}
+table.hort td.hc{cursor:pointer}table.hort td.hc b{display:block;font-size:13px}table.hort td.hc span{display:block;color:inherit;opacity:.85}table.hort td.hc .hau{color:inherit;opacity:.7;font-size:11.5px}
 table.hort td.hc:hover{border-color:#999}table.hort td.hc.sel{outline:2px solid #111}table.hort td.hc.ara{box-shadow:inset 0 0 0 2px var(--tar)}table.hort.blq td.hc{cursor:default}table.hort.blq td.hc.lli{cursor:pointer}
 table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#888;text-align:center;font-size:12px;padding:3px;border-color:#eee}
 .hhed{display:flex;align-items:center;gap:2px;justify-content:flex-end}.hhed input{width:44px;padding:2px 3px;font-size:12.5px;text-align:center}.hhacc{display:flex;gap:3px;justify-content:flex-end;margin-top:2px}.hhacc button{font-size:11px;border:1px solid #ddd;background:#fff;border-radius:5px;padding:0 5px;cursor:pointer}.hhacc button.on{background:#eee}
 .hedt{border:1px solid #ddd;border-radius:10px;padding:8px 10px;margin-top:10px;background:#fafafa}.hedtt{display:flex;align-items:center}.hedtf{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-top:6px}.hedtf label{display:flex;flex-direction:column;font-size:12px;color:#555;gap:2px}.hedtf input{width:160px}
-.hcols{display:flex;gap:5px;flex-wrap:wrap;max-width:560px}.hcols button{width:24px;height:24px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer}.hcols button.on{border-color:#111;box-shadow:0 0 0 2px #111}
+.hcols{display:flex;gap:5px;flex-wrap:wrap;max-width:560px}.hcols .hsep{width:1px;background:#ccc;margin:0 3px}.hcols button{width:24px;height:24px;border-radius:50%;border:1.5px solid #ccc;cursor:pointer}.hcols button.on{border-color:#111;box-shadow:0 0 0 2px #111}
 .hcopav{background:#fff4ec;border-radius:8px;padding:6px 10px;margin:0 0 8px;font-size:13px;display:flex;align-items:center;gap:10px}
 .mhdia{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}.mhdia b{font-size:17px}.mhf{display:flex;gap:12px;align-items:center}.mhh{display:flex;flex-direction:column;font-size:12px;color:#666;min-width:46px}.mhh b{font-size:14px;color:#111}.mhc{flex:1}
 .mhf.ara{box-shadow:inset 0 0 0 2px var(--tar)}.mhp{text-align:center;color:#999;font-size:12.5px;padding:4px}
@@ -730,7 +730,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
   <div class="fl"><label class="lb">Tipus</label><select id="cTipus">
     <optgroup label="Avaluables">
       <option value="num">Numèrica</option><option value="ord">Escala ordinal</option><option value="ass">Assoliments</option>
-      <option value="ext">D'una altra llibreta</option><option value="suma">Suma (de columnes)</option>
+      <option value="ext">D'una altra llibreta</option><option value="suma">Calculada (suma, mitjana o millor nota)</option>
     </optgroup>
     <optgroup label="Nota">
       <option value="final">Nota final (la poses tu, amb càlcul de referència)</option>
@@ -773,11 +773,12 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
     <div class="fl"><label class="lb"></label><span style="font-size:12.5px;color:var(--suau);max-width:330px">Només surten les llibretes que comparteixen alumnes amb aquesta (les que has duplicat). Les dades s'actualitzen soles i no es poden editar des d'aquí.</span></div>
   </div>
   <div id="cSumF">
-    <div class="fl" style="align-items:flex-start"><label class="lb">Què suma</label><div id="cSumL" class="suml"></div></div>
-    <div class="fl"><label class="lb">Total possible</label><input type="text" id="cSumTot" inputmode="decimal" style="width:90px"><span class="aj" id="cSumTotA"></span></div>
-    <div class="fl"><label class="lb">Passa-la a</label><input type="text" id="cSumA" inputmode="decimal" style="width:90px" placeholder="no"><span class="aj">opcional: 10, 4, 1, 0,5… Buit: la suma tal qual.</span></div>
-    <div class="fl"><label class="lb"></label><button type="button" class="btn sec" id="cSumNC">Marca les sumades com a «No entra al càlcul»</button></div>
-    <div class="fl"><label class="lb"></label><span class="aj" style="max-width:340px">Es calcula sola. Si a una numèrica hi falta la nota, surt «…» fins que la posis. F, FJ i «no ava» valen 0; un check, icones o opcions sense marcar valen 0.</span></div>
+    <div class="fl"><label class="lb">Què fa</label><select id="cSumOp"><option value="suma">Suma</option><option value="mitjana">Mitjana</option><option value="max">La millor nota</option></select></div>
+    <div class="fl" style="align-items:flex-start"><label class="lb">Columnes</label><div id="cSumL" class="suml"></div></div>
+    <div class="fl" id="cSumTotF"><label class="lb">Total possible</label><input type="text" id="cSumTot" inputmode="decimal" style="width:90px"><span class="aj" id="cSumTotA"></span></div>
+    <div class="fl"><label class="lb">Passa-la a</label><input type="text" id="cSumA" inputmode="decimal" style="width:90px" placeholder="no"><span class="aj" id="cSumAA">opcional: 10, 4, 1, 0,5… Buit: la suma tal qual.</span></div>
+    <div class="fl"><label class="lb"></label><button type="button" class="btn sec" id="cSumNC">Marca les triades com a «No entra al càlcul»</button></div>
+    <div class="fl"><label class="lb"></label><span class="aj" style="max-width:340px" id="cSumReg"></span></div>
   </div>
   <div id="cComptaF" style="background:var(--gris);border-radius:8px;padding:8px 10px;margin:6px 0">
     <label id="cComptaL"><input type="checkbox" id="cCompta"> <b>Compta per a la nota</b> <span id="cComptaT">(dins de la seva categoria)</span></label>
@@ -912,7 +913,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.7.2 · ammonite · novembre 2026',COMPILACIO='27/11 07:46';
+const VERSIO='2.8 · ammonite · novembre 2026',COMPILACIO='27/11 09:47';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -928,7 +929,7 @@ const grTxt=(c,o)=>o?(c.type==='grup'?grSh(c,o)+' '+o.t:o.t):'';
 /* 2.4.2 · columnes bloquejades: candau de línia, d'un sol color */
 const CANDAU='<svg class="cand" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 const candau=c=>c.bloq?`<span class="candw" title="Columna bloquejada">${CANDAU}</span>`:'';
-const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",suma:'Suma',final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
+const TIPUS={num:'Numèrica',ord:'Escala ordinal',ass:'Assoliments',ext:"D'una altra llibreta",suma:'Calculada',final:'Nota final',check:'Check',icones:'Icones',opc:'Opcions',grup:'Grups',inc:'Incidències',classe:'Classe',url:'URL',lliure:'Lliure'};
 const METODE={mean:'mitjana',median:'mediana',mode:'moda',sumf:'suma fins a un màxim',sump:'percentatge de punts'};
 /* 2.6.3 · la suma només es pot fer amb columnes numèriques (com la mitjana); si no, mediana* */
 const metTxt=(sub,c)=>(c.method==='mean'||c.method==='sump'||c.method==='sumf')&&!mitjanaPermesa(sub,c)?'mediana*':c.method==='sumf'?'suma fins a '+fmt(sumTCat(sub,c)):METODE[c.method];
@@ -1083,8 +1084,19 @@ function svDe(c,k){const m=c.svals?.[k.id];if(m)return m;if(k.valMode==='num'&&k
 function sumaMaxCol(sub,c,k,d){switch(k.type){case 'num':return k.max||10;case 'ext':return 10;case 'suma':return d>4?0:sumaSobre(sub,k,d+1);
   default:{const v=Object.values(svDe(c,k)).map(Number).filter(x=>!isNaN(x));return v.length?Math.max(0,...v):0}}}
 function sumaTot(sub,c,d=0){if(c.tot>0)return c.tot;let t=0;(c.srcs||[]).forEach(id=>{const k=sub.columns.find(x=>x.id===id);if(k)t+=sumaMaxCol(sub,c,k,d)});return t}
-const sumaSobre=(sub,c,d=0)=>c.a>0?c.a:sumaTot(sub,c,d);
-function resolveSuma(sub,c,st,d=0){if(d>4)return null;const s=sub.settings;let sum=0,ple=0;const falta=[],det=[];
+const sumaSobre=(sub,c,d=0)=>c.a>0?c.a:c.op?10:sumaTot(sub,c,d);
+/* 2.8 · Calculada amb mitjana o la millor nota: cada valor a sobre 10; buides, FJ i «no ava» no compten; F = 0 */
+function resolveMitMax(sub,c,st,d){const s=sub.settings,xs=[],det=[];
+  for(const id of c.srcs||[]){const k=sub.columns.find(x=>x.id===id);if(!k)continue;let x=null;
+    if(k.type==='num'){const v=getG(sub,k.id,st.id);if(typeof v==='number')x=v/(k.max||10)*10;else if(v==='F')x=0}
+    else if(k.type==='ext'){const r=resolveExt(sub,k,st,d+1);if(r?.k==='num')x=r.x;else if(r?.k==='ass')x=s.assVals[LV[r.l]]??null;else if(r?.k==='f')x=0}
+    else if(k.type==='suma'){const r=resolveSuma(sub,k,st,d+1);if(r&&r.k==='num')x=r.x}
+    else{const v=getG(sub,k.id,st.id);if(v!==undefined&&v!==''){const m=sumaMaxCol(sub,c,k,d);x=m?(+svDe(c,k)[v]||0)/m*10:0}}
+    if(x===null||isNaN(x))continue;x=Math.max(0,Math.min(10,x));xs.push(x);det.push(k.name+' '+fmt(x))}
+  if(!xs.length)return null;
+  const r=c.op==='max'?Math.max(...xs):mean(xs),v=c.a>0?r/10*c.a:r;
+  return{k:'num',x:r,v,label:fmt(v),lvl:lvlNum(r,s),det:(c.op==='max'?'La millor: ':'Mitjana: ')+det.join(' · ')+' → '+fmt(r)+(c.a>0?' → '+fmt(v)+' sobre '+fmt(c.a):'')}}
+function resolveSuma(sub,c,st,d=0){if(d>4)return null;if(c.op)return resolveMitMax(sub,c,st,d);const s=sub.settings;let sum=0,ple=0;const falta=[],det=[];
   for(const id of c.srcs||[]){const k=sub.columns.find(x=>x.id===id);if(!k)continue;let x=0;
     if(k.type==='num'){const v=getG(sub,k.id,st.id);if(v===undefined||v===''){falta.push(k.name);continue}ple++;x=typeof v==='number'?v:0}
     else if(k.type==='ext'){const r=resolveExt(sub,k,st,d+1);if(!r){falta.push(k.name);continue}ple++;x=r.k==='num'?r.x:r.k==='ass'?(s.assVals[LV[r.l]]??0):0}
@@ -1694,7 +1706,7 @@ function subtitolCol(sub,c){
   switch(c.type){case 'num':return 'Numèrica /'+c.max;case 'ord':return 'Escala 1-'+sub.settings.ordMax;
   case 'icones':return 'Icones '+iconesDe(c).join(' ')+(c.compta?' · compta':'');case 'check':return 'Check'+(c.compta?' · compta':'');case 'classe':return 'Classe';
   case 'ext':{const s=state.subjects.find(x=>x.id===c.src);return '↪ '+(s?s.name:'llibreta esborrada')}
-  case 'suma':{const n=(c.srcs||[]).filter(id=>sub.columns.some(k=>k.id===id)).length;return `Σ ${n} columne${n===1?'':'s'} · sobre ${fmt(sumaSobre(sub,c))}`}
+  case 'suma':{const n=(c.srcs||[]).filter(id=>sub.columns.some(k=>k.id===id)).length;return `${{mitjana:'Mitjana',max:'La millor'}[c.op]||'Σ Suma'} de ${n} columne${n===1?'':'s'} · sobre ${fmt(sumaSobre(sub,c))}`}
   default:return TIPUS[c.type]}}
 
 /* ======================= Pestanya Llibreta ======================= */
@@ -1751,7 +1763,7 @@ function rLlibreta(){const sub=cur();if(!sub)return senseLlibretes();
       const srt=sub.ordre==='col:'+c.id?`<span class="srt">${sub.ordreDir==='asc'?'▲':'▼'}</span>`:'';
       const first=g.solt?true:i===0,last=g.solt?true:i===g.cols.length-1;
       const tools=ro?'':`<button class="hdots" data-hm="${c.id}" data-first="${g.solt?0:first?1:0}" data-last="${g.solt?0:last?1:0}" title="Opcions de la columna">⋯</button>`;
-      return `<th class="colh ${calcCol(c)?'extc':''} ${c.type==='suma'?'sumh':''} ${np?'nopond':''} ${gi&&!i?'catini':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
+      return `<th class="colh ${calcCol(c)?'extc':''} ${c.type==='suma'?'sumh op-'+(c.op||'suma'):''} ${np?'nopond':''} ${gi&&!i?'catini':''}" data-col="${c.id}" data-g="${g.cat?g.cat.id:''}" ${ro||g.solt?'':'draggable="true"'} style="${top};${ws(c)};z-index:${zc}" title="${esc(c.name)}${c.type==='ext'?'\n'+esc(subtitolCol(sub,c)):''}">${vert?`<span class="vt">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}</span>${srt}`:`<span class="hn">${np?'<span class="npx" title="No entra al càlcul">⊘</span> ':''}${esc(c.name)}${candau(c)}${srt}</span>`}${tools}</th>`}).join('')}).join('');
   h+=`</tr></thead><tbody>`;
   const ncol=fix.length+gs.reduce((a,g)=>a+(g.folded?1:g.cols.length),0),files=filesVisibles(sub);
   h+=files.map(r=>{if(r.sep)return `<tr class="sepc ${r.sh?'sepg':''}"><td colspan="${ncol}" ${r.col?`style="--gc:${r.col}"`:''}><span>${r.sh?`<i class="grsh" style="background:${r.col}">${r.sh}</i>`:''}${esc(r.sep)} · ${r.n} alumne${r.n===1?'':'s'}</span></td></tr>`;const st=r.st;
@@ -2695,8 +2707,8 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li><b>⋯ › 🎲 Grups a l'atzar</b>: tria quants grups o quants alumnes per grup; els reparteix equilibrats i, si hi ha alumnes de diverses classes, les pot barrejar. També pot omplir només els alumnes sense grup.</li>
     <li><b>⋯ › 👥 Mostra per grups</b> (o <b>Mostra</b> › per grups / un sol grup): els alumnes surten agrupats amb una franja per grup. També es pot ordenar per la columna (⇅ o «Ordena per»).</li>
     <li><b>Nota de grup</b>: posa la nota a un alumne, fes <b>clic dret</b> a la cel·la i tria <b>«👥 Posa-la a tot el grup»</b>. Si algú del grup ja té una altra nota, pregunta si la sobreescriu o només omple els buits. Es pot desfer amb ↶.</li></ul>`)+
-  sec('Columnes i notes',`<ul><li><b>＋ Columna</b>: Numèrica, Escala ordinal, Assoliments, D'una altra llibreta, Suma, Nota final, Check, Opcions (un desplegable amb les teves opcions i colors, amb suggeriments d'un clic: 😊 😐 😞, 🟢 🟡 🔴, 👍 👎, ⭐, ✔ ✘; també hi pots posar qualsevol icona amb Windows + .), Dits, Incidències, Classe, URL i Lliure.</li>
-    <li><b>Σ Suma</b>: suma les columnes que marquis (numèriques, d'una altra llibreta, altres sumes, check, icones i opcions; a les tres últimes tries quant val cada opció). El <b>total possible</b> surt sol (la suma dels «sobre») i el pots canviar; a <b>Passa-la a</b> hi pots posar 10, 4, 1, 0,5… o deixar-ho buit per veure la suma tal qual. Si a una numèrica hi falta la nota, surt «…» (en passar-hi el ratolí diu què falta); F, FJ i «no ava» valen 0, i un check, icones o opcions sense marcar valen 0. Pot anar dins d'una categoria i comptar com una numèrica; amb <b>Marca les sumades com a «No entra al càlcul»</b> les parts no es compten dues vegades. En passar el ratolí per la cel·la surt el detall.</li>
+  sec('Columnes i notes',`<ul><li><b>＋ Columna</b>: Numèrica, Escala ordinal, Assoliments, D'una altra llibreta, Calculada, Nota final, Check, Opcions (un desplegable amb les teves opcions i colors, amb suggeriments d'un clic: 😊 😐 😞, 🟢 🟡 🔴, 👍 👎, ⭐, ✔ ✘; també hi pots posar qualsevol icona amb Windows + .), Dits, Incidències, Classe, URL i Lliure.</li>
+    <li><b>Calculada</b> (abans Suma): a «Què fa» tries <b>Suma</b>, <b>Mitjana</b> o <b>La millor nota</b> de les columnes que marquis. <b>Mitjana</b> i <b>la millor nota</b> passen cada nota a sobre 10; les buides, FJ i «no ava» no compten i F és un 0 (la millor nota és ideal per a examen + recuperació). A la capçalera surt Σ (suma), x̄ (mitjana) o ↑ (la millor). <b>Suma</b>: suma les columnes que marquis (numèriques, d'una altra llibreta, altres sumes, check, icones i opcions; a les tres últimes tries quant val cada opció). El <b>total possible</b> surt sol (la suma dels «sobre») i el pots canviar; a <b>Passa-la a</b> hi pots posar 10, 4, 1, 0,5… o deixar-ho buit per veure la suma tal qual. Si a una numèrica hi falta la nota, surt «…» (en passar-hi el ratolí diu què falta); F, FJ i «no ava» valen 0, i un check, icones o opcions sense marcar valen 0. Pot anar dins d'una categoria i comptar com una numèrica; amb <b>Marca les sumades com a «No entra al càlcul»</b> les parts no es compten dues vegades. En passar el ratolí per la cel·la surt el detall.</li>
     <li>En passar el ratolí pel títol d'una columna surt el botó <b>⋯</b>: propietats, ordenar, plegar, moure, duplicar i posar la data d'avui al nom. Les columnes també es mouen <b>arrossegant el títol</b> dins de la seva categoria. Una columna plegada es desplega clicant-la.</li>
     <li>Al nom de la columna: <b>📅</b> hi posa la data d'avui (el nom el pots continuar escrivint). Al quadre d'una columna que ja existeix, <b>⧉ Duplica</b> en fa una còpia buida amb la data d'avui.</li>
     <li><b>Compta per a la nota</b>: si la desmarques, la columna es queda a la seva categoria però no entra al càlcul; al títol surt <b>⊘</b> (en passar-hi el ratolí: «No entra al càlcul»; a la Vista alumne i als PDF, «no entra al càlcul»).</li>
@@ -2714,7 +2726,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>A <b>Avaluació</b>, el <b>⋯</b> de la columna Càlcul tria com es mostra el resultat a cada llibreta: <b>Assoliments</b> (AN), <b>Numèric</b> (6,8) o <b>Mixt</b> (6,8 · AN). Val per a les categories, el càlcul, la Vista alumne, el PDF i la Distribució. El càlcul no canvia, només com es mostra. Si la nota final no encaixa amb el mode (un número en una llibreta d'assoliments o al revés), la cel·la surt marcada en taronja.</li></ul>`)+
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
-    <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Hi ha 21 colors. <b>PDF</b> desa l'horari al Drive (amb els colors). Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
+    <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Hi ha colors clars i set de vius, triats perquè es distingeixin bé també amb daltonisme (sobre els foscos el text surt en blanc). <b>PDF</b> desa l'horari al Drive (amb els colors). Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
     <li><b>🧰 Eines › 🧩 Atenció a la diversitat</b>: el llistat de tots els alumnes amb dades de diversitat (mesures, proposta i enllaços), de totes les llibretes o d'una, amb les arxivades si vols, <b>per llibreta</b> o <b>per alumne</b> (cada alumne amb el que té a cada llibreta), i un cercador. <b>PDF al Drive</b> desa el que estàs veient. <b>Esborra la diversitat d'aquesta llibreta</b> (vista per llibreta) esborra mesures, proposta i enllaços de diversitat d'aquella llibreta (no toca notes ni comentaris): pregunta si vols el PDF abans i demana escriure el nom de la llibreta; no es pot desfer. La fitxa no surt si tens marcat «Amaga 🧩».</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
@@ -2968,7 +2980,7 @@ function obreCol(id){const sub=cur();colEd=id?sub.columns.find(c=>c.id===id):nul
   $('#cCat').innerHTML='<option value="">— Sense categoria</option>'+sub.categories.map(c=>`<option value="${c.id}">${esc(c.sigla)} · ${esc(c.name)}${sub.tipus==='llista'?'':' ('+c.weight+'%)'}</option>`).join('');
   $('#cCat').value=colEd?(sub.categories.some(k=>k.id===colEd.cat)?colEd.cat:''):(sub.categories[0]?.id||'');
   $('#cTipus').disabled=!!colEd&&(Object.keys(sub.grades[colEd.id]||{}).length>0||calcCol(colEd));
-  sumEd={srcs:[...(colEd?.srcs||[])],svals:JSON.parse(JSON.stringify(colEd?.svals||{}))};$('#cSumTot').value=colEd?.tot>0?String(colEd.tot).replace('.',','):'';$('#cSumA').value=colEd?.a>0?String(colEd.a).replace('.',','):'';pintaSuma();
+  sumEd={srcs:[...(colEd?.srcs||[])],svals:JSON.parse(JSON.stringify(colEd?.svals||{}))};$('#cSumOp').value=colEd?.op||'suma';$('#cSumTot').value=colEd?.tot>0?String(colEd.tot).replace('.',','):'';$('#cSumA').value=colEd?.a>0?String(colEd.a).replace('.',','):'';pintaSuma();
   $('#cAmp').value=colEd?.amp||'normal';$('#cOcu').checked=!!colEd?.oculta;$('#cBloq').checked=!!colEd?.bloq;colColor=colEd?.color||'#D9D9D9';pintaColColor();$('#cFr').value=colEd?.franja||'';
   $('#cDel').style.visibility=colEd?'visible':'hidden';$('#cDup').style.display=colEd&&colEd.type!=='final'&&colEd.type!=='classe'?'':'none';tipusUI(true);$('#dlgCol').showModal();$('#cNom').focus()}
 function tipusUI(inici){const t=$('#cTipus').value;
@@ -2993,7 +3005,11 @@ function pintaColColor(){$('#cColor').innerHTML=COLPAL.map(([h,n])=>`<button typ
 $('#cColor').onclick=e=>{const b=e.target.closest('[data-cc]');if(!b)return;colColor=b.dataset.cc;pintaColColor()};
 $('#cSrc').onchange=()=>omplItems($('#cSrc').value);
 let mapaV={},mapaN={},opcEd=[],grEd=[],sumEd={srcs:[],svals:{}};
-function pintaSuma(){const sub=cur(),W=$('#cSumL');if(!W||!sub)return;const me=colEd?.id;
+const SUMREG={suma:'Es calcula sola. Si a una numèrica hi falta la nota, surt «…» fins que la posis. F, FJ i «no ava» valen 0; un check, icones o opcions sense marcar valen 0.',
+  mitjana:'Es calcula sola. Cada nota es passa a sobre 10 abans de fer la mitjana. Les cel·les buides, FJ i «no ava» no compten; F compta com a 0.',
+  max:'Es calcula sola: la nota més alta (passada a sobre 10) de les columnes triades. Les buides, FJ i «no ava» no compten; F compta com a 0. Ideal per a examen + recuperació.'};
+function pintaSuma(){const sub=cur(),W=$('#cSumL');if(!W||!sub)return;const me=colEd?.id,op=$('#cSumOp').value;
+  $('#cSumTotF').style.display=op==='suma'?'flex':'none';$('#cSumReg').textContent=SUMREG[op];$('#cSumAA').textContent=op==='suma'?'opcional: 10, 4, 1, 0,5… Buit: la suma tal qual.':'opcional: 10, 4, 1, 0,5… Buit: sobre 10.';
   const cs=sub.columns.filter(k=>SUMABLES.includes(k.type)&&k.id!==me&&!(k.type==='suma'&&me&&sumaInclou(sub,k,me)));
   const tmp={srcs:sumEd.srcs,svals:sumEd.svals};
   W.innerHTML=cs.length?cs.map(k=>{const on=sumEd.srcs.includes(k.id),vals=['check','icones','opc'].includes(k.type)?svDe(tmp,k):null;
@@ -3005,6 +3021,7 @@ document.addEventListener('change',e=>{const c=e.target.closest('#cSumL [data-su
   const k=cur().columns.find(x=>x.id===id);if(c.checked&&k&&['check','icones','opc'].includes(k.type)&&!sumEd.svals[id])sumEd.svals[id]={...svDe({},k)};pintaSuma()}});
 document.addEventListener('input',e=>{const i=e.target.closest('#cSumL [data-sumv]');if(!i)return;const [id,k]=i.dataset.sumv.split('|');const n=parseFloat(i.value.replace(',','.'));
   (sumEd.svals[id]??={})[k]=isNaN(n)?0:n;const t=sumaTot(cur(),{...sumEd,tot:0});$('#cSumTotA').textContent=`automàtic: ${fmt(t)} (la suma dels «sobre»)`;$('#cSumTot').placeholder=fmt(t)});
+$('#cSumOp').onchange=()=>{const n=$('#cNom');if(!colEd&&['Suma','Mitjana','La millor nota'].includes(n.value.trim()))n.value={suma:'Suma',mitjana:'Mitjana',max:'La millor nota'}[$('#cSumOp').value];pintaSuma()};
 $('#cSumNC').onclick=()=>{const sub=cur();let n=0;sumEd.srcs.forEach(id=>{const k=sub.columns.find(x=>x.id===id);if(!k||!k.cat)return;
   if(EVAL.includes(k.type)){if(!k.noCompta){k.noCompta=true;n++}}else if(k.compta){k.compta=false;n++}});
   if(!n)return toast('Les columnes sumades ja no entren al càlcul (o no són dins de cap categoria).');save('columnes sumades fora del càlcul');toast(`${n} columne${n===1?'':'s'} ja no entra${n===1?'':'n'} al càlcul.`)};
@@ -3083,12 +3100,13 @@ $('#cOk').onclick=async()=>{const sub=cur();let type=$('#cTipus').value;const na
   if(type==='classe'){o.classes=[...new Set($('#cClasses').value.split('\n').map(x=>x.trim()).filter(Boolean))]}
   if(type==='suma'){const srcs=sumEd.srcs.filter(id=>sub.columns.some(k=>k.id===id));if(!srcs.length)return toast('Marca com a mínim una columna per sumar.');
     const num=x=>{const n=parseFloat(String(x).replace(',','.'));return n>0?n:0};o.srcs=srcs;o.svals={};srcs.forEach(id=>{if(sumEd.svals[id])o.svals[id]=sumEd.svals[id]});
-    o.tot=num($('#cSumTot').value);o.a=num($('#cSumA').value);if(!o.tot)delete o.tot;if(!o.a)delete o.a;o.max=sumaSobre(sub,{...o})||10}
+    o.op=$('#cSumOp').value;if(o.op==='suma')delete o.op;
+    o.tot=o.op?0:num($('#cSumTot').value);o.a=num($('#cSumA').value);if(!o.tot)delete o.tot;if(!o.a)delete o.a;o.max=sumaSobre(sub,{...o})||10}
   if(type==='ext'){if(!$('#cSrc').value)return toast('No hi ha cap llibreta enllaçada. Primer duplica una llibreta.');o.src=$('#cSrc').value;o.item=$('#cItem').value}
   o.amp=$('#cAmp').value;o.oculta=$('#cOcu').checked;if($('#cBloq').checked)o.bloq=true;else delete o.bloq;o.color=colColor;const fr=$('#cFr').value.trim();if(fr)o.franja=fr;else delete o.franja;if(o.amp==='plegada'&&colEd&&colEd.amp!=='plegada')o.ampAnt=colEd.amp||'normal';
   /* si una columna surt d'una categoria, es queda al costat d'on era */
   if(colEd&&colEd.cat&&!o.cat&&sub.categories.some(k=>k.id===colEd.cat)){sincBlocs(sub);const i=sub.blocs.findIndex(x=>x.t==='cat'&&x.id===colEd.cat);sub.blocs.splice(i+1,0,{t:'col',id:colEd.id})}
-  if(colEd){Object.assign(colEd,o);if(!o.bloq)delete colEd.bloq;if(!o.franja)delete colEd.franja;if(type==='suma'){if(!o.tot)delete colEd.tot;if(!o.a)delete colEd.a}if(!o.valMode){delete colEd.valMode;delete colEd.nvals}}else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
+  if(colEd){Object.assign(colEd,o);if(!o.bloq)delete colEd.bloq;if(!o.franja)delete colEd.franja;if(type==='suma'){if(!o.tot)delete colEd.tot;if(!o.a)delete colEd.a;if(!o.op)delete colEd.op}if(!o.valMode){delete colEd.valMode;delete colEd.nvals}}else sub.columns.push({id:uid(),...o});save(colEd?'editar columna':'nova columna');$('#dlgCol').close();rLlibreta();if(o.oculta)toast('Columna amagada. La tornes a veure clicant el seu nom a l\'avís de sobre la taula.')};
 $('#cDel').onclick=async()=>{const sub=cur();if(!await confirma(`Eliminar la columna «${colEd.name}» i totes les seves dades?`,'Elimina'))return;
   sub.columns=sub.columns.filter(c=>c!==colEd);delete sub.grades[colEd.id];save('eliminar columna');$('#dlgCol').close();rLlibreta()};
 function omple(totes){const sub=cur(),arr=$('#cArr').value;let n=0;snapshot(sub);
@@ -3327,7 +3345,11 @@ $('#dvtPdf').onclick=()=>{const f=dvFiles();const s=DVT.sub?state.subjects.find(
 /* 2.7 · Horari de classe (state.horari): files {id,ini,fi,pati}, cel['dia|fila']={m,c,a,col,sub}, bloq */
 const ICAL='<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="12" height="11" rx="1.2"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3M2 10.2h12M6 6.5v7.5M10 6.5v7.5"/></svg>';
 const HDIES=['Dilluns','Dimarts','Dimecres','Dijous','Divendres'];
-const HCOL=[['','blanc'],...LPAL,['#FFE0B2','préssec'],['#D7F0FF','cel'],['#C8F0D8','menta'],['#FFF3A8','llimona'],['#E1D5F5','lavanda'],['#FFD0D0','coral'],['#F8D1E8','xiclet'],['#D9DEE3','pissarra'],['#E6F4C8','pistatxo'],['#CDEFEA','aigua'],['#F3E1CB','sorra'],['#FFE4F0','cotó']];
+const HCOL=[['','blanc'],['#FFE0B2','préssec'],['#D7F0FF','cel'],['#C8F0D8','menta'],['#FFF3A8','llimona'],['#E1D5F5','lavanda'],['#FFD0D0','coral'],['#D9DEE3','pissarra'],['#F3E1CB','sorra'],
+  ['#E69F00','taronja'],['#56B4E9','blau cel'],['#009E73','verd blavós'],['#F0E442','groc'],['#0072B2','blau'],['#D55E00','vermelló'],['#CC79A7','rosa fort']];
+/* text blanc sobre els colors foscos */
+const hFosc=h=>{if(!h)return false;const n=parseInt(h.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (0.299*r+0.587*g+0.114*b)<150};
+const hEst=h=>h?`background:${h};${hFosc(h)?'color:#fff;':''}`:'';
 const HFR=[['8:30','9:30'],['9:30','10:30'],['10:30','11:30'],['11:30','12:00',1],['12:00','13:00'],['13:00','14:00'],['14:00','15:00'],['15:00','16:00'],['16:00','17:00'],['17:00','18:00']];
 function horari(){state.horari??={files:HFR.map(([ini,fi,pati])=>({id:uid(),ini,fi,...(pati?{pati:true}:{})})),cel:{},bloq:false};return state.horari}
 const hMin=t=>{const m=/^(\d{1,2})[:.,h](\d{2})$/.exec(String(t).trim())||/^(\d{1,2})$/.exec(String(t).trim());return m?(+m[1])*60+(+(m[2]||0)):NaN};
@@ -3342,13 +3364,13 @@ function pintaHorari(){const H=horari(),ara=horAra(),bl=!!H.bloq,ed=!bl;
   const files=H.files.map((f,fi)=>{const hora=ed?`<div class="hhed"><input data-hini="${f.id}" value="${esc(f.ini)}" aria-label="Inici"><span>–</span><input data-hfi="${f.id}" value="${esc(f.fi)}" aria-label="Final"></div><div class="hhacc"><button data-hpati="${f.id}" class="${f.pati?'on':''}" title="Marca-la com a pati o descans">${f.pati?'Pati ✓':'Pati'}</button><button data-hdel="${f.id}" title="Treu la franja">✕</button></div>`:`<b>${esc(f.ini)}</b><span>${esc(f.fi)}</span>`;
     if(f.pati)return `<tr class="hpati"><td class="hh">${hora}</td><td colspan="5" class="hpt">Pati</td></tr>`;
     return `<tr><td class="hh">${hora}</td>${HDIES.map((_,d)=>{const k=d+'|'+f.id,c=H.cel[k],t=horCelTxt(c),sb=c?.sub&&state.subjects.find(z=>z.id===c.sub&&!z.archived);
-      return `<td class="hc ${d===ara.dia&&f.id===ara.fila?'ara':''} ${HOR.sel===k?'sel':''} ${sb?'lli':''}" data-hc="${k}" style="${c?.col?'background:'+c.col:''}" title="${sb?'Obre «'+esc(sb.name)+'»':''}">${t.length?`<b>${esc(c.m||'')}</b>${c.c?`<span>${esc(c.c)}</span>`:''}${c.a?`<span class="hau">${esc(c.a)}</span>`:''}`:''}</td>`}).join('')}</tr>`}).join('');
+      return `<td class="hc ${d===ara.dia&&f.id===ara.fila?'ara':''} ${HOR.sel===k?'sel':''} ${sb?'lli':''}" data-hc="${k}" style="${hEst(c?.col)}" title="${sb?'Obre «'+esc(sb.name)+'»':''}">${t.length?`<b>${esc(c.m||'')}</b>${c.c?`<span>${esc(c.c)}</span>`:''}${c.a?`<span class="hau">${esc(c.a)}</span>`:''}`:''}</td>`}).join('')}</tr>`}).join('');
   let edt='';
   if(ed&&HOR.sel){const [d,fid]=HOR.sel.split('|'),f=H.files.find(x=>x.id===fid),c=H.cel[HOR.sel]||{};
     edt=`<div class="hedt"><div class="hedtt"><b>${HDIES[+d]} · ${esc(f?.ini||'')}–${esc(f?.fi||'')}</b><span style="flex:1"></span><button class="x" id="hTanca" title="Tanca">✕</button></div>
       <div class="hedtf"><label>Matèria<input id="hM" value="${esc(c.m||'')}"></label><label>Curs<input id="hC" value="${esc(c.c||'')}"></label><label>Aula<input id="hA" value="${esc(c.a||'')}"></label>
       <label>Llibreta<select id="hS"><option value="">Cap</option>${actives().filter(z=>z.tipus!=='llista'||true).map(z=>`<option value="${z.id}" ${c.sub===z.id?'selected':''}>${z.icon||''} ${esc(z.name)}</option>`).join('')}</select></label></div>
-      <div class="hedtf"><span class="hcols">${HCOL.map(([hx,n])=>`<button type="button" class="${(c.col||'')===hx?'on':''}" data-hcol="${hx}" title="${n}" style="background:${hx||'#fff'}"></button>`).join('')}</span><span style="flex:1"></span>
+      <div class="hedtf"><span class="hcols">${HCOL.map(([hx,n],i)=>(i===9?'<span class="hsep"></span>':'')+`<button type="button" class="${(c.col||'')===hx?'on':''}" data-hcol="${hx}" title="${n}" style="background:${hx||'#fff'}"></button>`).join('')}</span><span style="flex:1"></span>
       <button class="btn sec" id="hCopia" ${horCelTxt(c).length?'':'disabled'}>Copia a altres espais</button><button class="btn sec perill" id="hBuida">Buida</button></div></div>`}
   $('#horW').innerHTML=`${HOR.copia?`<p class="hcopav">Clica els espais on vols copiar «${esc(horCelTxt(H.cel[HOR.copia]).join(' · '))}». <button class="btn sec" id="hCopiaFi">Fet</button></p>`:''}
     <table class="hort ${bl?'blq':''}">${cap}${files}</table>${ed?'<div class="fl" style="margin-top:8px"><button class="btn sec" id="hAfFr">＋ Afegeix una franja</button><span class="aj">Clica un espai per omplir-lo. Quan acabis, bloqueja l\'horari.</span></div>':'<p class="aj" style="margin-top:8px">Clica una classe lligada a una llibreta per obrir-la. Per canviar l\'horari, desbloqueja\'l.</p>'}${edt}`;
@@ -3378,7 +3400,7 @@ async function pdfHorari(){const H=horari();await carregaPDF();const doc=new win
   doc.setFontSize(15);doc.text(pt('Horari'),10,13);doc.setFontSize(8.5);doc.setTextColor(120);doc.text(pt(new Date().toLocaleDateString('ca-ES')),287,13,{align:'right'});doc.setTextColor(0);
   const ln=xs=>xs.filter(Boolean).map(pt).join('\n');
   const body=H.files.map(f=>f.pati?[{content:ln([f.ini,f.fi])},{content:'Pati',colSpan:5,styles:{halign:'center',textColor:140,fillColor:[244,244,244],fontSize:8}}]
-    :[ln([f.ini,f.fi]),...HDIES.map((_,d)=>{const c=H.cel[d+'|'+f.id];return{content:c?ln([c.m,c.c,c.a]):'',styles:{fillColor:rgb(c?.col)}}})]);
+    :[ln([f.ini,f.fi]),...HDIES.map((_,d)=>{const c=H.cel[d+'|'+f.id];return{content:c?ln([c.m,c.c,c.a]):'',styles:{fillColor:rgb(c?.col),textColor:hFosc(c?.col)?255:20}}})]);
   doc.autoTable({startY:18,margin:{left:10,right:10},theme:'grid',styles:{fontSize:9,cellPadding:2,valign:'middle',lineColor:[210,210,210],minCellHeight:13},headStyles:{fillColor:[17,17,17],halign:'center'},
     columnStyles:{0:{cellWidth:20,fontStyle:'bold',halign:'right'},1:{cellWidth:51.4},2:{cellWidth:51.4},3:{cellWidth:51.4},4:{cellWidth:51.4},5:{cellWidth:51.4}},head:[['',...HDIES]],body});
   return doc}
@@ -3392,7 +3414,7 @@ document.addEventListener('keydown',e=>{if(e.altKey&&!e.ctrlKey&&!e.metaKey&&e.k
 /* mòbil: l'horari d'un dia */
 function rMobilHor(){const H=horari(),ara=horAra();MB.hd??=(ara.dia>=0&&ara.dia<5?ara.dia:0);const d=MB.hd;
   const fs=H.files.map(f=>{if(f.pati)return `<div class="mhp">${esc(f.ini)}–${esc(f.fi)} · Pati</div>`;const c=H.cel[d+'|'+f.id],sb=c?.sub&&state.subjects.find(z=>z.id===c.sub&&!z.archived);
-    return `<div class="mbal mhf ${d===ara.dia&&f.id===ara.fila?'ara':''}" ${sb?`data-mhsub="${sb.id}"`:''} style="${c?.col?'background:'+c.col:''}"><span class="mhh"><b>${esc(f.ini)}</b>${esc(f.fi)}</span><span class="mhc">${c&&horCelTxt(c).length?`<b>${esc(c.m||'')}</b> ${esc([c.c,c.a].filter(Boolean).join(' · '))}`:'<span class="buida">—</span>'}</span>${sb?'<span class="mbv">›</span>':''}</div>`}).join('');
+    return `<div class="mbal mhf ${d===ara.dia&&f.id===ara.fila?'ara':''}" ${sb?`data-mhsub="${sb.id}"`:''} style="${hEst(c?.col)}"><span class="mhh"><b>${esc(f.ini)}</b>${esc(f.fi)}</span><span class="mhc">${c&&horCelTxt(c).length?`<b>${esc(c.m||'')}</b> ${esc([c.c,c.a].filter(Boolean).join(' · '))}`:'<span class="buida">—</span>'}</span>${sb?'<span class="mbv">›</span>':''}</div>`}).join('');
   $('#main').innerHTML=`<div class="mhdia"><button class="btn sec" id="mhAnt" ${d<=0?'disabled':''}>‹</button><b>${HDIES[d]}${d===ara.dia?' · avui':''}</b><button class="btn sec" id="mhSeg" ${d>=4?'disabled':''}>›</button></div><div class="mbenl">${fs}</div>`;
   $('#mhAnt').onclick=()=>{MB.hd=Math.max(0,d-1);rMobilHor()};$('#mhSeg').onclick=()=>{MB.hd=Math.min(4,d+1);rMobilHor()};
   $$('[data-mhsub]').forEach(x=>x.onclick=()=>{state.cur=x.dataset.mhsub;MB.sec='ll';MB.st=null;rMobil();scrollTo(0,0)})}

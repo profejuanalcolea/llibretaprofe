@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.8 · ammonite · novembre 2026
+- La columna Suma passa a ser **Calculada**, amb «Què fa»: **Suma** (com abans), **Mitjana** (cada nota a sobre 10; buides, FJ i «no ava» no compten; F = 0) o **La millor nota** (per a examen + recuperació). «Passa-la a» opcional. Capçalera amb Σ, x̄ o ↑. Les sumes que ja hi havia no canvien.
+- Horari: menys colors pastel i set de vius (paleta Okabe-Ito, distingible amb daltonisme), amb el text en blanc sobre els foscos (també al PDF i al mòbil).
+
 ## 2.7.2 · ammonite · novembre 2026
 - Noms dels mètodes de suma: «suma fins a un màxim» (abans «suma (total fix)», amb el camp «màxim») i, darrere, «percentatge de punts» (abans «suma (punts fets)»). Funcionen igual.
 
