@@ -1611,6 +1611,33 @@ def p_horari_mobil(b):
     comprova(not errs, 'errors JS: %s' % errs)
     ctx.close()
 
+@prova('Tancament: Enter a l\'última fila desa la nota, avís de versió nova, i en arxivar pregunta per la diversitat')
+def p_tancament(b):
+    ctx, pg = pagina_local(b)
+    pg.evaluate(CALC_JS); pg.wait_for_timeout(200)
+    pg.fill('td[data-c=c4][data-s=a3] input', '5'); pg.keyboard.press('Enter'); pg.wait_for_timeout(250)
+    comprova(pg.evaluate("getG(cur(),'c4','a3')") == 5, 'Enter a l\'última fila no desa la nota')
+    # versió nova
+    pg.evaluate("""VN.prova=true;window._f=window.fetch;window.fetch=async()=>({ok:true,text:async()=>"const VERSIO='9.9 · prova',COMPILACIO='01/01 00:00';"})""")
+    pg.evaluate("miraVersio(true)"); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#versioNova') and '9.9' in pg.inner_text('#versioNova'), 'no surt l\'avís de versió nova')
+    pg.click('#vnX'); pg.evaluate("window.fetch=window._f")
+    # arxivar amb diversitat
+    pg.evaluate("dvSet(cur(),'a1','pi',true);save('x')")
+    sid = pg.evaluate("cur().id")
+    pg.evaluate("$('#dlgArx').showModal()"); pg.wait_for_timeout(100); pg.click('#aOk'); pg.wait_for_timeout(300)
+    comprova(pg.is_visible('#dlgQ') and 'diversitat' in pg.inner_text('#dlgQ'), 'en arxivar hauria de preguntar per la diversitat')
+    pg.click('#qBtns button:text-is("Esborra-les")'); pg.wait_for_timeout(200)
+    comprova(pg.evaluate(f"Object.keys(state.subjects.find(z=>z.id==='{sid}').div||{{}}).length") == 0, 'no s\'ha esborrat la diversitat')
+    # avís de curs nou
+    pg.evaluate(f"const z=state.subjects.find(z=>z.id==='{sid}');dvSet(z,'a1','ma',true);save('x')")
+    pg.evaluate("divCursNou(); null"); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#dlgQ') and 'arxivada' in pg.inner_text('#dlgQ'), 'no surt l\'avís de setembre')
+    pg.click('#qBtns button:has-text("Mostra-les")'); pg.wait_for_timeout(200)
+    comprova(pg.is_visible('#dlgDvT') and pg.is_checked('#dvtArx'), 'hauria d\'obrir el llistat amb les arxivades')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1690,7 +1717,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax, p_tancament]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

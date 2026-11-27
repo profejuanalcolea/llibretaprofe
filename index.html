@@ -641,6 +641,10 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 .hcopav{background:#fff4ec;border-radius:8px;padding:6px 10px;margin:0 0 8px;font-size:13px;display:flex;align-items:center;gap:10px}
 .mhdia{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}.mhdia b{font-size:17px}.mhf{display:flex;gap:12px;align-items:center}.mhh{display:flex;flex-direction:column;font-size:12px;color:#666;min-width:46px}.mhh b{font-size:14px;color:#111}.mhc{flex:1}
 .mhf.ara{box-shadow:inset 0 0 0 2px var(--tar)}.mhp{text-align:center;color:#999;font-size:12.5px;padding:4px}
+
+#versioNova{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:3000;background:#111;color:#fff;border-radius:12px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;max-width:94vw}
+#versioNova .btn{background:var(--tar);border-color:var(--tar);color:#fff}#versioNova .x{color:#fff;background:none;border:0;font-size:16px;cursor:pointer}
+.mob #versioNova{bottom:78px}
 </style>
 </head>
 <body>
@@ -913,7 +917,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.8 · ammonite · novembre 2026',COMPILACIO='27/11 09:47';
+const VERSIO='2.8.1 · ammonite · novembre 2026',COMPILACIO='27/11 10:24';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1540,11 +1544,12 @@ function renderSel(){const sel=$('#selSub');if(!state){sel.innerHTML='';return}
 let cursComprovat=false;
 async function comprovaCursNou(){const k=cursKey();if(!state)return;if(!state.cursVist){state.cursVist=k;save(null,true);return}if(state.cursVist===k)return;
   await soCursNou();
+  await divCursNou();
   const prev=state.cursVist;state.cursVist=k;save(null,true);const act=actives();if(!act.length)return;
   const r=await pregunta('Curs nou',`Ha començat el curs ${cursCurt(k)}. Vols arxivar les llibretes del curs anterior?`,[{t:'Ara no',v:0,cls:'sec'},{t:'Tria quines…',v:1}]);if(!r)return;
   const d=$('#dlgCurs');$('#cuTit').textContent=`Arxiva a «Curs ${prev}»`;$('#cuLl').innerHTML=act.map(x=>`<label class="cuit"><input type="checkbox" value="${x.id}" checked> ${x.icon||''} ${esc(x.name)}</label>`).join('');d.showModal();
   $('#cuOk').onclick=()=>{const ids=$$('#cuLl input:checked').map(i=>i.value);ids.forEach(id=>{const x=state.subjects.find(z=>z.id===id);x.archived={cat:'Curs '+prev,data:avui()}});
-    d.close();if(ids.length){const a=actives();if(a.length&&!a.some(x=>x.id===state.cur))state.cur=a[0].id;save('arxivar el curs anterior');render();toast(ids.length+' llibreta(es) arxivada(es) a «Curs '+prev+'».')}};
+    d.close();if(ids.length){const a=actives();if(a.length&&!a.some(x=>x.id===state.cur))state.cur=a[0].id;save('arxivar el curs anterior');render();toast(ids.length+' llibreta(es) arxivada(es) a «Curs '+prev+'».');divEnArxivar(ids.map(id=>state.subjects.find(z=>z.id===id)).filter(Boolean))}};
   $('#cuCanc').onclick=()=>d.close()}
 function render(){if(!state)return;aplicaColors();{const s0=cur();if(s0?.cls&&!s0.cls.link&&mode==='drive'&&G.token&&!enllacDemanat.has(s0.id)){enllacDemanat.add(s0.id);enllacCls(s0)}}$('#cursLbl').textContent='Curs '+cursCurt(cursKey());if(!cursComprovat){cursComprovat=true;setTimeout(comprovaCursNou,700)}
   const esLl=cur()?.tipus==='llista';$('#tabs [data-t=resum]').hidden=esLl;if(esLl&&tab==='resum')tab=tabPrincipal='llibreta';
@@ -2727,6 +2732,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
     <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Hi ha colors clars i set de vius, triats perquè es distingeixin bé també amb daltonisme (sobre els foscos el text surt en blanc). <b>PDF</b> desa l'horari al Drive (amb els colors). Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
+    <li>En <b>arxivar</b> una llibreta amb dades de diversitat, pregunta si les vols conservar o esborrar (amb PDF o sense). A l'<b>inici de curs</b> avisa si alguna llibreta arxivada encara en té.</li>
     <li><b>🧰 Eines › 🧩 Atenció a la diversitat</b>: el llistat de tots els alumnes amb dades de diversitat (mesures, proposta i enllaços), de totes les llibretes o d'una, amb les arxivades si vols, <b>per llibreta</b> o <b>per alumne</b> (cada alumne amb el que té a cada llibreta), i un cercador. <b>PDF al Drive</b> desa el que estàs veient. <b>Esborra la diversitat d'aquesta llibreta</b> (vista per llibreta) esborra mesures, proposta i enllaços de diversitat d'aquella llibreta (no toca notes ni comentaris): pregunta si vols el PDF abans i demana escriure el nom de la llibreta; no es pot desfer. La fitxa no surt si tens marcat «Amaga 🧩».</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
     <li><b>Copia la proposta a altres alumnes</b> (al final del panell, plegat): tria la llibreta (aquesta o una altra; si hi és el mateix alumne, surt marcat sol), marca els alumnes i, si vols, també P · MA · PI. Si algun ja té proposta, pregunta si la substitueix o l'afegeix a sota. Els enllaços només es copien si marques «També els enllaços» (si l'alumne ja en té un d'igual, no es repeteix). Es desfà amb ↶.</li>
@@ -2821,8 +2827,20 @@ function suggCats(){const c=cursActual();return [...new Set([...catsArxiu(),c,c+
 function omplCats(){$('#llCats').innerHTML=suggCats().map(c=>`<option value="${esc(c)}">`).join('')}
 function obreArx(){omplCats();$('#aCat').value='Curs '+cursKey();$('#dlgArx').showModal();$('#aCat').focus()}
 $('#aCanc').onclick=()=>$('#dlgArx').close();
-$('#aOk').onclick=()=>{const sub=cur();sub.archived={cat:$('#aCat').value.trim()||'Curs '+cursKey(),data:avui()};
-  $('#dlgArx').close();const a=actives();state.cur=a[0]?.id||sub.id;save();tab='arxiu';render();toast('Llibreta arxivada.')};
+$('#aOk').onclick=async()=>{const sub=cur();sub.archived={cat:$('#aCat').value.trim()||'Curs '+cursKey(),data:avui()};
+  $('#dlgArx').close();const a=actives();state.cur=a[0]?.id||sub.id;save();tab='arxiu';render();toast('Llibreta arxivada.');await divEnArxivar([sub])};
+/* 2.8.1 · en arxivar llibretes amb dades de diversitat, pregunta si s'esborren (per defecte es conserven) */
+async function divEnArxivar(subs){const amb=subs.filter(z=>z.students.some(st=>dvAlguna(dvDe(z,st.id))));if(!amb.length)return;
+  const r=await pregunta('Atenció a la diversitat',`${amb.length===1?`«${amb[0].name}» té`:`${amb.length} de les llibretes arxivades tenen`} dades d'atenció a la diversitat. Les esborro ara? Si les conserves, les podràs esborrar més endavant a 🧰 Eines › 🧩 Atenció a la diversitat.`,
+    [{t:'Conserva-les',v:0,cls:'sec'},{t:'Esborra-les',v:'nomes',cls:'sec'},{t:'Desa el PDF i esborra-les',v:'pdf'}]);
+  if(!r)return;
+  if(r==='pdf'){const f=[];amb.forEach(sub=>sub.students.forEach(st=>{const d=dvDe(sub,st.id);if(dvAlguna(d))f.push({sub,st,d,nom:soNom(st),cl:classeDe(sub,st)||''})}));
+    if(!await desaPdfDv(f.sort((a,b)=>a.nom.localeCompare(b.nom,'ca')),amb.length===1?amb[0].name:'llibretes arxivades'))return}
+  amb.forEach(z=>z.div={});save('esborrar la diversitat en arxivar');iniciaHist();render();toast('Dades de diversitat esborrades. Les còpies setmanals del Drive les conserven unes setmanes.',7000)}
+/* 2.8.1 · a l'inici de curs: avís de llibretes arxivades que encara tenen diversitat */
+async function divCursNou(){const amb=state.subjects.filter(z=>z.archived&&z.students.some(st=>dvAlguna(dvDe(z,st.id))));if(!amb.length)return;
+  const r=await pregunta('Atenció a la diversitat',`${amb.length===1?'1 llibreta arxivada encara té':amb.length+' llibretes arxivades encara tenen'} dades d'atenció a la diversitat. És un bon moment per esborrar les que ja no necessitis.`,[{t:'Ara no',v:0,cls:'sec'},{t:'Mostra-les',v:1}]);
+  if(r){DVT.arx=true;DVT.vista='ll';DVT.sub='';obreDvTot()}}
 
 /* ======================= Duplicar ======================= */
 function obreDup(){const sub=cur();omplCats();
@@ -2840,7 +2858,7 @@ $('#dOk').onclick=()=>{const sub=cur(),nom=$('#dNom').value.trim();if(!nom)retur
   const clO=colsClasse(sub),clN=colsClasse(n);clO.forEach((c,i)=>{if(clN[i])n.grades[clN[i].id]={...(sub.grades[c.id]||{})}});
   state.subjects.push(n);
   if($('#dArx').checked)sub.archived={cat:$('#dCat').value.trim(),data:avui()};
-  state.cur=n.id;save();$('#dlgDup').close();tab='llibreta';render();toast('Llibreta duplicada. Les notes de l\'anterior les pots portar amb una columna «D\'una altra llibreta».')};
+  state.cur=n.id;save();$('#dlgDup').close();tab='llibreta';render();toast('Llibreta duplicada. Les notes de l\'anterior les pots portar amb una columna «D\'una altra llibreta».');if(sub.archived)divEnArxivar([sub])};
 
 /* ======================= Edició de la taula ======================= */
 const faltaDe=v=>/^(np|f)$/i.test(v)?'F':/^fj$/i.test(v)?'FJ':/^(no\s*ava|nav)$/i.test(v)?'NAV':null;
@@ -2891,7 +2909,7 @@ $('#main').addEventListener('keydown',e=>{if(tab!=='llibreta'||e.ctrlKey||e.meta
   e.preventDefault();const tr=td.parentElement,ci=td.cellIndex;let t=null;
   if(dr){let r=tr;do{r=dr>0?r.nextElementSibling:r.previousElementSibling}while(r&&!r.dataset.s);if(r)t=focusDe(r.cells[ci])}
   else{let c=ci+dc;while(c>=0&&c<tr.cells.length&&!(t=focusDe(tr.cells[c])))c+=dc}
-  if(!t)return;el.blur?.();t.focus();if(t.tagName==='INPUT')t.select()});
+  if(!t){if(el.tagName==='INPUT'){el.blur();el.focus();el.select?.()}return}el.blur?.();t.focus();if(t.tagName==='INPUT')t.select()});
 
 /* Enganxar des de l'Excel: s'omple cap avall i cap a la dreta des de la casella activa */
 document.addEventListener('paste',async e=>{const el=document.activeElement;if(!el?.classList?.contains('g')||RO()||tab!=='llibreta')return;
@@ -3787,6 +3805,18 @@ $('#btnCalc').onclick=()=>calcObre(false);$('#btnMob').onclick=()=>{try{sessionS
   addEventListener('mouseup',()=>drag=false)})();
 
 document.addEventListener('input',e=>{const el=e.target;if(el.matches?.('input.lliure'))el.title=el.value},true);
+/* 2.8.1 · avís «Hi ha una versió nova»: mira de tant en tant si la web té una compilació diferent */
+const VN={vist:0,av:false};
+async function miraVersio(forca){if(VN.av||(!VN.prova&&(!/^https?:$/.test(location.protocol)||location.hostname==='localhost'||location.hostname==='127.0.0.1')))return;
+  if(!forca&&Date.now()-VN.vist<10*60e3)return;VN.vist=Date.now();
+  try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const t=await r.text();
+    const c=/COMPILACIO='([^']+)'/.exec(t)?.[1],v=/VERSIO='([^'·]+)/.exec(t)?.[1]?.trim();if(!c||c===COMPILACIO)return;
+    VN.av=true;const d=document.createElement('div');d.id='versioNova';d.innerHTML=`<span>Hi ha una versió nova de la llibreta${v?' ('+esc(v)+')':''}.</span><button class="btn" id="vnAct">Actualitza</button><button class="x" id="vnX" title="Més tard">✕</button>`;document.body.appendChild(d);
+    $('#vnX').onclick=()=>d.remove();
+    $('#vnAct').onclick=async()=>{$('#vnAct').disabled=true;$('#vnAct').textContent='Desant…';try{if(mode==='drive'&&G.brut){guardaCache();await driveDesa()}else if(pend)escriuFitxer()}catch{}location.reload()}}catch{}}
+setInterval(()=>miraVersio(),30*60e3);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')miraVersio()});
+setTimeout(()=>miraVersio(true),60e3);
 addEventListener('beforeunload',e=>{if(mode==='drive'){if(G.brut){guardaCache();driveDesa();e.preventDefault();e.returnValue=''}return}if(pend){escriuFitxer();e.preventDefault();e.returnValue=''}});
 
 /* ======================= Inici ======================= */

@@ -1,5 +1,10 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.8.1 · ammonite · novembre 2026
+- Corregit: Enter a l'última fila no desava la nota fins que es clicava fora.
+- Avís **«Hi ha una versió nova · Actualitza»**: la llibreta mira cada mitja hora (i en tornar a la pestanya) si la web té una versió nova; el botó desa i recarrega.
+- En arxivar una llibreta amb dades de diversitat (també en duplicar arxivant i en arxivar el curs anterior), pregunta si es conserven o s'esborren (amb PDF o sense). A l'inici de curs, avís de les llibretes arxivades que encara en tenen, amb botó per veure-les.
+
 ## 2.8 · ammonite · novembre 2026
 - La columna Suma passa a ser **Calculada**, amb «Què fa»: **Suma** (com abans), **Mitjana** (cada nota a sobre 10; buides, FJ i «no ava» no compten; F = 0) o **La millor nota** (per a examen + recuperació). «Passa-la a» opcional. Capçalera amb Σ, x̄ o ↑. Les sumes que ja hi havia no canvien.
 - Horari: menys colors pastel i set de vius (paleta Okabe-Ito, distingible amb daltonisme), amb el text en blanc sobre els foscos (també al PDF i al mòbil).
