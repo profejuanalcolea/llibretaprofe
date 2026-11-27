@@ -1638,6 +1638,23 @@ def p_tancament(b):
     comprova(not pg.errs, 'errors JS: %s' % pg.errs)
     ctx.close()
 
+@prova('Aparença: nom propi (part blanca i taronja, 12 lletres, sense espai) a la barra, sense moure els botons, al títol i a l\'entrada')
+def p_nom_app(b):
+    ctx, pg = pagina_local(b)
+    x0 = pg.evaluate("document.querySelector('#tabs').getBoundingClientRect().left")
+    pg.click('.tabic[data-t=config]'); pg.wait_for_timeout(150); pg.locator('details[data-cfg=calcam] > summary').click(); pg.wait_for_timeout(100)
+    comprova('Aparença' in pg.inner_text('details[data-cfg=calcam] summary'), 'l\'apartat s\'hauria de dir Aparença')
+    pg.check('#kNomOn'); pg.fill('#kNomB', 'Ammo'); pg.fill('#kNomT', 'NOTE1234567890'); pg.check('#kNomJ'); pg.wait_for_timeout(150)
+    comprova(pg.evaluate("state.nomApp.t") == 'NOTE12345678', 'la part taronja no pot passar de 12 lletres')
+    comprova(pg.inner_text('#logo') == 'AmmoNOTE12345678' and pg.evaluate("document.title") == 'AmmoNOTE12345678', 'el nom no surt a la barra o al títol')
+    comprova(pg.evaluate("document.querySelector('#tabs').getBoundingClientRect().left") == x0, 'els botons de la barra s\'han mogut')
+    comprova(pg.evaluate("JSON.parse(localStorage.getItem('llibreta-nom')).b") == 'Ammo', 'no es guarda el nom per a l\'entrada')
+    comprova('Ammo' in pg.inner_text('#login h1'), 'el nom no surt a la pantalla d\'entrada')
+    pg.uncheck('#kNomOn'); pg.wait_for_timeout(150)
+    comprova(pg.inner_text('#logo') == 'Llibreta del Profe' and pg.evaluate("localStorage.getItem('llibreta-nom')") is None, 'en desmarcar ha de tornar el nom original')
+    comprova(not pg.errs, 'errors JS: %s' % pg.errs)
+    ctx.close()
+
 @prova('Recursos: el quadre «Nou enllaç» s\'obre i desa')
 def p_recursos(b):
     ctx, pg = pagina_local(b)
@@ -1717,7 +1734,7 @@ with sync_playwright() as p:
     b = p.chromium.launch()
     p_mobil.dev = p.devices['iPhone 13']
     proves = [p_arrencada, p_mitjanes, p_calcul, p_edicio, p_desat_local, p_drive, p_anotacions,
-              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax, p_tancament]
+              p_avaluacio, p_arxiu, p_llista, p_calculadora, p_mobil, p_pdf, p_sri, p_textllarg, p_sons, p_bloc, p_migra_bloc, p_sortides, p_nocompta, p_noava, p_opcions, p_amagades, p_ordinador, p_arxiu2, p_pestanyes, p_arxiu3, p_dataduplica, p_classes_migra, p_classes_recupera, p_classes_propaga, p_recursos, p_capcalera, p_mobil2, p_full, p_barra, p_franja, p_opc_icones, p_estreta, p_calc_copia, p_calc_mode, p_diversitat, p_escut, p_mobil_enl, p_grups, p_bloq, p_bloc_check, p_enl_icones, p_div_copia, p_ammo_calc, p_div_amaga_buida, p_cat_pct_rsc, p_suma, p_icones_num, p_cat_suma, p_sortides_esborra, p_div_eines, p_horari, p_horari_mobil, p_calc_mitmax, p_tancament, p_nom_app]
     if GENERA_REF: proves = [p_mitjanes]
     if NOMES: proves = [f for f in proves if any(n in f.__name__ for n in NOMES)]
     for f in proves: f(b)

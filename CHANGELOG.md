@@ -1,5 +1,9 @@
 # Historial de canvis · Llibreta del Profe
 
+## 2.8.2 · ammonite · novembre 2026
+- ⚙ › **Aparença** (abans Calculadora): «Calculadora amb animacions» i **Nom propi** de l'app (part blanca i taronja, 12 lletres cada una, opció sense espai), a la barra negra (mateix espai, alineat a l'esquerra, lletra més petita si cal), a l'entrada i al títol de la pestanya.
+- L'avís de versió nova comprova un cop al dia (abans, cada mitja hora).
+
 ## 2.8.1 · ammonite · novembre 2026
 - Corregit: Enter a l'última fila no desava la nota fins que es clicava fora.
 - Avís **«Hi ha una versió nova · Actualitza»**: la llibreta mira cada mitja hora (i en tornar a la pestanya) si la web té una versió nova; el botó desa i recarrega.

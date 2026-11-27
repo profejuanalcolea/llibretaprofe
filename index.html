@@ -645,6 +645,10 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 #versioNova{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:3000;background:#111;color:#fff;border-radius:12px;padding:10px 12px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px;max-width:94vw}
 #versioNova .btn{background:var(--tar);border-color:var(--tar);color:#fff}#versioNova .x{color:#fff;background:none;border:0;font-size:16px;cursor:pointer}
 .mob #versioNova{bottom:78px}
+
+/* 2.8.2 · nom propi */
+header .logo{overflow:hidden;flex:0 0 auto;text-align:left}
+.nomprev{display:flex;align-items:center;gap:14px;background:var(--neg);color:#fff;border-radius:8px;padding:10px 12px;margin-top:8px;max-width:520px}.nomprev .logo{display:inline-block;white-space:nowrap;overflow:hidden}
 </style>
 </head>
 <body>
@@ -719,7 +723,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
   <path d="M48 68.2 L49.4 68.3 L50.9 68.3 L52.3 68.2 L53.7 68 L55.2 67.7 L56.6 67.3 L58 66.8 L59.4 66.2 L60.7 65.5 L62 64.7 L63.3 63.8 L64.4 62.8 L65.6 61.7 L66.6 60.6 L67.6 59.3 L68.5 58 L69.3 56.6 L70 55.2 L70.7 53.7 L71.2 52.1 L71.6 50.5 L71.9 48.8 L72.1 47.2 L72.1 45.5 L72.1 43.8 L71.9 42 L71.6 40.3 L71.2 38.6 L70.7 36.9 L70 35.3 L69.2 33.7 L68.3 32.1 L67.3 30.6 L66.2 29.1 L65 27.8 L63.7 26.5 L62.2 25.2 L60.7 24.1 L59.1 23.1 L57.4 22.2 L55.6 21.4 L53.8 20.7 L51.9 20.2 L50 19.7 L48 19.5 L46 19.3 L44 19.3 L41.9 19.4 L39.9 19.7 L37.9 20.1 L35.8 20.7 L33.9 21.4 L31.9 22.3 L30 23.3 L28.2 24.4 L26.4 25.7 L24.7 27.1 L23.1 28.6 L21.6 30.2 L20.3 32 L19 33.8 L17.8 35.8 L16.8 37.9 L15.9 40 L15.2 42.2 L14.6 44.5 L14.2 46.8 L13.9 49.2 L13.9 51.6 L13.9 54 L14.2 56.4 L14.6 58.9 L15.2 61.3 L15.9 63.6 L16.9 66 L18 68.3 L19.2 70.5 L20.7 72.6 L22.2 74.7 L24 76.6 L25.9 78.5 L27.9 80.2 L30 81.8 L32.3 83.2 L34.7 84.5 L37.2 85.6 L39.8 86.6 L42.5 87.4 L45.2 88 L48 88.4Z" fill="none" stroke="#141414" stroke-width="2.6" stroke-linejoin="round"/>
  </g>
 </g></g></svg></div>
-  <h1>Llibreta <b>del Profe</b></h1>
+  <h1 id="lgNom">Llibreta <b>del Profe</b></h1>
   <p style="color:#bbb;max-width:460px">Entra amb el compte del centre. Les dades es desen al teu Google Drive.</p>
   <button class="btn" id="lgEntra">Entra amb Google</button>
   <div id="lgMsg" style="color:#ffb35c;max-width:500px"></div>
@@ -917,7 +921,7 @@ table.hort tr.hpati td{height:auto}table.hort td.hpt{background:#f4f4f4;color:#8
 <div id="toast"></div>
 
 <script>
-const VERSIO='2.8.1 · ammonite · novembre 2026',COMPILACIO='27/11 10:24';
+const VERSIO='2.8.2 · ammonite · novembre 2026',COMPILACIO='27/11 11:36';
 /* ======================= Utilitats ======================= */
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -1551,7 +1555,7 @@ async function comprovaCursNou(){const k=cursKey();if(!state)return;if(!state.cu
   $('#cuOk').onclick=()=>{const ids=$$('#cuLl input:checked').map(i=>i.value);ids.forEach(id=>{const x=state.subjects.find(z=>z.id===id);x.archived={cat:'Curs '+prev,data:avui()}});
     d.close();if(ids.length){const a=actives();if(a.length&&!a.some(x=>x.id===state.cur))state.cur=a[0].id;save('arxivar el curs anterior');render();toast(ids.length+' llibreta(es) arxivada(es) a «Curs '+prev+'».');divEnArxivar(ids.map(id=>state.subjects.find(z=>z.id===id)).filter(Boolean))}};
   $('#cuCanc').onclick=()=>d.close()}
-function render(){if(!state)return;aplicaColors();{const s0=cur();if(s0?.cls&&!s0.cls.link&&mode==='drive'&&G.token&&!enllacDemanat.has(s0.id)){enllacDemanat.add(s0.id);enllacCls(s0)}}$('#cursLbl').textContent='Curs '+cursCurt(cursKey());if(!cursComprovat){cursComprovat=true;setTimeout(comprovaCursNou,700)}
+function render(){if(!state)return;aplicaColors();aplicaNom();{const s0=cur();if(s0?.cls&&!s0.cls.link&&mode==='drive'&&G.token&&!enllacDemanat.has(s0.id)){enllacDemanat.add(s0.id);enllacCls(s0)}}$('#cursLbl').textContent='Curs '+cursCurt(cursKey());if(!cursComprovat){cursComprovat=true;setTimeout(comprovaCursNou,700)}
   const esLl=cur()?.tipus==='llista';$('#tabs [data-t=resum]').hidden=esLl;if(esLl&&tab==='resum')tab=tabPrincipal='llibreta';
   renderSel();document.body.classList.toggle('mob',esMobil());if(!esMobil())setTimeout(mirarShare,0);document.body.classList.toggle('bpleg',barraPlegada()&&!esMobil());if(esMobil()){tancaPanell();VA.on=false;rMobil();estat();return}$$('#tabs button,.tabic').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));if(tab!=='resum'){tancaPanell();VA.on=false}
   if(tab==='alumnes'){tab='config';alObert=true}
@@ -2599,7 +2603,12 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
     <div class="fl"><label><b class="vFJ">FJ</b> (falta justificada):</label><select id="kFJ"><option value="skip" ${s.fjMode!=='zero'?'selected':''}>no compta (recomanat)</option><option value="zero" ${s.fjMode==='zero'?'selected':''}>compta com un 0</option></select></div>`)}
   ${cfgDet('taula','▦ Taula',s.filaTotals?'amb fila de totals':'sense fila de totals',`<label><input type="checkbox" id="kTot" ${s.filaTotals?'checked':''}> Mostra una fila de totals al final de la taula (mitjanes, valor més repetit, fets, targetes…)</label>`)}
   ${cfgDet('sortides','🚻 Sortides de l\'aula','avís als '+state.sortidesMin+' min',`<label>Avisa quan un alumne porta fora <input type="number" id="kSoMin" min="1" max="60" value="${state.sortidesMin}" style="width:64px"> minuts</label>`)}
-  </fieldset>${cfgDet('calcam','🧮 Calculadora',ammoCalc()?'amb animacions':'sense animacions',`<label><input type="checkbox" id="kCalcAm" ${ammoCalc()?'checked':''}> Calculadora amb animacions</label>`)}${cfgDet('alumnat','📇 Llistats del curs '+cursCurt(cursKey()),`${alumnatDe().length} alumnes · ${grupsDe().length} grups`,'<div id="alumW"></div>')}${colorsHtml()}${cfgDet('banc','💬 Banc de comentaris',state.banc.items.length+' comentari'+(state.banc.items.length===1?'':'s')+' · '+state.banc.cats.length+' categori'+(state.banc.cats.length===1?'a':'es'),'<div id="bancW"></div>','detBanc')}${cfgDet('bancdiv','🧩 Banc d\'atenció a la diversitat',state.bancDiv.items.length+' frase'+(state.bancDiv.items.length===1?'':'s')+' · '+state.bancDiv.cats.length+' categori'+(state.bancDiv.cats.length===1?'a':'es'),'<p class="aj" style="margin:0 0 8px">Frases per a la proposta educativa (panell de 🧩 a Avaluació). Escriu-hi mesures, no diagnòstics.</p><div id="bancDivW"></div>')}<div id="dades"></div>`;
+  </fieldset>${cfgDet('calcam','🎨 Aparença',[ammoCalc()?'calculadora amb animacions':'',state.nomApp?.on?'nom propi':''].filter(Boolean).join(' · '),`<label><input type="checkbox" id="kCalcAm" ${ammoCalc()?'checked':''}> Calculadora amb animacions</label>
+    <div style="margin-top:8px"><label><input type="checkbox" id="kNomOn" ${state.nomApp?.on?'checked':''}> Nom propi</label></div>
+    <div id="kNomW" ${state.nomApp?.on?'':'hidden'} style="margin:6px 0 0 24px">
+      <div class="fl"><label class="lb" style="min-width:90px">Part blanca</label><input type="text" id="kNomB" maxlength="12" value="${esc(nomApp().b)}" style="width:170px"><label class="lb" style="min-width:90px;margin-left:10px">Part taronja</label><input type="text" id="kNomT" maxlength="12" value="${esc(nomApp().t)}" style="width:170px"><span class="aj">12 lletres cada una</span></div>
+      <label><input type="checkbox" id="kNomJ" ${state.nomApp?.junt?'checked':''}> Sense espai entre les dues parts</label>
+      <div class="nomprev"><span class="logo" id="kNomPrev"></span><span class="aj" style="color:#999">Llibreta · Avaluació · …</span></div></div>`)}${cfgDet('alumnat','📇 Llistats del curs '+cursCurt(cursKey()),`${alumnatDe().length} alumnes · ${grupsDe().length} grups`,'<div id="alumW"></div>')}${colorsHtml()}${cfgDet('banc','💬 Banc de comentaris',state.banc.items.length+' comentari'+(state.banc.items.length===1?'':'s')+' · '+state.banc.cats.length+' categori'+(state.banc.cats.length===1?'a':'es'),'<div id="bancW"></div>','detBanc')}${cfgDet('bancdiv','🧩 Banc d\'atenció a la diversitat',state.bancDiv.items.length+' frase'+(state.bancDiv.items.length===1?'':'s')+' · '+state.bancDiv.cats.length+' categori'+(state.bancDiv.cats.length===1?'a':'es'),'<p class="aj" style="margin:0 0 8px">Frases per a la proposta educativa (panell de 🧩 a Avaluació). Escriu-hi mesures, no diagnòstics.</p><div id="bancDivW"></div>')}<div id="dades"></div>`;
   rDades(true);rAlumnes();rAlumnat();rBanc();rBanc('#bancDivW',state.bancDiv,{niv:false,ob:bancDivObertes,ph:'Més temps als exàmens.\nEnunciats curts i per passos.'});lligaCfg();lligaColors();$('#cfgPl').onclick=()=>plegaCfg(false);$('#cfgDp').onclick=()=>plegaCfg(true);
   if(ro)return;
   const on=(id,ev,f)=>{const e=$(id);if(e)e[ev]=f};
@@ -2634,7 +2643,12 @@ function rConfig(){const sub=cur();if(!sub)return rDades();if(alObert){const o=c
   on('#kOrdMean','onchange',e=>{s.allowOrdMean=e.target.checked;save();rConfig()});
   on('#kFJ','onchange',e=>{s.fjMode=e.target.value;save('falta justificada')});
   on('#kTot','onchange',e=>{s.filaTotals=e.target.checked;save('fila de totals')});
-  on('#kCalcAm','onchange',e=>{state.ammoCalc=e.target.checked;save('Ammo a la calculadora');aplicaAmmoCalc();const r=document.querySelector('details[data-cfg=calcam] .cres');if(r)r.textContent=e.target.checked?'amb animacions':'sense animacions'});
+  const nomRes=()=>{const r=document.querySelector('details[data-cfg=calcam] .cres');if(r)r.textContent=[ammoCalc()?'calculadora amb animacions':'',state.nomApp?.on?'nom propi':''].filter(Boolean).join(' · ')};
+  const nomDesa=lbl=>{state.nomApp={...(state.nomApp||{}),on:$('#kNomOn').checked,b:$('#kNomB').value.slice(0,12),t:$('#kNomT').value.slice(0,12),junt:$('#kNomJ').checked};save(lbl,!lbl);aplicaNom();pintaNomPrev();nomRes()};
+  on('#kNomOn','onchange',e=>{$('#kNomW').hidden=!e.target.checked;nomDesa(e.target.checked?'nom propi':'nom original')});
+  on('#kNomB','oninput',()=>nomDesa());on('#kNomT','oninput',()=>nomDesa());on('#kNomB','onchange',()=>save('nom de l\'app'));on('#kNomT','onchange',()=>save('nom de l\'app'));
+  on('#kNomJ','onchange',()=>nomDesa('nom de l\'app'));pintaNomPrev();
+  on('#kCalcAm','onchange',e=>{state.ammoCalc=e.target.checked;save('Ammo a la calculadora');aplicaAmmoCalc();nomRes()});
   on('#kSoMin','onchange',e=>{const v=Math.round(+e.target.value);if(v>=1&&v<=60){state.sortidesMin=v;save('temps d\'avís de sortides');const r=document.querySelector('details[data-cfg=sortides] .cres');if(r)r.textContent='avís als '+v+' min';pintaSortides()}else e.target.value=state.sortidesMin})}
 /* ----- Banc de comentaris (comú a totes les llibretes) ----- */
 let bancObert=false;const bancCatObertes=new Set(),bancDivObertes=new Set();
@@ -2732,6 +2746,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
   sec('Atenció a la diversitat',`<ul><li>A <b>Avaluació</b>, la columna <b>🧩</b> (P personalització · MA mesures addicionals · PI): clica la cel·la d'un alumne i, al panell de la dreta, marca <b>Personalització</b>, <b>Mesures addicionals</b> i <b>PI</b> lliurement: cap, alguna o totes.</li>
     <li>Al mateix panell: la <b>proposta educativa</b> (text lliure o frases del banc de sota, amb 📋 per copiar-la al PI) i els <b>🔗 enllaços</b> (documents útils, el PI al Drive…), plegats al final del panell, sota el banc: clica «🔗 Enllaços» per obrir-los; el nom obre l'enllaç i el botó del costat el copia. Només es veuen al panell.</li>
     <li><b>🗓️ Horari</b> (la icona del calendari al costat del nom de la llibreta, Alt+H o 🧰 Eines): graella de dilluns a divendres amb les franges de 8:30 a 18:00 i el pati. Clica un espai per posar-hi matèria, curs, aula i color, i si vols lligar-lo a una llibreta; <b>Copia a altres espais</b> el posa on cliquis després. Les hores es canvien escrivint-les (8:30), i pots afegir o treure franges o marcar-ne una com a pati. Hi ha colors clars i set de vius, triats perquè es distingeixin bé també amb daltonisme (sobre els foscos el text surt en blanc). <b>PDF</b> desa l'horari al Drive (amb els colors). Quan el tinguis fet, <b>Bloqueja</b>'l: així no es canvia sense voler, i en clicar una classe lligada s'obre la seva llibreta. La franja d'ara surt marcada en taronja. Al mòbil, botó <b>Horari</b> a baix, amb el dia d'avui i fletxes per als altres dies.</li>
+    <li><b>⚙ › Aparença</b>: «Calculadora amb animacions» i <b>Nom propi</b> (part blanca i part taronja, 12 lletres cada una, i «Sense espai entre les dues parts»). El nom surt a la barra negra (sempre a l'esquerra i en el mateix espai, perquè no es mogui res; si és llarg, la lletra es fa més petita), a l'entrada i al títol de la pestanya. El nom de l'app instal·lada no canvia. La llibreta mira un cop al dia si hi ha una versió nova i, si n'hi ha, ho avisa a baix.</li>
     <li>En <b>arxivar</b> una llibreta amb dades de diversitat, pregunta si les vols conservar o esborrar (amb PDF o sense). A l'<b>inici de curs</b> avisa si alguna llibreta arxivada encara en té.</li>
     <li><b>🧰 Eines › 🧩 Atenció a la diversitat</b>: el llistat de tots els alumnes amb dades de diversitat (mesures, proposta i enllaços), de totes les llibretes o d'una, amb les arxivades si vols, <b>per llibreta</b> o <b>per alumne</b> (cada alumne amb el que té a cada llibreta), i un cercador. <b>PDF al Drive</b> desa el que estàs veient. <b>Esborra la diversitat d'aquesta llibreta</b> (vista per llibreta) esborra mesures, proposta i enllaços de diversitat d'aquella llibreta (no toca notes ni comentaris): pregunta si vols el PDF abans i demana escriure el nom de la llibreta; no es pot desfer. La fitxa no surt si tens marcat «Amaga 🧩».</li>
     <li>La columna <b>Proposta educativa</b> surt plegada; desplegada, mostra una sola línia per alumne. Clica-la per llegir-ho tot.</li>
@@ -2744,7 +2759,7 @@ function ajudaHtml(){const url=location.protocol==='file:'?'https://profejuanalc
     <li>La <b>classe</b> ve dels Llistats: si un alumne canvia de grup (als Llistats o des de qualsevol llibreta), es canvia a totes les llibretes actives. Les arxivades conserven la que tenien. Els alumnes que no són als Llistats poden tenir una classe escrita a mà.</li>
     <li><b>🔁 Recupera les classes dels llistats</b> (⚙ › Alumnes): et mostra què canviarà abans de fer res, fa una còpia de seguretat i es pot desfer. També troba alumnes duplicats i els fusiona.</li>
     <li>Les <b>llistes</b> (sense notes) serveixen per a sortides, autoritzacions… Es creen amb la plantilla «llista».</li></ul>`)+
-  sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C; l'Ammo de la barra granat, com a la icona (es pot treure a ⚙ › Calculadora › «Calculadora amb animacions»), mira les tecles que prems, parpelleja amb =, arronsa els tentacles si hi ha un error i fa una espurna en copiar), Llistats i Sortides, i els enllaços de recursos.</li>
+  sec('Eines d\'aula, Bloc i pòsits',`<ul><li><b>🧰 Eines</b>: temporitzador (sons 🎮 joc, 🔔 bip, 🎹 Bach, 🎧 ritme urbà i 🐦 cucut, amb ▶ per escoltar-los), alumne a l'atzar, parelles, calculadora (amb % com al mòbil i el botó ⧉ per copiar el resultat, o Ctrl+C; l'Ammo de la barra granat, com a la icona (es pot treure a ⚙ › Aparença › «Calculadora amb animacions»), mira les tecles que prems, parpelleja amb =, arronsa els tentacles si hi ha un error i fa una espurna en copiar), Llistats i Sortides, i els enllaços de recursos.</li>
     <li><b>Sortides de l'aula</b>: clic dret o doble clic al nom de l'alumne › 🚻 WC o 🚪 Sortida. A la barra surt un botó amb els minuts (a partir de 3 alumnes, un de sol amb la llista); clica'l quan torni. Si passa del temps (⚙ › Sortides de l'aula, 7 minuts per defecte), sona el cucut fins que tries «Esperem» o «Ja ha tornat». La consulta i el PDF són a 🧰 Eines › Sortides; allà pots esborrar una sortida amb ✕ o totes les de les dates triades (es pot desfer amb ↶). El registre del curs anterior s'esborra en començar el curs nou.</li>
     <li><b>Bloc</b> (la icona de la llibreta amb espiral): pestanyes de notes del dia a dia i, al costat, els <b>pòsits</b> amb data d'avís. El número vermell de la icona són els pòsits en alerta. <b>Esc</b> torna a la llibreta. <b>Caselles:</b> el botó ☐ (o escriure <b>[ ]</b> al principi d'una línia) hi posa una casella; un clic a la casella la marca ☑ o la desmarca, també al mòbil. «Treu els fets» esborra les línies marcades (es pot desfer amb ↶). Les eines (☐, Treu els fets, Elimina la pestanya) són en una fila a sobre del text; si hi ha moltes pestanyes, s'estrenyen.</li></ul>`)+
   sec('Arxiu, curs nou i PDF',`<ul><li>En arxivar una llibreta (⚙ › Llibreta) es proposa la carpeta del curs. A la pestanya <b>Arxiu</b> les carpetes van de la més nova a la més antiga. Cada llibreta i cada carpeta es poden desar en PDF o <b>esborrar</b> (cal escriure el nom per confirmar-ho; es pot desfer amb ↶ mentre no tanquis).</li>
@@ -3746,6 +3761,20 @@ $('#calcKp').innerHTML=['C','(',')','←','7','8','9','÷','4','5','6','×','1',
 function calcObre(forca){const vis=calc.style.display==='block';calc.style.display=forca||!vis?'block':'none';if(calc.style.display==='block'){cin.focus();if(!vis){aplicaAmmoCalc();caFes('ca-surt',650);caDorm()}}}
 /* 2.5.4 · la cara de l'Ammo (i un tros de closca) a la barra de la calculadora; reacciona al que fas */
 const ammoCalc=()=>state?.ammoCalc!==false;
+/* 2.8.2 · nom propi de l'app: part blanca + part taronja (12 lletres cada una), a la barra negra, a l'entrada i al títol de la pestanya */
+const NOMDEF={b:'Llibreta',t:'del Profe'};
+function nomApp(){const n=state?.nomApp;if(n?.on)return{b:(n.b||'').slice(0,12),t:(n.t||'').slice(0,12),junt:!!n.junt};
+  if(!state){try{const l=JSON.parse(localStorage.getItem('llibreta-nom')||'null');if(l)return l}catch{}}return{...NOMDEF,junt:false}}
+const nomHtml=n=>`${esc(n.b)}${n.b&&n.t&&!n.junt?' ':''}<b>${esc(n.t)}</b>`;
+let LOGOW=0;
+function encaixaLogo(el){if(!el)return;if(!LOGOW){const m=document.createElement('span');m.className='logo';m.style.cssText='position:absolute;visibility:hidden;left:-999px';m.innerHTML=nomHtml({...NOMDEF,junt:false});document.body.appendChild(m);LOGOW=Math.ceil(m.getBoundingClientRect().width)+2;m.remove()}
+  el.style.width=LOGOW+'px';el.style.fontSize='';let f=parseFloat(getComputedStyle(el).fontSize);while(el.scrollWidth>LOGOW+1&&f>10){f-=.5;el.style.fontSize=f+'px'}}
+function aplicaNom(){const n=nomApp(),h=nomHtml(n),txt=(n.b+(n.b&&n.t&&!n.junt?' ':'')+n.t).trim()||'Llibreta del Profe';
+  const lg=$('#logo');if(lg&&lg.dataset.nom!==h){lg.innerHTML=h;lg.dataset.nom=h;encaixaLogo(lg)}
+  const lh=$('#login h1');if(lh)lh.innerHTML=h;if(document.title!==txt)document.title=txt;
+  if(state){try{if(state.nomApp?.on)localStorage.setItem('llibreta-nom',JSON.stringify(n));else localStorage.removeItem('llibreta-nom')}catch{}}}
+function pintaNomPrev(){const p=$('#kNomPrev');if(!p)return;p.innerHTML=nomHtml(nomApp());encaixaLogo(p)}
+try{aplicaNom()}catch{}
 function aplicaAmmoCalc(){calc.classList.toggle('senseAm',!ammoCalc());if(ammoCalc())caPrepara()}
 function caPrepara(){if($('#calcAm'))return;const s=$('#lgAmmo svg');if(!s)return;const t=document.createElement('div');t.innerHTML=s.outerHTML;const v=t.firstElementChild;
   v.id='calcAm';v.setAttribute('viewBox','32 54 44 41');v.removeAttribute('width');v.removeAttribute('height');
@@ -3808,15 +3837,16 @@ document.addEventListener('input',e=>{const el=e.target;if(el.matches?.('input.l
 /* 2.8.1 · avís «Hi ha una versió nova»: mira de tant en tant si la web té una compilació diferent */
 const VN={vist:0,av:false};
 async function miraVersio(forca){if(VN.av||(!VN.prova&&(!/^https?:$/.test(location.protocol)||location.hostname==='localhost'||location.hostname==='127.0.0.1')))return;
-  if(!forca&&Date.now()-VN.vist<10*60e3)return;VN.vist=Date.now();
+  const dia=avui();let ult='';try{ult=localStorage.getItem('llibreta-versio-dia')||''}catch{}if(!forca&&ult===dia)return;try{localStorage.setItem('llibreta-versio-dia',dia)}catch{}
   try{const r=await fetch(location.pathname+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)return;const t=await r.text();
     const c=/COMPILACIO='([^']+)'/.exec(t)?.[1],v=/VERSIO='([^'·]+)/.exec(t)?.[1]?.trim();if(!c||c===COMPILACIO)return;
     VN.av=true;const d=document.createElement('div');d.id='versioNova';d.innerHTML=`<span>Hi ha una versió nova de la llibreta${v?' ('+esc(v)+')':''}.</span><button class="btn" id="vnAct">Actualitza</button><button class="x" id="vnX" title="Més tard">✕</button>`;document.body.appendChild(d);
     $('#vnX').onclick=()=>d.remove();
     $('#vnAct').onclick=async()=>{$('#vnAct').disabled=true;$('#vnAct').textContent='Desant…';try{if(mode==='drive'&&G.brut){guardaCache();await driveDesa()}else if(pend)escriuFitxer()}catch{}location.reload()}}catch{}}
-setInterval(()=>miraVersio(),30*60e3);
+/* un cop al dia: la primera vegada que es fa servir cada dia (en obrir o en tornar a la pestanya) */
+setInterval(()=>{if(document.visibilityState==='visible')miraVersio()},60*60e3);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')miraVersio()});
-setTimeout(()=>miraVersio(true),60e3);
+setTimeout(()=>miraVersio(),60e3);
 addEventListener('beforeunload',e=>{if(mode==='drive'){if(G.brut){guardaCache();driveDesa();e.preventDefault();e.returnValue=''}return}if(pend){escriuFitxer();e.preventDefault();e.returnValue=''}});
 
 /* ======================= Inici ======================= */
